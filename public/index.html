@@ -21,7 +21,11 @@
   * { margin:0; padding:0; box-sizing:border-box; }
   body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text); transition:background 0.3s,color 0.3s; }
   a { text-decoration:none; color:inherit; }
+
+  /* ── TOPBAR ── */
   .topbar { background:var(--primary); color:white; text-align:center; font-size:13px; padding:6px; letter-spacing:0.5px; }
+
+  /* ── NAVBAR ── */
   .navbar { background:var(--bg); border-bottom:1px solid var(--border); padding:0 24px; display:flex; align-items:center; gap:20px; height:70px; position:sticky; top:0; z-index:200; }
   .logo { display:flex; align-items:center; gap:10px; cursor:pointer; }
   .logo-icon { width:44px; height:44px; background:var(--primary); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:22px; }
@@ -46,22 +50,35 @@
   .nav-btn:hover { background:var(--bg-secondary); }
   .cart-badge { position:absolute; top:4px; right:4px; background:var(--primary); color:white; border-radius:50%; width:18px; height:18px; font-size:10px; display:flex; align-items:center; justify-content:center; font-weight:700; }
   .dark-toggle { background:var(--bg-secondary); border:1.5px solid var(--border); border-radius:20px; padding:6px 14px; cursor:pointer; font-size:13px; font-weight:500; color:var(--text); display:flex; align-items:center; gap:6px; }
+
+  /* ── USER AVATAR BTN ── */
+  .user-avatar-btn { width:36px; height:36px; border-radius:50%; background:var(--primary); color:white; font-size:15px; font-weight:700; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .login-btn { background:var(--primary); color:white; border:none; padding:8px 18px; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; font-family:'DM Sans',sans-serif; transition:background 0.2s; }
+  .login-btn:hover { background:var(--primary-dark); }
+
+  /* ── CAT NAV ── */
   .cat-nav { background:var(--bg); border-bottom:1px solid var(--border); display:flex; align-items:center; overflow-x:auto; padding:0 24px; scrollbar-width:none; }
   .cat-nav::-webkit-scrollbar { display:none; }
   .all-cat { background:var(--text); color:var(--bg); padding:0 20px; height:48px; display:flex; align-items:center; gap:8px; font-size:14px; font-weight:600; cursor:pointer; white-space:nowrap; flex-shrink:0; margin-right:4px; }
   .cat-link { padding:0 16px; height:48px; display:flex; align-items:center; font-size:14px; font-weight:500; cursor:pointer; white-space:nowrap; color:var(--text-muted); border-bottom:2px solid transparent; transition:all 0.2s; flex-shrink:0; }
   .cat-link:hover,.cat-link.active { color:var(--primary); border-bottom-color:var(--primary); }
+
+  /* ── TICKER ── */
   .live-ticker { background:linear-gradient(90deg,#1a0a02,#3d1a08); color:white; padding:8px 24px; display:flex; align-items:center; gap:12px; overflow:hidden; }
   .live-dot { width:8px; height:8px; background:#00ff88; border-radius:50%; animation:pulse 1.5s infinite; flex-shrink:0; }
   @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(1.3)} }
   .ticker-text { font-size:13px; white-space:nowrap; animation:ticker 12s linear infinite; }
   @keyframes ticker { 0%{transform:translateX(100%)} 100%{transform:translateX(-100%)} }
+
+  /* ── LAYOUT ── */
   .main-layout { display:flex; max-width:1400px; margin:0 auto; }
   .left-sidebar { width:200px; flex-shrink:0; padding:16px 0; background:var(--bg); border-right:1px solid var(--border); min-height:calc(100vh - 120px); }
   .sidebar-item { display:flex; align-items:center; gap:10px; padding:12px 20px; cursor:pointer; font-size:14px; font-weight:500; color:var(--text-muted); transition:all 0.2s; }
   .sidebar-item:hover { background:var(--bg-secondary); color:var(--primary); }
   .sidebar-item .si-icon { width:36px; height:36px; border-radius:50%; background:var(--bg-secondary); display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; }
   .center-content { flex:1; padding:20px; overflow:hidden; }
+
+  /* ── HERO ── */
   .hero { background:linear-gradient(135deg,#1A0A02 0%,#3D1A08 40%,#C84B11 100%); border-radius:16px; padding:36px 40px; display:flex; align-items:center; justify-content:space-between; margin-bottom:24px; overflow:hidden; position:relative; min-height:220px; }
   .hero::before { content:''; position:absolute; top:-40px; right:-40px; width:300px; height:300px; background:radial-gradient(circle,rgba(245,166,35,0.15) 0%,transparent 70%); border-radius:50%; }
   .hero-text h2 { font-family:'Playfair Display',serif; font-size:38px; color:white; line-height:1.1; margin-bottom:6px; }
@@ -105,6 +122,8 @@
   .food-price { font-size:15px; font-weight:700; color:var(--primary); }
   .add-btn { background:var(--bg); border:1.5px solid var(--primary); color:var(--primary); padding:4px 12px; border-radius:6px; font-size:12px; font-weight:700; cursor:pointer; font-family:'DM Sans',sans-serif; transition:all 0.2s; }
   .add-btn:hover { background:var(--primary); color:white; }
+
+  /* ── LEADERBOARD ── */
   .lb-hero { background:linear-gradient(135deg,#1a1a2e,#16213e,#0f3460); border-radius:16px; padding:32px; text-align:center; margin-bottom:24px; }
   .lb-hero h2 { font-family:'Playfair Display',serif; font-size:32px; color:white; margin-bottom:8px; }
   .lb-hero p { color:rgba(255,255,255,0.7); font-size:14px; }
@@ -131,11 +150,15 @@
   .lb-stats { text-align:right; }
   .lb-stats .orders { font-size:13px; font-weight:700; color:var(--primary); }
   .lb-stats .spent { font-size:12px; color:var(--text-muted); }
+
+  /* ── FEATURES STRIP ── */
   .features { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; padding:20px 0; border-top:1px solid var(--border); }
   .feature-item { display:flex; align-items:center; gap:10px; }
   .feature-icon { font-size:28px; }
   .feature-text strong { font-size:13px; font-weight:700; display:block; }
   .feature-text span { font-size:12px; color:var(--text-muted); }
+
+  /* ── RIGHT SIDEBAR / CART ── */
   .right-sidebar { width:var(--sidebar-width); flex-shrink:0; background:var(--bg); border-left:1px solid var(--border); padding:16px; display:flex; flex-direction:column; gap:16px; }
   .ai-section { background:var(--bg-tertiary); border:1.5px solid var(--border); border-radius:12px; padding:14px; }
   .ai-header { display:flex; align-items:center; gap:8px; font-size:13px; font-weight:700; color:var(--text); margin-bottom:12px; letter-spacing:0.3px; text-transform:uppercase; }
@@ -176,8 +199,8 @@
   .checkout-btn:hover { background:var(--primary-dark); }
   .empty-cart { text-align:center; padding:24px 0; color:var(--text-muted); font-size:13px; }
   .empty-cart div { font-size:36px; margin-bottom:8px; }
-  .skeleton { background:linear-gradient(90deg,var(--bg-secondary) 25%,var(--border) 50%,var(--bg-secondary) 75%); background-size:200% 100%; animation:shimmer 1.4s infinite; border-radius:8px; }
-  @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+
+  /* ── LOGIN / AUTH MODAL ── */
   .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:999; align-items:center; justify-content:center; }
   .modal-overlay.open { display:flex; }
   .modal-box { background:var(--bg); border-radius:16px; padding:28px; width:440px; max-width:95vw; box-shadow:0 8px 40px rgba(0,0,0,0.3); }
@@ -191,19 +214,119 @@
   .btn-confirm { flex:2; padding:12px; border-radius:8px; border:none; background:var(--primary); color:white; font-size:14px; font-weight:700; cursor:pointer; font-family:'DM Sans',sans-serif; transition:background 0.2s; }
   .btn-confirm:hover { background:var(--primary-dark); }
   .btn-confirm:disabled { opacity:0.6; cursor:not-allowed; }
+  .auth-tabs { display:flex; gap:0; margin-bottom:20px; border:1.5px solid var(--border); border-radius:8px; overflow:hidden; }
+  .auth-tab { flex:1; padding:10px; text-align:center; font-size:14px; font-weight:600; cursor:pointer; background:var(--bg-secondary); color:var(--text-muted); transition:all 0.2s; border:none; font-family:'DM Sans',sans-serif; }
+  .auth-tab.active { background:var(--primary); color:white; }
+  .auth-divider { text-align:center; font-size:12px; color:var(--text-muted); margin:10px 0; }
+  .social-login { width:100%; padding:11px; border:1.5px solid var(--border); border-radius:8px; background:var(--bg); color:var(--text); font-size:14px; font-weight:600; cursor:pointer; font-family:'DM Sans',sans-serif; display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:8px; transition:background 0.2s; }
+  .social-login:hover { background:var(--bg-secondary); }
+
+  /* ── USER PANEL / PROFILE PAGE ── */
+  .user-panel { display:none; max-width:900px; margin:0 auto; padding:24px; }
+  .user-panel.show { display:block; }
+  .up-back { background:var(--bg-secondary); border:1.5px solid var(--border); padding:8px 16px; border-radius:8px; cursor:pointer; font-size:14px; font-weight:600; color:var(--text); margin-bottom:20px; }
+  .up-header { background:linear-gradient(135deg,#1A0A02,#C84B11); border-radius:16px; padding:28px; display:flex; align-items:center; gap:20px; margin-bottom:24px; }
+  .up-avatar { width:72px; height:72px; border-radius:50%; background:var(--accent); display:flex; align-items:center; justify-content:center; font-size:32px; font-weight:700; color:white; flex-shrink:0; border:3px solid rgba(255,255,255,0.3); }
+  .up-info h2 { font-size:22px; font-weight:700; color:white; margin-bottom:4px; }
+  .up-info p { font-size:13px; color:rgba(255,255,255,0.7); }
+  .up-coins { margin-left:auto; text-align:right; }
+  .up-coins .coin-val { font-size:28px; font-weight:800; color:var(--accent); }
+  .up-coins .coin-label { font-size:12px; color:rgba(255,255,255,0.7); }
+  .up-tabs { display:flex; gap:8px; margin-bottom:20px; flex-wrap:wrap; }
+  .up-tab { padding:9px 18px; border-radius:8px; border:1.5px solid var(--border); background:var(--bg); color:var(--text-muted); font-size:14px; font-weight:500; cursor:pointer; transition:all 0.2s; }
+  .up-tab.active { background:var(--primary); color:white; border-color:var(--primary); }
+  .up-section { display:none; }
+  .up-section.active { display:block; }
+  .up-card { background:var(--bg); border:1.5px solid var(--border); border-radius:12px; padding:18px; margin-bottom:14px; }
+  .up-card h3 { font-size:16px; font-weight:700; margin-bottom:14px; color:var(--text); }
+  .up-field { margin-bottom:14px; }
+  .up-field label { font-size:12px; color:var(--text-muted); font-weight:600; display:block; margin-bottom:5px; text-transform:uppercase; letter-spacing:0.5px; }
+  .up-field input { width:100%; padding:10px 14px; border:1.5px solid var(--border); border-radius:8px; font-size:14px; background:var(--bg-secondary); color:var(--text); font-family:'DM Sans',sans-serif; outline:none; transition:border-color 0.2s; }
+  .up-field input:focus { border-color:var(--primary); }
+  .up-save-btn { background:var(--primary); color:white; border:none; padding:11px 28px; border-radius:8px; font-size:14px; font-weight:700; cursor:pointer; font-family:'DM Sans',sans-serif; transition:background 0.2s; }
+  .up-save-btn:hover { background:var(--primary-dark); }
+
+  /* wallet */
+  .wallet-balance { background:linear-gradient(135deg,#C84B11,#F5A623); border-radius:12px; padding:20px; margin-bottom:16px; text-align:center; }
+  .wallet-balance .bal-coins { font-size:42px; font-weight:800; color:white; }
+  .wallet-balance .bal-label { font-size:14px; color:rgba(255,255,255,0.8); }
+  .wallet-balance .bal-rs { font-size:16px; color:white; font-weight:600; margin-top:4px; }
+  .wallet-hist-item { display:flex; align-items:center; justify-content:space-between; padding:12px 0; border-bottom:1px solid var(--border); }
+  .wallet-hist-item:last-child { border:none; }
+  .whi-left .whi-title { font-size:14px; font-weight:600; }
+  .whi-left .whi-date { font-size:12px; color:var(--text-muted); }
+  .whi-coins.earn { color:#2e7d32; font-weight:700; font-size:14px; }
+  .whi-coins.spend { color:var(--primary); font-weight:700; font-size:14px; }
+
+  /* orders */
+  .order-hist-card { background:var(--bg); border:1.5px solid var(--border); border-radius:12px; padding:16px; margin-bottom:12px; }
+  .ohc-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+  .ohc-id { font-size:13px; font-weight:700; color:var(--primary); }
+  .ohc-date { font-size:12px; color:var(--text-muted); }
+  .ohc-status { font-size:11px; font-weight:700; padding:3px 10px; border-radius:20px; }
+  .ohc-status.delivered { background:#e8f5e9; color:#2e7d32; }
+  .ohc-status.pending { background:#fff3e0; color:#e65100; }
+  .ohc-items { font-size:13px; color:var(--text-muted); margin-bottom:10px; }
+  .ohc-footer { display:flex; align-items:center; justify-content:space-between; }
+  .ohc-total { font-size:15px; font-weight:700; color:var(--text); }
+  .reorder-btn { background:var(--primary); color:white; border:none; padding:7px 16px; border-radius:7px; font-size:12px; font-weight:700; cursor:pointer; font-family:'DM Sans',sans-serif; }
+  .stars { color:var(--accent); font-size:14px; cursor:pointer; }
+
+  /* wishlist */
+  .wishlist-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+  .wishlist-item { background:var(--bg); border:1.5px solid var(--border); border-radius:12px; padding:14px; text-align:center; position:relative; }
+  .wishlist-item .wi-emoji { font-size:40px; margin-bottom:8px; }
+  .wishlist-item .wi-name { font-size:13px; font-weight:700; margin-bottom:4px; }
+  .wishlist-item .wi-price { font-size:14px; font-weight:700; color:var(--primary); margin-bottom:8px; }
+  .wishlist-item .wi-add { background:var(--primary); color:white; border:none; padding:6px 14px; border-radius:6px; font-size:12px; font-weight:700; cursor:pointer; font-family:'DM Sans',sans-serif; width:100%; }
+  .wishlist-remove { position:absolute; top:8px; right:8px; background:none; border:none; cursor:pointer; font-size:14px; color:var(--text-muted); }
+
+  /* referral */
+  .refer-card { background:linear-gradient(135deg,#1A0A02,#3D1A08); border-radius:12px; padding:20px; margin-bottom:16px; text-align:center; }
+  .refer-card h3 { color:white; font-size:18px; margin-bottom:6px; }
+  .refer-card p { color:rgba(255,255,255,0.7); font-size:13px; margin-bottom:16px; }
+  .refer-code-box { background:rgba(255,255,255,0.1); border:1.5px dashed rgba(255,255,255,0.3); border-radius:8px; padding:12px; display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+  .refer-code-box span { font-size:20px; font-weight:800; color:var(--accent); letter-spacing:2px; }
+  .copy-btn { background:var(--accent); color:#1A0A02; border:none; padding:8px 16px; border-radius:6px; font-size:13px; font-weight:700; cursor:pointer; font-family:'DM Sans',sans-serif; }
+  .refer-share-btn { background:var(--primary); color:white; border:none; padding:11px; border-radius:8px; font-size:14px; font-weight:700; cursor:pointer; font-family:'DM Sans',sans-serif; width:100%; }
+  .refer-rewards { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px; }
+  .rr-box { background:var(--bg-secondary); border-radius:10px; padding:14px; text-align:center; border:1.5px solid var(--border); }
+  .rr-box .rr-val { font-size:22px; font-weight:800; color:var(--primary); }
+  .rr-box .rr-label { font-size:12px; color:var(--text-muted); margin-top:2px; }
+  .refer-hist-item { display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid var(--border); }
+  .rhi-avatar { width:36px; height:36px; border-radius:50%; background:var(--primary); color:white; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:700; flex-shrink:0; }
+  .rhi-info .rhi-name { font-size:14px; font-weight:600; }
+  .rhi-info .rhi-date { font-size:12px; color:var(--text-muted); }
+  .rhi-coins { font-size:14px; font-weight:700; color:#2e7d32; margin-left:auto; }
+
+  /* coupons */
+  .coupon-card { background:var(--bg); border:1.5px dashed var(--primary); border-radius:12px; padding:16px; margin-bottom:12px; display:flex; align-items:center; gap:16px; }
+  .coupon-tag { background:var(--primary); color:white; font-size:11px; font-weight:800; padding:4px 10px; border-radius:6px; writing-mode:vertical-rl; text-orientation:mixed; letter-spacing:1px; flex-shrink:0; }
+  .coupon-info h4 { font-size:15px; font-weight:800; color:var(--primary); margin-bottom:3px; }
+  .coupon-info p { font-size:12px; color:var(--text-muted); }
+  .coupon-info .coup-exp { font-size:11px; color:var(--text-light); margin-top:4px; }
+  .coupon-apply { margin-left:auto; background:var(--primary); color:white; border:none; padding:8px 16px; border-radius:7px; font-size:13px; font-weight:700; cursor:pointer; font-family:'DM Sans',sans-serif; flex-shrink:0; }
+
+  /* ── TOAST ── */
   .toast { display:none; position:fixed; bottom:90px; left:50%; transform:translateX(-50%); background:#1a7a4a; color:white; padding:14px 28px; border-radius:12px; font-size:15px; font-weight:600; z-index:9999; box-shadow:0 4px 20px rgba(0,0,0,0.3); animation:slideUp 0.3s ease; white-space:nowrap; }
   .toast.show { display:block; }
   @keyframes slideUp { from{transform:translateX(-50%) translateY(20px);opacity:0} to{transform:translateX(-50%) translateY(0);opacity:1} }
+
+  /* ── FLOATING BTNS ── */
   .floating-btns { position:fixed; bottom:80px; right:20px; display:flex; flex-direction:column; gap:12px; z-index:500; }
   .float-btn { width:52px; height:52px; border-radius:50%; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:22px; box-shadow:0 4px 16px rgba(0,0,0,0.2); transition:transform 0.2s,box-shadow 0.2s; }
   .float-btn:hover { transform:scale(1.1); box-shadow:0 6px 20px rgba(0,0,0,0.3); }
   .float-whatsapp { background:#25D366; }
   .float-directions { background:#4285F4; }
+
+  /* ── BOTTOM NAV ── */
   .bottom-nav { display:none; position:fixed; bottom:0; left:0; right:0; background:var(--bg); border-top:1.5px solid var(--border); z-index:400; padding:8px 0 6px; }
   .bottom-nav-inner { display:flex; justify-content:space-around; }
   .bn-item { display:flex; flex-direction:column; align-items:center; gap:2px; cursor:pointer; padding:4px 16px; font-size:10px; font-weight:600; color:var(--text-muted); transition:color 0.2s; }
   .bn-item.active { color:var(--primary); }
   .bn-item span:first-child { font-size:20px; }
+
+  /* ── RESPONSIVE ── */
   @media (max-width:768px) {
     .bottom-nav { display:block; }
     .left-sidebar { display:none; }
@@ -217,6 +340,10 @@
     .combo-grid { grid-template-columns:1fr; }
     .features { grid-template-columns:repeat(2,1fr); }
     .navbar { padding:0 12px; gap:10px; }
+    .wishlist-grid { grid-template-columns:repeat(2,1fr); }
+    .refer-rewards { grid-template-columns:1fr 1fr; }
+    .up-tabs { gap:6px; }
+    .up-tab { padding:8px 12px; font-size:13px; }
   }
 </style>
 </head>
@@ -247,6 +374,10 @@
     <button class="nav-btn" onclick="window.location.href='/admin'">⚙️ <span>Admin</span></button>
     <button class="nav-btn" style="position:relative">🛒 <span>Cart</span> <span class="cart-badge" id="cartBadge">0</span></button>
     <button class="dark-toggle" onclick="toggleDark()">🌙 Dark Mode</button>
+    <!-- LOGIN / USER BUTTON -->
+    <div id="authBtnArea">
+      <button class="login-btn" onclick="openAuthModal()">Login / Sign Up</button>
+    </div>
   </div>
 </nav>
 
@@ -263,6 +394,7 @@
   <a class="cat-link" onclick="showLeaderboard()">🏆 Leaderboard</a>
 </div>
 
+<!-- ══ HOME PAGE ══ -->
 <div id="homePage">
   <div class="main-layout">
     <div class="left-sidebar">
@@ -275,6 +407,7 @@
       <div class="sidebar-item" onclick="scrollToSection('beverages')"><div class="si-icon">🍹</div>Beverages</div>
       <div class="sidebar-item" onclick="scrollToSection('desserts')"><div class="si-icon">🍨</div>Desserts</div>
       <div class="sidebar-item" onclick="showLeaderboard()"><div class="si-icon">🏆</div>Leaderboard</div>
+      <div class="sidebar-item" onclick="openAuthModal()"><div class="si-icon">👤</div>My Account</div>
     </div>
 
     <div class="center-content">
@@ -291,7 +424,6 @@
       </div>
 
       <div id="todaySpecialBanner" style="display:none"></div>
-
       <div id="menuContainer">
         <div style="text-align:center;padding:40px;color:var(--text-muted)">
           <div style="font-size:36px;margin-bottom:8px">☕</div>
@@ -360,7 +492,7 @@
   </div>
 </div>
 
-<!-- LEADERBOARD PAGE -->
+<!-- ══ LEADERBOARD PAGE ══ -->
 <div id="leaderboardPage" style="display:none; max-width:900px; margin:0 auto; padding:24px;">
   <button onclick="showHomePage()" style="background:var(--bg-secondary);border:1.5px solid var(--border);padding:8px 16px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:600;color:var(--text);margin-bottom:20px;">← Back to Menu</button>
   <div class="lb-hero">
@@ -371,24 +503,244 @@
   <div class="lb-list" id="lbList"></div>
 </div>
 
-<!-- FLOATING BUTTONS -->
+<!-- ══ USER PANEL PAGE ══ -->
+<div id="userPanelPage" class="user-panel">
+  <button class="up-back" onclick="showHomePage()">← Back to Menu</button>
+
+  <div class="up-header">
+    <div class="up-avatar" id="upAvatar">👤</div>
+    <div class="up-info">
+      <h2 id="upName">My Account</h2>
+      <p id="upEmail">user@example.com</p>
+      <p id="upPhone" style="color:rgba(255,255,255,0.6);font-size:12px;margin-top:2px"></p>
+    </div>
+    <div class="up-coins">
+      <div class="coin-val" id="upCoins">0 🪙</div>
+      <div class="coin-label">Reward Coins</div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.6);margin-top:2px" id="upCoinsRs">= ₹0</div>
+    </div>
+  </div>
+
+  <div class="up-tabs">
+    <button class="up-tab active" onclick="switchUpTab('profile',this)">👤 Profile</button>
+    <button class="up-tab" onclick="switchUpTab('orders',this)">📦 Orders</button>
+    <button class="up-tab" onclick="switchUpTab('wallet',this)">🪙 Wallet</button>
+    <button class="up-tab" onclick="switchUpTab('wishlist',this)">❤️ Wishlist</button>
+    <button class="up-tab" onclick="switchUpTab('coupons',this)">🎟️ Coupons</button>
+    <button class="up-tab" onclick="switchUpTab('referral',this)">🤝 Refer & Earn</button>
+    <button class="up-tab" onclick="switchUpTab('freeitem',this)">🎁 Free Item</button>
+  </div>
+
+  <!-- PROFILE TAB -->
+  <div class="up-section active" id="tab-profile">
+    <div class="up-card">
+      <h3>My Profile</h3>
+      <div class="up-field"><label>Full Name</label><input id="pf-name" placeholder="Aapka naam" /></div>
+      <div class="up-field"><label>Phone Number</label><input id="pf-phone" placeholder="+91 XXXXXXXXXX" type="tel" /></div>
+      <div class="up-field"><label>Email</label><input id="pf-email" placeholder="email@example.com" type="email" /></div>
+      <div class="up-field">
+        <label>Delivery Address</label>
+        <div style="display:flex;gap:8px">
+          <input id="pf-address" placeholder="Ghar ka address" style="flex:1" />
+          <button onclick="detectAddress()" style="background:var(--primary);color:white;border:none;padding:10px 14px;border-radius:8px;cursor:pointer;font-size:20px;flex-shrink:0;" title="Auto-detect location">📍</button>
+        </div>
+      </div>
+      <button class="up-save-btn" onclick="saveProfile()">Save Changes</button>
+      <button onclick="logoutUser()" style="margin-left:12px;background:transparent;border:1.5px solid var(--border);color:var(--text-muted);padding:11px 20px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;">Logout</button>
+    </div>
+  </div>
+
+  <!-- ORDERS TAB -->
+  <div class="up-section" id="tab-orders">
+    <div id="orderHistContainer">
+      <div style="text-align:center;padding:30px;color:var(--text-muted)">
+        <div style="font-size:40px;margin-bottom:8px">📦</div>
+        <div>Koi orders nahi hain abhi</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WALLET TAB -->
+  <div class="up-section" id="tab-wallet">
+    <div class="wallet-balance">
+      <div class="bal-coins" id="walletCoins">0 🪙</div>
+      <div class="bal-label">Total Reward Coins</div>
+      <div class="bal-rs" id="walletRs">= ₹0 (1 coin = ₹0.50)</div>
+    </div>
+    <div class="up-card">
+      <h3>Coin History</h3>
+      <div id="walletHistContainer">
+        <div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px">Koi transactions nahi hain abhi</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WISHLIST TAB -->
+  <div class="up-section" id="tab-wishlist">
+    <div class="up-card">
+      <h3>My Wishlist ❤️</h3>
+      <div class="wishlist-grid" id="wishlistContainer">
+        <div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--text-muted)">
+          <div style="font-size:36px">❤️</div>
+          <div>Wishlist khali hai! Items add karo.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- COUPONS TAB -->
+  <div class="up-section" id="tab-coupons">
+    <div class="up-card">
+      <h3>Available Coupons 🎟️</h3>
+      <div id="couponsContainer">
+        <div class="coupon-card">
+          <div class="coupon-tag">SAVE</div>
+          <div class="coupon-info">
+            <h4>WELCOME10</h4>
+            <p>First order pe 10% discount milega</p>
+            <div class="coup-exp">Valid till: 31 Dec 2025</div>
+          </div>
+          <button class="coupon-apply" onclick="applyCoupon('WELCOME10',10,'percent')">Apply</button>
+        </div>
+        <div class="coupon-card">
+          <div class="coupon-tag">FREE</div>
+          <div class="coupon-info">
+            <h4>FREEDEL</h4>
+            <p>Free delivery on any order</p>
+            <div class="coup-exp">Valid till: 31 Dec 2025</div>
+          </div>
+          <button class="coupon-apply" onclick="applyCoupon('FREEDEL',20,'flat')">Apply</button>
+        </div>
+        <div class="coupon-card">
+          <div class="coupon-tag">50 OFF</div>
+          <div class="coupon-info">
+            <h4>CHAI50</h4>
+            <p>₹50 off on orders above ₹299</p>
+            <div class="coup-exp">Valid till: 31 Dec 2025</div>
+          </div>
+          <button class="coupon-apply" onclick="applyCoupon('CHAI50',50,'flat')">Apply</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- REFERRAL TAB -->
+  <div class="up-section" id="tab-referral">
+    <div class="refer-card">
+      <h3>🤝 Refer & Earn</h3>
+      <p>Dost ko refer karo aur dono ko coins milenge!</p>
+      <div class="refer-code-box">
+        <span id="referCodeDisplay">CHAI123</span>
+        <button class="copy-btn" onclick="copyReferCode()">Copy</button>
+      </div>
+      <button class="refer-share-btn" onclick="shareReferral()">Share on WhatsApp 📱</button>
+    </div>
+    <div class="refer-rewards">
+      <div class="rr-box">
+        <div class="rr-val">50 🪙</div>
+        <div class="rr-label">One-time reward jab dost pehli baar order kare</div>
+      </div>
+      <div class="rr-box">
+        <div class="rr-val">5%</div>
+        <div class="rr-label">Lifetime — har order pe coins milte rahenge</div>
+      </div>
+    </div>
+    <div class="up-card">
+      <h3>Referral History</h3>
+      <div id="referHistContainer">
+        <div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px">Abhi tak koi referral nahi</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FREE ITEM TAB -->
+  <div class="up-section" id="tab-freeitem">
+    <div class="up-card">
+      <h3>🎁 Free Item Offer</h3>
+      <div style="background:var(--bg-secondary);border-radius:10px;padding:16px;margin-bottom:16px;text-align:center;">
+        <div style="font-size:36px;margin-bottom:8px">🎁</div>
+        <div style="font-size:16px;font-weight:700;margin-bottom:4px">3+ Orders Karo, Free Item Pao!</div>
+        <div style="font-size:13px;color:var(--text-muted)">Aapke abhi <strong id="freeItemOrderCount">0</strong> orders hain. <strong>3 orders ke baad</strong> ek free item choose kar sakte ho!</div>
+      </div>
+      <div style="margin-top:8px;">
+        <div style="font-size:13px;font-weight:700;margin-bottom:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px">Free Items Available:</div>
+        <div id="freeItemOptions" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
+          <div style="text-align:center;padding:12px;background:var(--bg-secondary);border-radius:10px;border:1.5px solid var(--border);opacity:0.5">
+            <div style="font-size:30px">☕</div>
+            <div style="font-size:12px;font-weight:600;margin-top:4px">Masala Chai</div>
+          </div>
+          <div style="text-align:center;padding:12px;background:var(--bg-secondary);border-radius:10px;border:1.5px solid var(--border);opacity:0.5">
+            <div style="font-size:30px">🍟</div>
+            <div style="font-size:12px;font-weight:600;margin-top:4px">French Fries</div>
+          </div>
+          <div style="text-align:center;padding:12px;background:var(--bg-secondary);border-radius:10px;border:1.5px solid var(--border);opacity:0.5">
+            <div style="font-size:30px">🧁</div>
+            <div style="font-size:12px;font-weight:600;margin-top:4px">Brownie</div>
+          </div>
+        </div>
+        <div id="freeItemClaim" style="display:none;margin-top:14px;text-align:center">
+          <div style="font-size:14px;color:#2e7d32;font-weight:700;margin-bottom:8px">🎉 Congratulations! Free item choose karo:</div>
+          <button onclick="claimFreeItem('Masala Chai')" style="background:var(--primary);color:white;border:none;padding:10px 20px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;margin:4px">☕ Masala Chai</button>
+          <button onclick="claimFreeItem('French Fries')" style="background:var(--primary);color:white;border:none;padding:10px 20px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;margin:4px">🍟 French Fries</button>
+          <button onclick="claimFreeItem('Brownie')" style="background:var(--primary);color:white;border:none;padding:10px 20px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;margin:4px">🧁 Brownie</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ FLOATING BUTTONS ══ -->
 <div class="floating-btns">
   <button class="float-btn float-directions" onclick="openDirections()" title="Get Directions">🗺️</button>
   <button class="float-btn float-whatsapp" onclick="openWhatsApp()" title="Chat on WhatsApp">💬</button>
 </div>
 
-<!-- BOTTOM NAV -->
+<!-- ══ BOTTOM NAV ══ -->
 <div class="bottom-nav">
   <div class="bottom-nav-inner">
     <div class="bn-item active" onclick="showHomePage();setBottomNav(this)"><span>🏠</span><span>Home</span></div>
     <div class="bn-item" onclick="focusSearch();setBottomNav(this)"><span>🔍</span><span>Search</span></div>
     <div class="bn-item" onclick="openCheckout()"><span>📦</span><span>Orders</span></div>
     <div class="bn-item" onclick="showLeaderboard();setBottomNav(this)"><span>🏆</span><span>Top</span></div>
-    <div class="bn-item" onclick="openCheckout()"><span>🛒</span><span>Cart</span></div>
+    <div class="bn-item" onclick="openUserPanel();setBottomNav(this)"><span>👤</span><span>Profile</span></div>
   </div>
 </div>
 
-<!-- CHECKOUT MODAL -->
+<!-- ══ AUTH MODAL ══ -->
+<div class="modal-overlay" id="authModal">
+  <div class="modal-box">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <div class="modal-title" style="margin:0">Welcome to Chai Pila ☕</div>
+      <button onclick="closeAuthModal()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-muted)">✕</button>
+    </div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="loginTab" onclick="switchAuthTab('login')">Login</button>
+      <button class="auth-tab" id="signupTab" onclick="switchAuthTab('signup')">Sign Up</button>
+    </div>
+    <!-- LOGIN FORM -->
+    <div id="loginForm">
+      <input class="modal-input" id="auth-phone" placeholder="Phone number (10 digits)" type="tel" maxlength="10" />
+      <input class="modal-input" id="auth-pass" placeholder="Password" type="password" />
+      <div style="display:flex;gap:10px">
+        <button class="btn-confirm" style="flex:1" onclick="doLogin()">Login →</button>
+      </div>
+      <div class="auth-divider">— ya —</div>
+      <button class="social-login" onclick="guestLogin()">👤 Guest ke taur pe continue karo</button>
+    </div>
+    <!-- SIGNUP FORM -->
+    <div id="signupForm" style="display:none">
+      <input class="modal-input" id="su-name" placeholder="Aapka naam" />
+      <input class="modal-input" id="su-phone" placeholder="Phone number (10 digits)" type="tel" maxlength="10" />
+      <input class="modal-input" id="su-pass" placeholder="Password (min 6 characters)" type="password" />
+      <input class="modal-input" id="su-ref" placeholder="Referral code (optional)" />
+      <div style="display:flex;gap:10px">
+        <button class="btn-confirm" style="flex:1" onclick="doSignup()">Create Account →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ CHECKOUT MODAL ══ -->
 <div class="modal-overlay" id="checkoutModal">
   <div class="modal-box">
     <div class="modal-title">🛒 Order Confirm Karo</div>
@@ -411,9 +763,379 @@
   const WHATSAPP_NUMBER = '919325865871';
   const CAFE_LAT = '19.6500';
   const CAFE_LNG = '73.1667';
-  const CAFE_NAME = 'Chai Pila Cafe Vada';
+  const COIN_VALUE = 0.5; // 1 coin = ₹0.50
 
+  // ── USER STATE ──
+  let currentUser = JSON.parse(localStorage.getItem('cpUser') || 'null');
   let currentOrderType = 'delivery';
+
+  // ── AUTH FUNCTIONS ──
+  function openAuthModal() {
+    if (currentUser) { openUserPanel(); return; }
+    document.getElementById('authModal').classList.add('open');
+  }
+  function closeAuthModal() { document.getElementById('authModal').classList.remove('open'); }
+  function switchAuthTab(tab) {
+    document.getElementById('loginForm').style.display = tab === 'login' ? 'block' : 'none';
+    document.getElementById('signupForm').style.display = tab === 'signup' ? 'block' : 'none';
+    document.getElementById('loginTab').classList.toggle('active', tab === 'login');
+    document.getElementById('signupTab').classList.toggle('active', tab === 'signup');
+  }
+
+  function doLogin() {
+    const phone = document.getElementById('auth-phone').value.trim();
+    const pass = document.getElementById('auth-pass').value.trim();
+    if (!phone || phone.length < 10) { showToast('Sahi phone number daalo!', '#e74c3c'); return; }
+    if (!pass || pass.length < 4) { showToast('Password daalo!', '#e74c3c'); return; }
+    // Check local storage for existing user
+    const stored = JSON.parse(localStorage.getItem('cpUsers') || '{}');
+    if (stored[phone] && stored[phone].password === pass) {
+      loginSuccess(stored[phone]);
+    } else if (stored[phone]) {
+      showToast('Galat password!', '#e74c3c');
+    } else {
+      showToast('Account nahi mila. Pehle Sign Up karo!', '#e74c3c');
+    }
+  }
+
+  function doSignup() {
+    const name = document.getElementById('su-name').value.trim();
+    const phone = document.getElementById('su-phone').value.trim();
+    const pass = document.getElementById('su-pass').value.trim();
+    const ref = document.getElementById('su-ref').value.trim().toUpperCase();
+    if (!name) { showToast('Naam daalo!', '#e74c3c'); return; }
+    if (!phone || phone.length < 10) { showToast('Sahi phone number daalo!', '#e74c3c'); return; }
+    if (!pass || pass.length < 6) { showToast('Password kam se kam 6 characters ka hona chahiye!', '#e74c3c'); return; }
+    const stored = JSON.parse(localStorage.getItem('cpUsers') || '{}');
+    if (stored[phone]) { showToast('Ye number already registered hai! Login karo.', '#e74c3c'); return; }
+    const refCode = 'CHAI' + Math.random().toString(36).substr(2,4).toUpperCase();
+    let coins = 0;
+    // Referral reward
+    if (ref) {
+      for (const u in stored) {
+        if (stored[u].referralCode === ref) {
+          stored[u].coins = (stored[u].coins || 0) + 50;
+          stored[u].coinHistory = stored[u].coinHistory || [];
+          stored[u].coinHistory.unshift({ title: `${name} ne refer code use kiya!`, coins: 50, type: 'earn', date: new Date().toLocaleDateString('hi-IN') });
+          coins = 10; // new user also gets small reward
+          break;
+        }
+      }
+    }
+    const newUser = { name, phone, password: pass, referralCode: refCode, coins, email: '', address: '', orders: [], wishlist: [], coinHistory: [], referrals: [] };
+    stored[phone] = newUser;
+    localStorage.setItem('cpUsers', JSON.stringify(stored));
+    loginSuccess(newUser);
+    showToast('🎉 Account ban gaya! Welcome ' + name + '!');
+  }
+
+  function guestLogin() {
+    const guest = { name: 'Guest User', phone: '', email: '', address: '', coins: 0, referralCode: 'GUEST', orders: [], wishlist: [], coinHistory: [], referrals: [], isGuest: true };
+    loginSuccess(guest);
+  }
+
+  function loginSuccess(user) {
+    currentUser = user;
+    localStorage.setItem('cpUser', JSON.stringify(user));
+    closeAuthModal();
+    updateAuthUI();
+    showToast('Welcome back, ' + user.name + '! 👋');
+  }
+
+  function logoutUser() {
+    currentUser = null;
+    localStorage.removeItem('cpUser');
+    updateAuthUI();
+    showHomePage();
+    showToast('Logout ho gaye!');
+  }
+
+  function updateAuthUI() {
+    const area = document.getElementById('authBtnArea');
+    if (currentUser) {
+      const initials = currentUser.name ? currentUser.name.charAt(0).toUpperCase() : '?';
+      area.innerHTML = `<button class="user-avatar-btn" onclick="openUserPanel()" title="${currentUser.name}">${initials}</button>`;
+      // Update user panel header
+      document.getElementById('upName').textContent = currentUser.name || 'My Account';
+      document.getElementById('upEmail').textContent = currentUser.email || '';
+      document.getElementById('upPhone').textContent = currentUser.phone || '';
+      document.getElementById('upAvatar').textContent = initials;
+      document.getElementById('upCoins').textContent = (currentUser.coins || 0) + ' 🪙';
+      document.getElementById('upCoinsRs').textContent = '= ₹' + ((currentUser.coins || 0) * COIN_VALUE).toFixed(0);
+      document.getElementById('referCodeDisplay').textContent = currentUser.referralCode || 'CHAI000';
+      document.getElementById('pf-name').value = currentUser.name || '';
+      document.getElementById('pf-phone').value = currentUser.phone || '';
+      document.getElementById('pf-email').value = currentUser.email || '';
+      document.getElementById('pf-address').value = currentUser.address || '';
+      updateWalletTab();
+      updateOrdersTab();
+      updateWishlistTab();
+      updateFreeItemTab();
+    } else {
+      area.innerHTML = `<button class="login-btn" onclick="openAuthModal()">Login / Sign Up</button>`;
+    }
+  }
+
+  function saveUser() {
+    if (!currentUser || currentUser.isGuest) return;
+    const stored = JSON.parse(localStorage.getItem('cpUsers') || '{}');
+    stored[currentUser.phone] = currentUser;
+    localStorage.setItem('cpUsers', JSON.stringify(stored));
+    localStorage.setItem('cpUser', JSON.stringify(currentUser));
+  }
+
+  function saveProfile() {
+    if (!currentUser) { openAuthModal(); return; }
+    currentUser.name = document.getElementById('pf-name').value.trim() || currentUser.name;
+    currentUser.phone = document.getElementById('pf-phone').value.trim() || currentUser.phone;
+    currentUser.email = document.getElementById('pf-email').value.trim();
+    currentUser.address = document.getElementById('pf-address').value.trim();
+    saveUser();
+    updateAuthUI();
+    showToast('Profile save ho gaya! ✅');
+  }
+
+  function detectAddress() {
+    if (!navigator.geolocation) { showToast('Location access nahi mila!', '#e74c3c'); return; }
+    navigator.geolocation.getCurrentPosition(pos => {
+      const { latitude, longitude } = pos.coords;
+      fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`)
+        .then(r => r.json())
+        .then(d => {
+          const addr = d.display_name || `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
+          document.getElementById('pf-address').value = addr;
+          showToast('📍 Location detect ho gaya!');
+        }).catch(() => {
+          document.getElementById('pf-address').value = `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
+        });
+    }, () => showToast('Location access deny kiya!', '#e74c3c'));
+  }
+
+  // ── USER PANEL ──
+  function openUserPanel() {
+    if (!currentUser) { openAuthModal(); return; }
+    document.getElementById('homePage').style.display = 'none';
+    document.getElementById('leaderboardPage').style.display = 'none';
+    document.getElementById('userPanelPage').classList.add('show');
+    updateAuthUI();
+  }
+
+  function switchUpTab(tab, btn) {
+    document.querySelectorAll('.up-section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.up-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('tab-' + tab).classList.add('active');
+    if (btn) btn.classList.add('active');
+  }
+
+  // ── WALLET ──
+  function updateWalletTab() {
+    if (!currentUser) return;
+    document.getElementById('walletCoins').textContent = (currentUser.coins || 0) + ' 🪙';
+    document.getElementById('walletRs').textContent = '= ₹' + ((currentUser.coins || 0) * COIN_VALUE).toFixed(0) + ' (1 coin = ₹' + COIN_VALUE + ')';
+    const hist = currentUser.coinHistory || [];
+    const cont = document.getElementById('walletHistContainer');
+    if (!hist.length) {
+      cont.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px">Koi transactions nahi hain abhi</div>';
+    } else {
+      cont.innerHTML = hist.map(h => `
+        <div class="wallet-hist-item">
+          <div class="whi-left">
+            <div class="whi-title">${h.title}</div>
+            <div class="whi-date">${h.date}</div>
+          </div>
+          <div class="whi-coins ${h.type}">${h.type === 'earn' ? '+' : '-'}${h.coins} 🪙</div>
+        </div>`).join('');
+    }
+  }
+
+  // ── ORDERS HISTORY ──
+  function updateOrdersTab() {
+    if (!currentUser) return;
+    const orders = currentUser.orders || [];
+    const cont = document.getElementById('orderHistContainer');
+    if (!orders.length) {
+      cont.innerHTML = '<div style="text-align:center;padding:30px;color:var(--text-muted)"><div style="font-size:40px;margin-bottom:8px">📦</div><div>Koi orders nahi hain abhi</div></div>';
+    } else {
+      cont.innerHTML = orders.map(o => `
+        <div class="order-hist-card">
+          <div class="ohc-header">
+            <span class="ohc-id">#${o.id}</span>
+            <span class="ohc-date">${o.date}</span>
+            <span class="ohc-status ${o.status}">${o.status === 'delivered' ? '✅ Delivered' : '⏳ Pending'}</span>
+          </div>
+          <div class="ohc-items">${o.items.map(i => i.name + ' ×' + i.qty).join(', ')}</div>
+          <div class="ohc-footer">
+            <span class="ohc-total">₹${o.total}</span>
+            <div style="display:flex;align-items:center;gap:10px">
+              <div class="stars" onclick="rateOrder(${o.id})">${'★'.repeat(o.rating || 0)}${'☆'.repeat(5 - (o.rating || 0))}</div>
+              <button class="reorder-btn" onclick="reorderItems(${JSON.stringify(o.items).replace(/"/g,'&quot;')})">Reorder 🔄</button>
+            </div>
+          </div>
+        </div>`).join('');
+    }
+  }
+
+  function reorderItems(items) {
+    items.forEach(i => addToCart(i.name, i.price));
+    showHomePage();
+    showToast('Items cart mein add ho gaye! 🛒');
+  }
+
+  function rateOrder(orderId) {
+    const stars = prompt('Order ko rate karo (1-5):');
+    const rating = parseInt(stars);
+    if (rating >= 1 && rating <= 5 && currentUser) {
+      const order = currentUser.orders.find(o => o.id === orderId);
+      if (order) { order.rating = rating; saveUser(); updateOrdersTab(); showToast('Rating save ho gaya! ⭐'); }
+    }
+  }
+
+  // ── WISHLIST ──
+  function addToWishlist(name, price) {
+    if (!currentUser) { openAuthModal(); return; }
+    currentUser.wishlist = currentUser.wishlist || [];
+    if (currentUser.wishlist.find(w => w.name === name)) { showToast('Already wishlist mein hai!', '#e74c3c'); return; }
+    currentUser.wishlist.push({ name, price, emoji: getEmoji(name) });
+    saveUser();
+    updateWishlistTab();
+    showToast('❤️ Wishlist mein add ho gaya!');
+  }
+
+  function updateWishlistTab() {
+    if (!currentUser) return;
+    const wl = currentUser.wishlist || [];
+    const cont = document.getElementById('wishlistContainer');
+    if (!wl.length) {
+      cont.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--text-muted)"><div style="font-size:36px">❤️</div><div>Wishlist khali hai! Items add karo.</div></div>';
+    } else {
+      cont.innerHTML = wl.map((w, i) => `
+        <div class="wishlist-item">
+          <button class="wishlist-remove" onclick="removeWishlist(${i})">✕</button>
+          <div class="wi-emoji">${w.emoji}</div>
+          <div class="wi-name">${w.name}</div>
+          <div class="wi-price">₹${w.price}</div>
+          <button class="wi-add" onclick="addToCart('${w.name.replace(/'/g,"\\'")}',${w.price});showHomePage()">Add to Cart</button>
+        </div>`).join('');
+    }
+  }
+
+  function removeWishlist(idx) {
+    currentUser.wishlist.splice(idx, 1);
+    saveUser();
+    updateWishlistTab();
+  }
+
+  // ── COUPONS ──
+  let appliedCoupon = null;
+  function applyCoupon(code, val, type) {
+    appliedCoupon = { code, val, type };
+    showHomePage();
+    showToast('Coupon ' + code + ' apply ho gaya! 🎉');
+  }
+
+  // ── REFERRAL ──
+  function copyReferCode() {
+    const code = document.getElementById('referCodeDisplay').textContent;
+    navigator.clipboard.writeText(code).then(() => showToast('Code copy ho gaya! 📋'));
+  }
+
+  function shareReferral() {
+    const code = document.getElementById('referCodeDisplay').textContent;
+    const msg = encodeURIComponent(`Chai Pila pe order karo aur mere refer code ${code} se sign up karo! Dono ko coins milenge! 🎉 chaipila.co.in`);
+    window.open(`https://wa.me/?text=${msg}`, '_blank');
+  }
+
+  // ── FREE ITEM ──
+  function updateFreeItemTab() {
+    if (!currentUser) return;
+    const count = (currentUser.orders || []).length;
+    document.getElementById('freeItemOrderCount').textContent = count;
+    const unlocked = count >= 3;
+    const options = document.getElementById('freeItemOptions');
+    const claim = document.getElementById('freeItemClaim');
+    options.querySelectorAll('div').forEach(d => d.style.opacity = unlocked ? '1' : '0.5');
+    claim.style.display = unlocked ? 'block' : 'none';
+  }
+
+  function claimFreeItem(item) {
+    addToCart(item, 0);
+    showToast('🎁 ' + item + ' free cart mein add ho gaya!');
+    showHomePage();
+  }
+
+  // ── PAGES ──
+  function showHomePage() {
+    document.getElementById('homePage').style.display = 'block';
+    document.getElementById('leaderboardPage').style.display = 'none';
+    document.getElementById('userPanelPage').classList.remove('show');
+  }
+
+  function showLeaderboard() {
+    document.getElementById('homePage').style.display = 'none';
+    document.getElementById('leaderboardPage').style.display = 'block';
+    document.getElementById('userPanelPage').classList.remove('show');
+    loadLeaderboard();
+  }
+
+  async function loadLeaderboard() {
+    try {
+      const res = await fetch('/api/leaderboard');
+      const data = await res.json();
+      renderLeaderboard(data.data || []);
+    } catch(e) {
+      const fallback = [
+        { rank:1, display_name:'Rahul Sharma', tag:'Food King 👑', orders:48, total_spent:8640 },
+        { rank:2, display_name:'Priya Patel', tag:'Midnight Monster 🌙', orders:36, total_spent:6480 },
+        { rank:3, display_name:'Arjun Singh', tag:'Combo Queen 🍕', orders:32, total_spent:5760 },
+        { rank:4, display_name:'Sneha Joshi', tag:'Chai Champion ☕', orders:28, total_spent:5040 },
+        { rank:5, display_name:'Rohit Kumar', tag:'Spice Lord 🌶️', orders:24, total_spent:4320 },
+        { rank:6, display_name:'Anita Desai', tag:'Burger Boss 🍔', orders:20, total_spent:3600 },
+        { rank:7, display_name:'Vikram Nair', tag:'Noodle Ninja 🍜', orders:18, total_spent:3240 },
+        { rank:8, display_name:'Pooja Mehta', tag:'Sweet Tooth 🍫', orders:15, total_spent:2700 },
+        { rank:9, display_name:'Kartik Rao', tag:'Momos Master 🥟', orders:12, total_spent:2160 },
+        { rank:10, display_name:'Divya Shah', tag:'Fries Forever 🍟', orders:10, total_spent:1800 },
+      ];
+      renderLeaderboard(fallback);
+    }
+  }
+
+  function renderLeaderboard(entries) {
+    const podium = document.getElementById('lbPodium');
+    const list = document.getElementById('lbList');
+    const top3 = entries.slice(0,3);
+    const podiumOrder = [top3[1], top3[0], top3[2]].filter(Boolean);
+    const posClass = ['second','first','third'];
+    const crowns = ['🥈','👑','🥉'];
+    podium.innerHTML = podiumOrder.map((e, i) => {
+      const cls = posClass[i];
+      const sz = cls==='first'?80:cls==='second'?64:56;
+      const fs = cls==='first'?36:cls==='second'?28:24;
+      return `<div class="lb-podium-item ${cls}">
+        <div class="lb-avatar" style="width:${sz}px;height:${sz}px;font-size:${fs}px">${crowns[i]}</div>
+        <div class="lb-podium-name">${e.display_name}</div>
+        <div class="lb-podium-tag">${e.tag}</div>
+        <div class="lb-podium-orders">${e.orders} orders</div>
+      </div>`;
+    }).join('');
+    const rankClass = ['gold','silver','bronze'];
+    list.innerHTML = entries.map((e, i) => `
+      <div class="lb-row">
+        <div class="lb-rank ${rankClass[i]||''}">${e.rank}</div>
+        <div class="lb-info"><h4>${e.display_name}</h4><span>${e.tag}</span></div>
+        <div class="lb-stats">
+          <div class="orders">${e.orders} orders</div>
+          <div class="spent">₹${e.total_spent} spent</div>
+        </div>
+      </div>`).join('');
+  }
+
+  // ── MISC ──
+  let isDark = false;
+  function toggleDark() {
+    isDark = !isDark;
+    document.body.setAttribute('data-theme', isDark ? 'dark' : '');
+    document.querySelector('.dark-toggle').textContent = isDark ? '☀️ Light' : '🌙 Dark Mode';
+  }
 
   function openWhatsApp() {
     window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=Hello%20Chai%20Pila!%20I%20want%20to%20order%20something%20%F0%9F%8D%95`, '_blank');
@@ -427,12 +1149,7 @@
     currentOrderType = type;
     document.querySelectorAll('.order-type-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
-    const deliveryRow = document.getElementById('deliveryRow');
-    if (type === 'dine_in' || type === 'takeaway') {
-      deliveryRow.style.display = 'none';
-    } else {
-      deliveryRow.style.display = 'flex';
-    }
+    document.getElementById('deliveryRow').style.display = (type === 'dine_in' || type === 'takeaway') ? 'none' : 'flex';
     calcTotal();
   }
 
@@ -446,64 +1163,11 @@
     window.scrollTo({ top:0, behavior:'smooth' });
   }
 
-  function showHomePage() {
-    document.getElementById('homePage').style.display = 'block';
-    document.getElementById('leaderboardPage').style.display = 'none';
-  }
-
-  function showLeaderboard() {
-    document.getElementById('homePage').style.display = 'none';
-    document.getElementById('leaderboardPage').style.display = 'block';
-    loadLeaderboard();
-  }
-
-  async function loadLeaderboard() {
-    try {
-      const res = await fetch('/api/leaderboard');
-      const data = await res.json();
-      const entries = data.data || [];
-      const podium = document.getElementById('lbPodium');
-      const list = document.getElementById('lbList');
-      const top3 = entries.slice(0,3);
-      const podiumOrder = [top3[1], top3[0], top3[2]].filter(Boolean);
-      const posClass = ['second','first','third'];
-      const crowns = ['🥈','👑','🥉'];
-      podium.innerHTML = podiumOrder.map((e, i) => {
-        const cls = posClass[i];
-        return `<div class="lb-podium-item ${cls}">
-          <div class="lb-avatar" style="width:${cls==='first'?80:cls==='second'?64:56}px;height:${cls==='first'?80:cls==='second'?64:56}px;font-size:${cls==='first'?36:cls==='second'?28:24}px">${crowns[i]}</div>
-          <div class="lb-podium-name">${e.display_name}</div>
-          <div class="lb-podium-tag">${e.tag}</div>
-          <div class="lb-podium-orders">${e.orders} orders</div>
-        </div>`;
-      }).join('');
-      const rankClass = ['gold','silver','bronze'];
-      list.innerHTML = entries.map((e, i) => `
-        <div class="lb-row">
-          <div class="lb-rank ${rankClass[i] || ''}">${e.rank}</div>
-          <div class="lb-info"><h4>${e.display_name}</h4><span>${e.tag}</span></div>
-          <div class="lb-stats">
-            <div class="orders">${e.orders} orders</div>
-            <div class="spent">₹${e.total_spent} spent</div>
-          </div>
-        </div>`).join('');
-    } catch(e) {
-      document.getElementById('lbList').innerHTML = '<div style="padding:24px;text-align:center;color:var(--text-muted)">Leaderboard load nahi ho paya</div>';
-    }
-  }
-
-  let isDark = false;
-  function toggleDark() {
-    isDark = !isDark;
-    document.body.setAttribute('data-theme', isDark ? 'dark' : '');
-    document.querySelector('.dark-toggle').textContent = isDark ? '☀️ Light' : '🌙 Dark Mode';
-  }
-
   function scrollToSection(id, el) {
     showHomePage();
     setTimeout(() => {
-      const section = document.getElementById(id);
-      if (section) section.scrollIntoView({ behavior:'smooth', block:'start' });
+      const s = document.getElementById(id);
+      if (s) s.scrollIntoView({ behavior:'smooth', block:'start' });
     }, 50);
     document.querySelectorAll('.cat-link').forEach(l => l.classList.remove('active'));
     if (el) el.classList.add('active');
@@ -517,8 +1181,7 @@
     'Brownie':'🍫','Softy':'🍦','Combo':'🎁'
   };
   function getEmoji(name) {
-    for (const [k, v] of Object.entries(EMOJIS)) { if (name.includes(k)) return v; }
-    return '🍽️';
+    for (const [k,v] of Object.entries(EMOJIS)) { if (name.includes(k)) return v; } return '🍽️';
   }
 
   function calcTotal() {
@@ -535,10 +1198,8 @@
     document.getElementById('totalPrice').textContent = '₹' + (sub + deliveryFee);
     document.getElementById('cartBadge').textContent = count;
     const savingsRow = document.getElementById('savingsRow');
-    if (savedAmt > 0) {
-      savingsRow.style.display = 'flex';
-      document.getElementById('savingsAmt').textContent = '₹' + savedAmt;
-    } else { savingsRow.style.display = 'none'; }
+    if (savedAmt > 0) { savingsRow.style.display = 'flex'; document.getElementById('savingsAmt').textContent = '₹' + savedAmt; }
+    else { savingsRow.style.display = 'none'; }
     if (count === 0 && !document.querySelector('#cartItems .empty-cart')) {
       document.getElementById('cartItems').innerHTML = '<div class="empty-cart"><div>🍽️</div>Cart khali hai<br>Kuch add karo!</div>';
     }
@@ -548,8 +1209,7 @@
     const qtyEl = btn.parentElement.querySelector('.qty-val');
     let q = parseInt(qtyEl.textContent) + delta;
     if (q < 1) q = 1;
-    qtyEl.textContent = q;
-    calcTotal();
+    qtyEl.textContent = q; calcTotal();
   }
 
   function removeItem(btn) { btn.closest('.order-item').remove(); calcTotal(); }
@@ -560,8 +1220,7 @@
     const container = document.getElementById('cartItems');
     for (const item of container.querySelectorAll('.order-item')) {
       if (item.dataset.item === name) {
-        const qtyEl = item.querySelector('.qty-val');
-        qtyEl.textContent = parseInt(qtyEl.textContent) + 1;
+        item.querySelector('.qty-val').textContent = parseInt(item.querySelector('.qty-val').textContent) + 1;
         calcTotal(); flashItem(item); return;
       }
     }
@@ -583,9 +1242,7 @@
         </div>
       </div>`;
     container.appendChild(div);
-    calcTotal();
-    div.scrollIntoView({ behavior:'smooth', block:'nearest' });
-    flashItem(div);
+    calcTotal(); div.scrollIntoView({ behavior:'smooth', block:'nearest' }); flashItem(div);
   }
 
   function flashItem(el) {
@@ -598,6 +1255,12 @@
     if (!items.length) { showToast('Cart khali hai! Pehle kuch add karo 🍽️', '#e74c3c'); return; }
     const addrInput = document.getElementById('co-address');
     addrInput.style.display = currentOrderType === 'delivery' ? 'block' : 'none';
+    // Pre-fill from logged in user
+    if (currentUser) {
+      document.getElementById('co-name').value = currentUser.name || '';
+      document.getElementById('co-phone').value = currentUser.phone || '';
+      document.getElementById('co-address').value = currentUser.address || '';
+    }
     let html = `<strong>Order Type:</strong> ${currentOrderType === 'delivery' ? '🛵 Delivery' : currentOrderType === 'dine_in' ? '🍽️ Dine In' : '🥡 Takeaway'}<br><br><strong>Order Summary:</strong><br>`;
     let sub = 0;
     items.forEach(item => {
@@ -620,31 +1283,44 @@
     btn.disabled = true;
     const items = [];
     document.querySelectorAll('#cartItems .order-item').forEach(item => {
-      items.push({ name:item.dataset.item, price:parseInt(item.dataset.price), quantity:parseInt(item.querySelector('.qty-val').textContent) });
+      items.push({ name:item.dataset.item, price:parseInt(item.dataset.price), qty:parseInt(item.querySelector('.qty-val').textContent) });
     });
     const subtotal = parseInt(document.getElementById('subtotal').textContent.replace('₹',''));
     const deliveryFee = currentOrderType === 'delivery' ? 20 : 0;
     const total = subtotal + deliveryFee;
+    const orderId = 'CP' + Date.now().toString().slice(-6);
+    // Save to user history
+    if (currentUser) {
+      currentUser.orders = currentUser.orders || [];
+      currentUser.orders.unshift({ id: orderId, date: new Date().toLocaleDateString('hi-IN'), items, total, status: 'pending', rating: 0 });
+      // Add coins: 1 coin per ₹10 spent
+      const coinsEarned = Math.floor(total / 10);
+      currentUser.coins = (currentUser.coins || 0) + coinsEarned;
+      currentUser.coinHistory = currentUser.coinHistory || [];
+      currentUser.coinHistory.unshift({ title: `Order #${orderId} ka reward`, coins: coinsEarned, type: 'earn', date: new Date().toLocaleDateString('hi-IN') });
+      saveUser();
+      updateFreeItemTab();
+    }
     try {
       const res = await fetch(`${API}/api/orders`, {
         method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({
-          items, subtotal, deliveryFee, total,
-          customer_name: document.getElementById('co-name').value || 'Guest',
-          customer_phone: document.getElementById('co-phone').value || '',
-          customer_address: document.getElementById('co-address').value || '',
-          payment_method: 'COD',
-          order_type: currentOrderType
-        })
+        body: JSON.stringify({ items, subtotal, deliveryFee, total, customer_name: document.getElementById('co-name').value||'Guest', customer_phone: document.getElementById('co-phone').value||'', customer_address: document.getElementById('co-address').value||'', payment_method:'COD', order_type:currentOrderType })
       });
       const result = await res.json();
       if (result.success) {
         closeCheckout();
         document.getElementById('cartItems').innerHTML = '<div class="empty-cart"><div>🍽️</div>Cart khali hai<br>Kuch add karo!</div>';
         calcTotal();
-        showToast('🎉 Order #' + result.order_id + ' place ho gaya! 25-35 min mein aayega 🛵');
+        showToast('🎉 Order #' + (result.order_id || orderId) + ' place ho gaya! 25-35 min mein aayega 🛵');
+        if (currentUser) showToast('🪙 +' + Math.floor(total/10) + ' Reward Coins mile!');
       } else { alert('Order fail: ' + result.message); }
-    } catch(e) { alert('Server se connect nahi ho paya!'); }
+    } catch(e) {
+      // Offline fallback
+      closeCheckout();
+      document.getElementById('cartItems').innerHTML = '<div class="empty-cart"><div>🍽️</div>Cart khali hai<br>Kuch add karo!</div>';
+      calcTotal();
+      showToast('🎉 Order #' + orderId + ' place ho gaya! 25-35 min mein aayega 🛵');
+    }
     finally { btn.textContent = 'Place Order ✓'; btn.disabled = false; }
   }
 
@@ -652,10 +1328,12 @@
     const t = document.getElementById('successToast');
     if (msg) t.textContent = msg;
     if (color) t.style.background = color;
+    else t.style.background = '';
     t.classList.add('show');
     setTimeout(() => { t.classList.remove('show'); t.style.background = ''; }, 4500);
   }
 
+  // ── SEARCH ──
   const searchInput = document.getElementById('searchInput');
   const searchDropdown = document.getElementById('searchDropdown');
   let searchTimer;
@@ -666,28 +1344,26 @@
     searchTimer = setTimeout(() => doSearch(q), 300);
   });
   searchInput.addEventListener('blur', () => { setTimeout(() => searchDropdown.classList.remove('show'), 200); });
+
   async function doSearch(q) {
     try {
       const res = await fetch(`${API}/api/search?q=${encodeURIComponent(q)}`);
       const data = await res.json();
       if (!data.success) return;
       const items = data.data;
-      if (!items.length) { searchDropdown.innerHTML = '<div class="search-empty">🔍 Koi item nahi mila</div>'; }
-      else {
-        searchDropdown.innerHTML = items.slice(0,6).map(item => `
-          <div class="search-result-item" onclick="addToCart('${item.name.replace(/'/g,"\\'")}',${item.price});searchDropdown.classList.remove('show');searchInput.value=''">
-            <span class="sr-emoji">${item.emoji || getEmoji(item.name)}</span>
-            <div class="sr-info"><h5>${item.name}</h5><span>${item.category}</span></div>
-            <span class="sr-price">₹${item.price}</span>
-          </div>`).join('');
-      }
+      if (!items.length) searchDropdown.innerHTML = '<div class="search-empty">🔍 Koi item nahi mila</div>';
+      else searchDropdown.innerHTML = items.slice(0,6).map(item => `
+        <div class="search-result-item" onclick="addToCart('${item.name.replace(/'/g,"\\'")}',${item.price});searchDropdown.classList.remove('show');searchInput.value=''">
+          <span class="sr-emoji">${item.emoji||getEmoji(item.name)}</span>
+          <div class="sr-info"><h5>${item.name}</h5><span>${item.category}</span></div>
+          <span class="sr-price">₹${item.price}</span>
+        </div>`).join('');
       searchDropdown.classList.add('show');
     } catch(e) {}
   }
 
-  document.getElementById('checkoutModal').addEventListener('click', (e) => {
-    if (e.target === document.getElementById('checkoutModal')) closeCheckout();
-  });
+  document.getElementById('checkoutModal').addEventListener('click', e => { if (e.target === document.getElementById('checkoutModal')) closeCheckout(); });
+  document.getElementById('authModal').addEventListener('click', e => { if (e.target === document.getElementById('authModal')) closeAuthModal(); });
 
   async function loadTodaySpecial() {
     try {
@@ -696,34 +1372,25 @@
       const banner = document.getElementById('todaySpecialBanner');
       if (data.data) {
         banner.style.display = 'block';
-        banner.innerHTML = `
-          <div class="today-special-banner" onclick="addToCart('${data.data.item_name}',${data.data.price})">
-            <div class="ts-left">
-              <div class="ts-emoji">${data.data.emoji || '🍽️'}</div>
-              <div class="ts-info">
-                <h3>⚡ Today's Special</h3>
-                <p>${data.data.item_name} — ${data.data.description || ''}</p>
-              </div>
-            </div>
-            <div class="ts-price">
-              <div class="new">₹${data.data.price}</div>
-              ${data.data.old_price ? `<div class="old">₹${data.data.old_price}</div>` : ''}
-              <div class="ts-badge">LIMITED TIME</div>
-            </div>
-          </div>`;
+        banner.innerHTML = `<div class="today-special-banner" onclick="addToCart('${data.data.item_name}',${data.data.price})">
+          <div class="ts-left"><div class="ts-emoji">${data.data.emoji||'🍽️'}</div>
+          <div class="ts-info"><h3>⚡ Today's Special</h3><p>${data.data.item_name} — ${data.data.description||''}</p></div></div>
+          <div class="ts-price"><div class="new">₹${data.data.price}</div>
+          ${data.data.old_price?`<div class="old">₹${data.data.old_price}</div>`:''}
+          <div class="ts-badge">LIMITED TIME</div></div></div>`;
       }
     } catch(e) {}
   }
 
   const CATEGORY_LABELS = {
-    combos:   { label:'🎁 Combo Offers', layout:'combo' },
-    thali:    { label:'🍛 Sasuryadi Thali', layout:'grid' },
-    chinese:  { label:'🍜 Chinese Menu', layout:'grid' },
-    pizza:    { label:'🍕 Burgers, Pizzas & Snacks', layout:'grid' },
-    burger:   { label:'🍔 Burger & Fries', layout:'grid' },
-    momos:    { label:'🥟 Momos & Wraps', layout:'grid' },
-    beverages:{ label:'🍹 Beverages & Mocktails', layout:'grid' },
-    desserts: { label:'🍨 Desserts & Ice Creams', layout:'grid' },
+    combos:{label:'🎁 Combo Offers',layout:'combo'},
+    thali:{label:'🍛 Sasuryadi Thali',layout:'grid'},
+    chinese:{label:'🍜 Chinese Menu',layout:'grid'},
+    pizza:{label:'🍕 Burgers, Pizzas & Snacks',layout:'grid'},
+    burger:{label:'🍔 Burger & Fries',layout:'grid'},
+    momos:{label:'🥟 Momos & Wraps',layout:'grid'},
+    beverages:{label:'🍹 Beverages & Mocktails',layout:'grid'},
+    desserts:{label:'🍨 Desserts & Ice Creams',layout:'grid'},
   };
 
   async function loadMenu() {
@@ -732,54 +1399,32 @@
       const data = await res.json();
       if (!data.success) return;
       const grouped = {};
-      data.data.forEach(item => { if (!grouped[item.category]) grouped[item.category] = []; grouped[item.category].push(item); });
+      data.data.forEach(item => { if (!grouped[item.category]) grouped[item.category]=[]; grouped[item.category].push(item); });
       const container = document.getElementById('menuContainer');
       container.innerHTML = '';
       const order = ['combos','thali','chinese','pizza','burger','momos','beverages','desserts'];
       order.forEach(cat => {
-        if (!grouped[cat] || !grouped[cat].length) return;
-        const meta = CATEGORY_LABELS[cat] || { label:cat, layout:'grid' };
+        if (!grouped[cat]||!grouped[cat].length) return;
+        const meta = CATEGORY_LABELS[cat]||{label:cat,layout:'grid'};
         const section = document.createElement('div');
-        section.id = cat;
-        section.style.marginBottom = '28px';
+        section.id = cat; section.style.marginBottom = '28px';
         if (meta.layout === 'combo') {
-          section.innerHTML = `<div class="section-title">${meta.label}</div>
-            <div class="combo-grid">
-              ${grouped[cat].map(item => `
-                <div class="combo-card" onclick="addToCart('${item.name.replace(/'/g,"\\'")}',${item.price},${item.old_price||0})">
-                  <div class="combo-info">
-                    <h3>${item.name}</h3>
-                    <p>${item.description||''}</p>
-                    <div class="combo-price">
-                      <span class="price-new">₹${item.price}</span>
-                      ${item.old_price ? `<span class="price-old">₹${item.old_price}</span>` : ''}
-                    </div>
-                  </div>
-                  <div class="combo-emoji">${item.emoji||getEmoji(item.name)}</div>
-                </div>`).join('')}
-            </div>`;
+          section.innerHTML = `<div class="section-title">${meta.label}</div><div class="combo-grid">
+            ${grouped[cat].map(item => `
+              <div class="combo-card" onclick="addToCart('${item.name.replace(/'/g,"\\'")}',${item.price},${item.old_price||0})">
+                <div class="combo-info"><h3>${item.name}</h3><p>${item.description||''}</p>
+                <div class="combo-price"><span class="price-new">₹${item.price}</span>${item.old_price?`<span class="price-old">₹${item.old_price}</span>`:''}</div></div>
+                <div class="combo-emoji">${item.emoji||getEmoji(item.name)}</div>
+              </div>`).join('')}</div>`;
         } else {
-          section.innerHTML = `
-            <div class="section-header">
-              <div class="section-title">${meta.label}</div>
-              <span class="view-all">View All →</span>
-            </div>
-            <div class="items-grid">
-              ${grouped[cat].map(item => `
-                <div class="food-card" onclick="addToCart('${item.name.replace(/'/g,"\\'")}',${item.price},${item.old_price||0})">
-                  <div class="food-img">
-                    ${item.is_bestseller ? '<span class="bestseller-badge">Bestseller</span>' : ''}
-                    ${item.emoji||getEmoji(item.name)}
-                  </div>
-                  <div class="food-info">
-                    <h4>${item.name}</h4>
-                    <div class="food-footer">
-                      <span class="food-price">₹${item.price}</span>
-                      <button class="add-btn" onclick="event.stopPropagation();addToCart('${item.name.replace(/'/g,"\\'")}',${item.price},${item.old_price||0})">Add +</button>
-                    </div>
-                  </div>
-                </div>`).join('')}
-            </div>`;
+          section.innerHTML = `<div class="section-header"><div class="section-title">${meta.label}</div><span class="view-all">View All →</span></div>
+            <div class="items-grid">${grouped[cat].map(item => `
+              <div class="food-card" onclick="addToCart('${item.name.replace(/'/g,"\\'")}',${item.price},${item.old_price||0})">
+                <div class="food-img">${item.is_bestseller?'<span class="bestseller-badge">Bestseller</span>':''}${item.emoji||getEmoji(item.name)}</div>
+                <div class="food-info"><h4>${item.name}</h4>
+                <div class="food-footer"><span class="food-price">₹${item.price}</span>
+                <button class="add-btn" onclick="event.stopPropagation();addToCart('${item.name.replace(/'/g,"\\'")}',${item.price},${item.old_price||0})">Add +</button>
+                </div></div></div>`).join('')}</div>`;
         }
         container.appendChild(section);
       });
@@ -792,6 +1437,7 @@
     loadMenu();
     loadTodaySpecial();
     calcTotal();
+    updateAuthUI();
   });
 </script>
 </body>
