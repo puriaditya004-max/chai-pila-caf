@@ -3,134 +3,605 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin Panel — Chai Pila Cafe</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<title>Chai Pila - Admin Panel</title>
 <style>
-  :root { --primary:#C84B11; --bg:#fff; --bg2:#F9F5F0; --text:#1A1008; --muted:#6B5B4E; --border:#EDE3D8; }
-  * { margin:0; padding:0; box-sizing:border-box; }
-  body { font-family:'DM Sans',sans-serif; background:var(--bg2); color:var(--text); }
-  .topbar { background:var(--primary); color:white; padding:12px 24px; display:flex; align-items:center; justify-content:space-between; }
-  .topbar h1 { font-family:'Playfair Display',serif; font-size:20px; }
-  .topbar a { color:white; font-size:13px; opacity:0.8; text-decoration:none; }
-  .topbar a:hover { opacity:1; }
-  .container { max-width:1100px; margin:24px auto; padding:0 20px; }
-  .stats { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:28px; }
-  .stat-card { background:white; border-radius:12px; padding:20px; border:1.5px solid var(--border); }
-  .stat-card .num { font-size:32px; font-weight:700; color:var(--primary); }
-  .stat-card .lbl { font-size:13px; color:var(--muted); margin-top:4px; }
-  .orders-table { background:white; border-radius:12px; border:1.5px solid var(--border); overflow:hidden; }
-  .table-header { display:grid; grid-template-columns:60px 1fr 120px 100px 120px 140px; padding:12px 16px; background:var(--bg2); font-size:12px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.5px; border-bottom:1.5px solid var(--border); }
-  .order-row { display:grid; grid-template-columns:60px 1fr 120px 100px 120px 140px; padding:14px 16px; border-bottom:1px solid var(--border); align-items:center; font-size:13px; transition:background 0.15s; }
-  .order-row:hover { background:var(--bg2); }
-  .order-row:last-child { border-bottom:none; }
-  .order-id { font-weight:700; color:var(--primary); }
-  .items-list { font-size:12px; color:var(--muted); }
-  .status-badge { padding:3px 10px; border-radius:20px; font-size:11px; font-weight:700; display:inline-block; }
-  .status-confirmed { background:#e8f5e9; color:#2e7d32; }
-  .status-pending { background:#fff3e0; color:#e65100; }
-  .status-delivered { background:#e3f2fd; color:#1565c0; }
-  .status-cancelled { background:#fce4ec; color:#c62828; }
-  .status-preparing { background:#f3e5f5; color:#6a1b9a; }
-  .status-out_for_delivery { background:#e0f7fa; color:#006064; }
-  select.status-select { padding:4px 8px; border-radius:6px; border:1.5px solid var(--border); font-size:12px; font-family:'DM Sans',sans-serif; cursor:pointer; background:white; }
-  .total-cell { font-weight:700; color:var(--primary); }
-  .refresh-btn { background:var(--primary); color:white; border:none; padding:9px 20px; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; font-family:'DM Sans',sans-serif; }
-  .section-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
-  .section-head h2 { font-size:17px; font-weight:700; }
-  .time-cell { font-size:11px; color:var(--muted); }
-  .loading { text-align:center; padding:40px; color:var(--muted); }
-  .empty { text-align:center; padding:40px; color:var(--muted); font-size:15px; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; }
+.login-page { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(135deg, #ff6b35, #f7c59f); }
+.login-box { background: white; padding: 40px; border-radius: 16px; width: 360px; box-shadow: 0 20px 60px rgba(0,0,0,0.2); text-align: center; }
+.login-box h1 { font-size: 28px; color: #ff6b35; margin-bottom: 8px; }
+.login-box p { color: #888; margin-bottom: 24px; }
+.login-box input { width: 100%; padding: 12px 16px; border: 2px solid #eee; border-radius: 8px; font-size: 15px; margin-bottom: 12px; outline: none; }
+.login-box input:focus { border-color: #ff6b35; }
+.login-box button { width: 100%; padding: 13px; background: #ff6b35; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; }
+.login-box button:hover { background: #e55a25; }
+.admin-layout { display: none; min-height: 100vh; }
+.sidebar { width: 240px; background: #1a1a2e; position: fixed; height: 100vh; overflow-y: auto; }
+.sidebar-logo { padding: 24px 20px; border-bottom: 1px solid #ffffff15; }
+.sidebar-logo h2 { color: #ff6b35; font-size: 20px; }
+.sidebar-logo p { color: #888; font-size: 12px; }
+.nav-item { display: flex; align-items: center; gap: 12px; padding: 14px 20px; color: #aaa; cursor: pointer; transition: all 0.2s; border-left: 3px solid transparent; }
+.nav-item:hover, .nav-item.active { background: #ffffff10; color: white; border-left-color: #ff6b35; }
+.nav-item span { font-size: 18px; }
+.main-content { margin-left: 240px; padding: 24px; }
+.page { display: none; }
+.page.active { display: block; }
+.page-header { margin-bottom: 24px; }
+.page-header h1 { font-size: 24px; color: #1a1a2e; }
+.page-header p { color: #888; font-size: 14px; }
+.card { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); margin-bottom: 20px; }
+.stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+.stat-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+.stat-card .value { font-size: 28px; font-weight: 700; color: #1a1a2e; }
+.stat-card .label { color: #888; font-size: 13px; margin-top: 4px; }
+.stat-card .icon { font-size: 32px; margin-bottom: 8px; }
+.btn { padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600; transition: all 0.2s; }
+.btn-primary { background: #ff6b35; color: white; }
+.btn-primary:hover { background: #e55a25; }
+.btn-danger { background: #ff4444; color: white; }
+.btn-danger:hover { background: #cc0000; }
+.btn-success { background: #00b894; color: white; }
+.btn-sm { padding: 6px 12px; font-size: 12px; }
+table { width: 100%; border-collapse: collapse; }
+th { background: #f8f9fa; padding: 12px 16px; text-align: left; font-size: 13px; color: #666; font-weight: 600; }
+td { padding: 12px 16px; border-bottom: 1px solid #f0f0f0; font-size: 14px; }
+tr:hover td { background: #fafafa; }
+.badge { padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+.badge-pending { background: #fff3cd; color: #856404; }
+.badge-confirmed { background: #cce5ff; color: #004085; }
+.badge-preparing { background: #d4edda; color: #155724; }
+.badge-delivered { background: #d1ecf1; color: #0c5460; }
+.badge-cancelled { background: #f8d7da; color: #721c24; }
+.badge-bronze { background: #cd7f32; color: white; }
+.badge-silver { background: #c0c0c0; color: white; }
+.badge-gold { background: #ffd700; color: #333; }
+.badge-diamond { background: #b9f2ff; color: #0077b6; }
+.badge-platinum { background: #e5e4e2; color: #333; }
+.badge-vip { background: linear-gradient(135deg, #f093fb, #f5576c); color: white; }
+.modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
+.modal.open { display: flex; }
+.modal-box { background: white; border-radius: 16px; padding: 28px; width: 480px; max-height: 90vh; overflow-y: auto; }
+.modal-box h3 { margin-bottom: 20px; color: #1a1a2e; }
+.form-group { margin-bottom: 16px; }
+.form-group label { display: block; margin-bottom: 6px; font-size: 13px; font-weight: 600; color: #555; }
+.form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px 14px; border: 2px solid #eee; border-radius: 8px; font-size: 14px; outline: none; }
+.form-group input:focus, .form-group select:focus { border-color: #ff6b35; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.toggle { display: flex; align-items: center; gap: 10px; }
+.toggle input[type=checkbox] { width: 40px; height: 20px; cursor: pointer; }
 </style>
 </head>
 <body>
-<div class="topbar">
-  <h1>☕ Chai Pila — Admin Panel</h1>
-  <a href="/">← Back to Website</a>
+
+<!-- LOGIN PAGE -->
+<div class="login-page" id="loginPage">
+  <div class="login-box">
+    <h1>☕ Chai Pila</h1>
+    <p>Admin Panel mein welcome hai!</p>
+    <input type="text" id="loginUsername" placeholder="Username" value="admin">
+    <input type="password" id="loginPassword" placeholder="Password">
+    <button onclick="doLogin()">Login Karo</button>
+    <p id="loginError" style="color:red;margin-top:10px;font-size:13px;"></p>
+  </div>
 </div>
-<div class="container">
-  <div class="stats" id="statsRow">
-    <div class="stat-card"><div class="num" id="s-total">—</div><div class="lbl">Total Orders</div></div>
-    <div class="stat-card"><div class="num" id="s-today">—</div><div class="lbl">Today's Orders</div></div>
-    <div class="stat-card"><div class="num" id="s-revenue">—</div><div class="lbl">Total Revenue</div></div>
-    <div class="stat-card"><div class="num" id="s-pending">—</div><div class="lbl">Pending Orders</div></div>
-  </div>
-  <div class="section-head">
-    <h2>📋 All Orders</h2>
-    <button class="refresh-btn" onclick="loadOrders()">🔄 Refresh</button>
-  </div>
-  <div class="orders-table">
-    <div class="table-header">
-      <div>#ID</div><div>Items</div><div>Customer</div><div>Total</div><div>Status</div><div>Time</div>
+
+<!-- ADMIN LAYOUT -->
+<div class="admin-layout" id="adminLayout">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <h2>☕ Chai Pila</h2>
+      <p>Admin Panel</p>
     </div>
-    <div id="ordersBody"><div class="loading">Orders load ho rahi hain...</div></div>
+    <div class="nav-item active" onclick="showPage('dashboard')"><span>📊</span> Dashboard</div>
+    <div class="nav-item" onclick="showPage('menu')"><span>🍽️</span> Menu Edit</div>
+    <div class="nav-item" onclick="showPage('orders')"><span>📦</span> Orders</div>
+    <div class="nav-item" onclick="showPage('customers')"><span>👥</span> Customers</div>
+    <div class="nav-item" onclick="showPage('coupons')"><span>🎟️</span> Coupons</div>
+    <div class="nav-item" onclick="showPage('rewards')"><span>⭐</span> Rewards</div>
+    <div class="nav-item" onclick="showPage('sales')"><span>💰</span> Sales</div>
+    <div class="nav-item" onclick="showPage('delivery')"><span>🛵</span> Delivery</div>
+    <div class="nav-item" onclick="doLogout()" style="margin-top:auto;color:#ff4444;"><span>🚪</span> Logout</div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+
+    <!-- DASHBOARD -->
+    <div class="page active" id="page-dashboard">
+      <div class="page-header"><h1>📊 Dashboard</h1><p>Aaj ka overview</p></div>
+      <div class="stats-grid">
+        <div class="stat-card"><div class="icon">📦</div><div class="value" id="stat-orders">0</div><div class="label">Aaj ke Orders</div></div>
+        <div class="stat-card"><div class="icon">💰</div><div class="value" id="stat-sales">₹0</div><div class="label">Aaj ki Sale</div></div>
+        <div class="stat-card"><div class="icon">👥</div><div class="value" id="stat-customers">0</div><div class="label">Total Customers</div></div>
+        <div class="stat-card"><div class="icon">🍽️</div><div class="value" id="stat-menu">0</div><div class="label">Menu Items</div></div>
+      </div>
+      <div class="card">
+        <h3 style="margin-bottom:16px;">📦 Recent Orders</h3>
+        <table><thead><tr><th>#ID</th><th>Customer</th><th>Phone</th><th>Total</th><th>Status</th><th>Time</th></tr></thead>
+        <tbody id="recent-orders"></tbody></table>
+      </div>
+    </div>
+
+    <!-- MENU -->
+    <div class="page" id="page-menu">
+      <div class="page-header" style="display:flex;justify-content:space-between;align-items:center;">
+        <div><h1>🍽️ Menu Edit</h1><p>Food items manage karo</p></div>
+        <button class="btn btn-primary" onclick="openAddMenu()">+ Item Add Karo</button>
+      </div>
+      <div class="card">
+        <table><thead><tr><th>Emoji</th><th>Name</th><th>Category</th><th>Price</th><th>Old Price</th><th>Available</th><th>Action</th></tr></thead>
+        <tbody id="menu-table"></tbody></table>
+      </div>
+    </div>
+
+    <!-- ORDERS -->
+    <div class="page" id="page-orders">
+      <div class="page-header"><h1>📦 Orders</h1><p>Saare orders dekho</p></div>
+      <div class="card">
+        <table><thead><tr><th>#ID</th><th>Customer</th><th>Phone</th><th>Address</th><th>Items</th><th>Total</th><th>Payment</th><th>Status</th><th>Action</th></tr></thead>
+        <tbody id="orders-table"></tbody></table>
+      </div>
+    </div>
+
+    <!-- CUSTOMERS -->
+    <div class="page" id="page-customers">
+      <div class="page-header"><h1>👥 Customers</h1><p>Customer details & categories</p></div>
+      <div class="card">
+        <table><thead><tr><th>Name</th><th>Phone</th><th>Orders</th><th>Total Spent</th><th>Points</th><th>Category</th><th>Last Order</th></tr></thead>
+        <tbody id="customers-table"></tbody></table>
+      </div>
+    </div>
+
+    <!-- COUPONS -->
+    <div class="page" id="page-coupons">
+      <div class="page-header" style="display:flex;justify-content:space-between;align-items:center;">
+        <div><h1>🎟️ Coupons & Offers</h1><p>Discount coupons manage karo</p></div>
+        <button class="btn btn-primary" onclick="openAddCoupon()">+ Coupon Banao</button>
+      </div>
+      <div class="card">
+        <table><thead><tr><th>Code</th><th>Type</th><th>Amount</th><th>Min Order</th><th>Used/Max</th><th>Valid Till</th><th>Action</th></tr></thead>
+        <tbody id="coupons-table"></tbody></table>
+      </div>
+    </div>
+
+    <!-- REWARDS -->
+    <div class="page" id="page-rewards">
+      <div class="page-header"><h1>⭐ Rewards</h1><p>Customer rewards manage karo</p></div>
+      <div class="card" id="reward-settings-card">
+        <h3 style="margin-bottom:16px;">⚙️ Reward Settings</h3>
+        <div class="form-row">
+          <div class="form-group"><label>Active/Inactive</label>
+            <select id="reward-active"><option value="1">Active ✅</option><option value="0">Inactive ❌</option></select></div>
+          <div class="form-group"><label>Points Per Order</label><input type="number" id="reward-points" placeholder="10"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>1 Point = ₹ (value)</label><input type="number" id="reward-value" placeholder="1"></div>
+          <div class="form-group"><label>Validity (Days)</label><input type="number" id="reward-validity" placeholder="30"></div>
+        </div>
+        <button class="btn btn-primary" onclick="saveRewardSettings()">Settings Save Karo</button>
+      </div>
+      <div class="card">
+        <h3 style="margin-bottom:16px;">➕ Customer ko Points Do</h3>
+        <div class="form-row">
+          <div class="form-group"><label>Customer Phone</label><input type="text" id="reward-phone" placeholder="Phone number"></div>
+          <div class="form-group"><label>Points</label><input type="number" id="reward-add-points" placeholder="50"></div>
+        </div>
+        <div class="form-group"><label>Reason</label><input type="text" id="reward-reason" placeholder="Birthday bonus, etc."></div>
+        <button class="btn btn-primary" onclick="addRewardPoints()">Points Add Karo</button>
+      </div>
+    </div>
+
+    <!-- SALES -->
+    <div class="page" id="page-sales">
+      <div class="page-header"><h1>💰 Sales Report</h1><p>Revenue aur orders history</p></div>
+      <div class="stats-grid" style="grid-template-columns: repeat(3,1fr);">
+        <div class="stat-card"><div class="icon">📦</div><div class="value" id="sales-orders">0</div><div class="label">Aaj ke Orders</div></div>
+        <div class="stat-card"><div class="icon">💰</div><div class="value" id="sales-total">₹0</div><div class="label">Aaj ki Sale</div></div>
+        <div class="stat-card"><div class="icon">📈</div><div class="value" id="sales-avg">₹0</div><div class="label">Avg Order Value</div></div>
+      </div>
+      <div class="card">
+        <h3 style="margin-bottom:16px;">📅 Last 30 Days History</h3>
+        <table><thead><tr><th>Date</th><th>Total Orders</th><th>Total Sale</th></tr></thead>
+        <tbody id="sales-table"></tbody></table>
+      </div>
+    </div>
+
+    <!-- DELIVERY -->
+    <div class="page" id="page-delivery">
+      <div class="page-header"><h1>🛵 Delivery Settings</h1><p>Delivery charges manage karo</p></div>
+      <div class="card" style="max-width:400px;">
+        <div class="form-group"><label>Base Charge (per order) ₹</label><input type="number" id="del-base" placeholder="20"></div>
+        <div class="form-group"><label>Per KM Charge ₹</label><input type="number" id="del-km" placeholder="5"></div>
+        <div class="form-group"><label>Free Delivery Above ₹</label><input type="number" id="del-free" placeholder="500"></div>
+        <button class="btn btn-primary" onclick="saveDelivery()">Save Karo</button>
+      </div>
+    </div>
+
   </div>
 </div>
+
+<!-- ADD MENU MODAL -->
+<div class="modal" id="menuModal">
+  <div class="modal-box">
+    <h3 id="menuModalTitle">🍽️ Item Add Karo</h3>
+    <input type="hidden" id="menu-edit-id">
+    <div class="form-row">
+      <div class="form-group"><label>Name *</label><input type="text" id="menu-name" placeholder="Item ka naam"></div>
+      <div class="form-group"><label>Emoji</label><input type="text" id="menu-emoji" placeholder="🍕"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Category *</label>
+        <select id="menu-category">
+          <option value="combos">Combos</option><option value="thali">Thali</option>
+          <option value="chinese">Chinese</option><option value="pizza">Pizza</option>
+          <option value="burger">Burger</option><option value="momos">Momos</option>
+          <option value="beverages">Beverages</option><option value="desserts">Desserts</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Available</label>
+        <select id="menu-available"><option value="1">Yes ✅</option><option value="0">No ❌</option></select></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Price ₹ *</label><input type="number" id="menu-price" placeholder="150"></div>
+      <div class="form-group"><label>Old Price ₹ (optional)</label><input type="number" id="menu-old-price" placeholder="200"></div>
+    </div>
+    <div class="form-group"><label>Description</label><textarea id="menu-desc" rows="2" placeholder="Item ki details..."></textarea></div>
+    <div class="form-group"><label>Bestseller?</label>
+      <select id="menu-bestseller"><option value="0">No</option><option value="1">Yes ⭐</option></select></div>
+    <div style="display:flex;gap:10px;margin-top:8px;">
+      <button class="btn btn-primary" onclick="saveMenuItem()">Save Karo</button>
+      <button class="btn" style="background:#eee;" onclick="closeModal('menuModal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD COUPON MODAL -->
+<div class="modal" id="couponModal">
+  <div class="modal-box">
+    <h3>🎟️ Coupon Banao</h3>
+    <div class="form-group"><label>Coupon Code *</label><input type="text" id="coupon-code" placeholder="CHAI50" style="text-transform:uppercase;"></div>
+    <div class="form-row">
+      <div class="form-group"><label>Type</label>
+        <select id="coupon-type"><option value="flat">Flat ₹</option><option value="percent">Percent %</option></select></div>
+      <div class="form-group"><label>Amount *</label><input type="number" id="coupon-amount" placeholder="50"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Min Order ₹</label><input type="number" id="coupon-min" placeholder="0"></div>
+      <div class="form-group"><label>Max Uses</label><input type="number" id="coupon-max-uses" placeholder="100"></div>
+    </div>
+    <div class="form-group"><label>Valid Till (optional)</label><input type="date" id="coupon-valid-till"></div>
+    <div style="display:flex;gap:10px;margin-top:8px;">
+      <button class="btn btn-primary" onclick="saveCoupon()">Banao!</button>
+      <button class="btn" style="background:#eee;" onclick="closeModal('couponModal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ORDER STATUS MODAL -->
+<div class="modal" id="orderModal">
+  <div class="modal-box">
+    <h3>📦 Order Status Update</h3>
+    <input type="hidden" id="order-edit-id">
+    <p id="order-detail-text" style="margin-bottom:16px;color:#555;"></p>
+    <div class="form-group"><label>Status Change Karo</label>
+      <select id="order-status-select">
+        <option value="pending">Pending</option>
+        <option value="confirmed">Confirmed</option>
+        <option value="preparing">Preparing</option>
+        <option value="out_for_delivery">Out for Delivery</option>
+        <option value="delivered">Delivered</option>
+        <option value="cancelled">Cancelled</option>
+      </select>
+    </div>
+    <div style="display:flex;gap:10px;">
+      <button class="btn btn-primary" onclick="updateOrderStatus()">Update Karo</button>
+      <button class="btn" style="background:#eee;" onclick="closeModal('orderModal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
 <script>
-  async function loadOrders() {
-    try {
-      const res = await fetch('/api/orders');
-      const data = await res.json();
-      if (!data.success) return;
-      const orders = data.data;
+const API = '';
 
-      // Stats
-      const today = new Date().toDateString();
-      let revenue = 0, pending = 0, todayCount = 0;
-      orders.forEach(o => {
-        revenue += o.total;
-        if (o.status === 'pending' || o.status === 'confirmed') pending++;
-        if (new Date(o.created_at).toDateString() === today) todayCount++;
-      });
-      document.getElementById('s-total').textContent = orders.length;
-      document.getElementById('s-today').textContent = todayCount;
-      document.getElementById('s-revenue').textContent = '₹' + revenue;
-      document.getElementById('s-pending').textContent = pending;
-
-      if (!orders.length) {
-        document.getElementById('ordersBody').innerHTML = '<div class="empty">🍽️ Abhi koi order nahi aaya</div>';
-        return;
-      }
-
-      document.getElementById('ordersBody').innerHTML = orders.map(o => {
-        const itemsList = o.items.map(i => `${i.name} ×${i.quantity}`).join(', ');
-        const time = new Date(o.created_at).toLocaleString('en-IN', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' });
-        return `<div class="order-row">
-          <div class="order-id">#${o.id}</div>
-          <div>
-            <div style="font-weight:600;font-size:13px">${o.customer_name || 'Guest'}</div>
-            <div class="items-list">${itemsList}</div>
-          </div>
-          <div style="font-size:12px">${o.customer_phone || '—'}</div>
-          <div class="total-cell">₹${o.total}</div>
-          <div>
-            <select class="status-select" onchange="updateStatus(${o.id},this.value)" data-current="${o.status}">
-              <option value="pending" ${o.status==='pending'?'selected':''}>Pending</option>
-              <option value="confirmed" ${o.status==='confirmed'?'selected':''}>Confirmed</option>
-              <option value="preparing" ${o.status==='preparing'?'selected':''}>Preparing</option>
-              <option value="out_for_delivery" ${o.status==='out_for_delivery'?'selected':''}>Out for Delivery</option>
-              <option value="delivered" ${o.status==='delivered'?'selected':''}>Delivered</option>
-              <option value="cancelled" ${o.status==='cancelled'?'selected':''}>Cancelled</option>
-            </select>
-          </div>
-          <div class="time-cell">${time}</div>
-        </div>`;
-      }).join('');
-    } catch(e) {
-      document.getElementById('ordersBody').innerHTML = '<div class="empty">Server se connect nahi ho paya</div>';
+async function doLogin() {
+  const username = document.getElementById('loginUsername').value;
+  const password = document.getElementById('loginPassword').value;
+  try {
+    const res = await fetch(`${API}/api/admin/login`, { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({username, password}) });
+    const data = await res.json();
+    if (data.success) {
+      localStorage.setItem('adminToken', data.token);
+      document.getElementById('loginPage').style.display = 'none';
+      document.getElementById('adminLayout').style.display = 'flex';
+      loadDashboard();
+    } else {
+      document.getElementById('loginError').textContent = data.message;
     }
-  }
+  } catch(e) { document.getElementById('loginError').textContent = 'Server se connect nahi ho raha!'; }
+}
 
-  async function updateStatus(id, status) {
-    try {
-      await fetch(`/api/orders/${id}/status`, {
-        method:'PUT', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ status })
-      });
-    } catch(e) { alert('Status update fail'); }
-  }
+function doLogout() {
+  localStorage.removeItem('adminToken');
+  location.reload();
+}
 
-  loadOrders();
-  setInterval(loadOrders, 30000); // Auto refresh every 30 sec
+window.onload = () => {
+  if (localStorage.getItem('adminToken')) {
+    document.getElementById('loginPage').style.display = 'none';
+    document.getElementById('adminLayout').style.display = 'flex';
+    loadDashboard();
+  }
+};
+
+function showPage(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  event.currentTarget.classList.add('active');
+  if (page === 'dashboard') loadDashboard();
+  if (page === 'menu') loadMenu();
+  if (page === 'orders') loadOrders();
+  if (page === 'customers') loadCustomers();
+  if (page === 'coupons') loadCoupons();
+  if (page === 'rewards') loadRewardSettings();
+  if (page === 'sales') loadSales();
+  if (page === 'delivery') loadDelivery();
+}
+
+async function loadDashboard() {
+  try {
+    const [todayRes, custRes, menuRes] = await Promise.all([
+      fetch('/api/sales/today'), fetch('/api/customers'), fetch('/api/menu')
+    ]);
+    const today = await todayRes.json();
+    const custs = await custRes.json();
+    const menu = await menuRes.json();
+    document.getElementById('stat-orders').textContent = today.data.totalOrders;
+    document.getElementById('stat-sales').textContent = '₹' + today.data.totalSale;
+    document.getElementById('stat-customers').textContent = custs.data.length;
+    document.getElementById('stat-menu').textContent = menu.data.length;
+    const tbody = document.getElementById('recent-orders');
+    tbody.innerHTML = today.data.orders.slice(0,10).map(o => `
+      <tr><td>#${o.id}</td><td>${o.customer_name}</td><td>${o.customer_phone}</td>
+      <td>₹${o.total}</td><td><span class="badge badge-${o.status}">${o.status}</span></td>
+      <td>${new Date(o.created_at).toLocaleTimeString('en-IN')}</td></tr>
+    `).join('');
+  } catch(e) {}
+}
+
+async function loadMenu() {
+  const res = await fetch('/api/menu');
+  const data = await res.json();
+  document.getElementById('menu-table').innerHTML = data.data.map(item => `
+    <tr>
+      <td style="font-size:24px;">${item.emoji}</td>
+      <td><strong>${item.name}</strong>${item.is_bestseller ? ' ⭐' : ''}</td>
+      <td>${item.category}</td>
+      <td>₹${item.price}</td>
+      <td>${item.old_price ? '₹'+item.old_price : '-'}</td>
+      <td>${item.is_available ? '✅' : '❌'}</td>
+      <td>
+        <button class="btn btn-sm btn-primary" onclick="editMenu(${item.id})">Edit</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteMenu(${item.id})" style="margin-left:4px;">Delete</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function openAddMenu() {
+  document.getElementById('menuModalTitle').textContent = '🍽️ Item Add Karo';
+  document.getElementById('menu-edit-id').value = '';
+  document.getElementById('menu-name').value = '';
+  document.getElementById('menu-emoji').value = '';
+  document.getElementById('menu-price').value = '';
+  document.getElementById('menu-old-price').value = '';
+  document.getElementById('menu-desc').value = '';
+  document.getElementById('menuModal').classList.add('open');
+}
+
+async function editMenu(id) {
+  const res = await fetch('/api/menu/' + id);
+  const data = await res.json();
+  const item = data.data;
+  document.getElementById('menuModalTitle').textContent = '✏️ Item Edit Karo';
+  document.getElementById('menu-edit-id').value = item.id;
+  document.getElementById('menu-name').value = item.name;
+  document.getElementById('menu-emoji').value = item.emoji;
+  document.getElementById('menu-category').value = item.category;
+  document.getElementById('menu-price').value = item.price;
+  document.getElementById('menu-old-price').value = item.old_price || '';
+  document.getElementById('menu-desc').value = item.description;
+  document.getElementById('menu-bestseller').value = item.is_bestseller;
+  document.getElementById('menu-available').value = item.is_available;
+  document.getElementById('menuModal').classList.add('open');
+}
+
+async function saveMenuItem() {
+  const id = document.getElementById('menu-edit-id').value;
+  const body = {
+    name: document.getElementById('menu-name').value,
+    emoji: document.getElementById('menu-emoji').value || '🍽️',
+    category: document.getElementById('menu-category').value,
+    price: parseInt(document.getElementById('menu-price').value),
+    old_price: parseInt(document.getElementById('menu-old-price').value) || null,
+    description: document.getElementById('menu-desc').value,
+    is_bestseller: parseInt(document.getElementById('menu-bestseller').value),
+    is_available: parseInt(document.getElementById('menu-available').value)
+  };
+  const url = id ? `/api/menu/${id}` : '/api/menu';
+  const method = id ? 'PUT' : 'POST';
+  const res = await fetch(url, { method, headers: {'Content-Type':'application/json'}, body: JSON.stringify(body) });
+  const data = await res.json();
+  if (data.success) { closeModal('menuModal'); loadMenu(); alert('✅ ' + data.message); }
+  else alert('❌ ' + data.message);
+}
+
+async function deleteMenu(id) {
+  if (!confirm('Delete karna hai?')) return;
+  const res = await fetch('/api/menu/' + id, { method: 'DELETE' });
+  const data = await res.json();
+  if (data.success) loadMenu();
+}
+
+async function loadOrders() {
+  const res = await fetch('/api/orders');
+  const data = await res.json();
+  document.getElementById('orders-table').innerHTML = data.data.map(o => `
+    <tr>
+      <td><strong>#${o.id}</strong></td>
+      <td>${o.customer_name}</td>
+      <td>${o.customer_phone}</td>
+      <td style="max-width:120px;font-size:12px;">${o.customer_address || '-'}</td>
+      <td style="max-width:150px;font-size:12px;">${o.items.map(i => i.name + ' x' + i.quantity).join(', ')}</td>
+      <td>₹${o.total}</td>
+      <td>${o.payment_method || 'COD'}</td>
+      <td><span class="badge badge-${o.status}">${o.status}</span></td>
+      <td><button class="btn btn-sm btn-primary" onclick="openOrderModal(${o.id}, '${o.status}', '${o.customer_name}', ${o.total})">Update</button></td>
+    </tr>
+  `).join('');
+}
+
+function openOrderModal(id, status, name, total) {
+  document.getElementById('order-edit-id').value = id;
+  document.getElementById('order-status-select').value = status;
+  document.getElementById('order-detail-text').textContent = `Order #${id} — ${name} — ₹${total}`;
+  document.getElementById('orderModal').classList.add('open');
+}
+
+async function updateOrderStatus() {
+  const id = document.getElementById('order-edit-id').value;
+  const status = document.getElementById('order-status-select').value;
+  const res = await fetch(`/api/orders/${id}/status`, { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify({status}) });
+  const data = await res.json();
+  if (data.success) { closeModal('orderModal'); loadOrders(); alert('✅ Status update ho gaya!'); }
+}
+
+async function loadCustomers() {
+  const res = await fetch('/api/customers');
+  const data = await res.json();
+  document.getElementById('customers-table').innerHTML = data.data.map(c => `
+    <tr>
+      <td><strong>${c.name}</strong></td>
+      <td>${c.phone}</td>
+      <td>${c.total_orders}</td>
+      <td>₹${c.total_spent}</td>
+      <td>⭐${c.reward_points}</td>
+      <td><span class="badge badge-${c.category}">${c.category.toUpperCase()}</span></td>
+      <td>${c.last_order_at ? new Date(c.last_order_at).toLocaleDateString('en-IN') : '-'}</td>
+    </tr>
+  `).join('');
+}
+
+async function loadCoupons() {
+  const res = await fetch('/api/coupons');
+  const data = await res.json();
+  document.getElementById('coupons-table').innerHTML = data.data.map(c => `
+    <tr>
+      <td><strong>${c.code}</strong></td>
+      <td>${c.type === 'flat' ? 'Flat ₹' : 'Percent %'}</td>
+      <td>${c.type === 'flat' ? '₹' : ''}${c.amount}${c.type === 'percent' ? '%' : ''}</td>
+      <td>₹${c.min_order}</td>
+      <td>${c.used_count}/${c.max_uses}</td>
+      <td>${c.valid_till || 'No limit'}</td>
+      <td><button class="btn btn-sm btn-danger" onclick="deleteCoupon(${c.id})">Delete</button></td>
+    </tr>
+  `).join('');
+}
+
+function openAddCoupon() { document.getElementById('couponModal').classList.add('open'); }
+
+async function saveCoupon() {
+  const body = {
+    code: document.getElementById('coupon-code').value,
+    type: document.getElementById('coupon-type').value,
+    amount: parseInt(document.getElementById('coupon-amount').value),
+    min_order: parseInt(document.getElementById('coupon-min').value) || 0,
+    max_uses: parseInt(document.getElementById('coupon-max-uses').value) || 1,
+    valid_till: document.getElementById('coupon-valid-till').value
+  };
+  const res = await fetch('/api/coupons', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body) });
+  const data = await res.json();
+  if (data.success) { closeModal('couponModal'); loadCoupons(); alert('✅ Coupon ban gaya!'); }
+  else alert('❌ ' + data.message);
+}
+
+async function deleteCoupon(id) {
+  if (!confirm('Delete karna hai?')) return;
+  await fetch('/api/coupons/' + id, { method: 'DELETE' });
+  loadCoupons();
+}
+
+async function loadRewardSettings() {
+  const res = await fetch('/api/rewards/settings');
+  const data = await res.json();
+  if (data.data) {
+    document.getElementById('reward-active').value = data.data.is_active;
+    document.getElementById('reward-points').value = data.data.points_per_order;
+    document.getElementById('reward-value').value = data.data.point_value;
+    document.getElementById('reward-validity').value = data.data.validity_days;
+  }
+}
+
+async function saveRewardSettings() {
+  const body = {
+    is_active: parseInt(document.getElementById('reward-active').value),
+    points_per_order: parseInt(document.getElementById('reward-points').value),
+    point_value: parseInt(document.getElementById('reward-value').value),
+    validity_days: parseInt(document.getElementById('reward-validity').value)
+  };
+  const res = await fetch('/api/rewards/settings', { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body) });
+  const data = await res.json();
+  alert(data.success ? '✅ Settings save ho gayi!' : '❌ Error!');
+}
+
+async function addRewardPoints() {
+  const body = {
+    customer_phone: document.getElementById('reward-phone').value,
+    points: parseInt(document.getElementById('reward-add-points').value),
+    reason: document.getElementById('reward-reason').value
+  };
+  const res = await fetch('/api/rewards/add', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body) });
+  const data = await res.json();
+  alert(data.success ? '✅ ' + data.message : '❌ ' + data.message);
+}
+
+async function loadSales() {
+  const res = await fetch('/api/sales/today');
+  const data = await res.json();
+  document.getElementById('sales-orders').textContent = data.data.totalOrders;
+  document.getElementById('sales-total').textContent = '₹' + data.data.totalSale;
+  document.getElementById('sales-avg').textContent = data.data.totalOrders > 0 ? '₹' + Math.floor(data.data.totalSale / data.data.totalOrders) : '₹0';
+
+  const histRes = await fetch('/api/sales/history');
+  const histData = await histRes.json();
+  document.getElementById('sales-table').innerHTML = histData.data.map(s => `
+    <tr><td>${s.date}</td><td>${s.total_orders}</td><td>₹${s.total_sale}</td></tr>
+  `).join('');
+}
+
+async function loadDelivery() {
+  const res = await fetch('/api/delivery/settings');
+  const data = await res.json();
+  if (data.data) {
+    document.getElementById('del-base').value = data.data.base_charge;
+    document.getElementById('del-km').value = data.data.per_km_charge;
+    document.getElementById('del-free').value = data.data.free_delivery_above;
+  }
+}
+
+async function saveDelivery() {
+  const body = {
+    base_charge: parseInt(document.getElementById('del-base').value),
+    per_km_charge: parseInt(document.getElementById('del-km').value),
+    free_delivery_above: parseInt(document.getElementById('del-free').value)
+  };
+  const res = await fetch('/api/delivery/settings', { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body) });
+  const data = await res.json();
+  alert(data.success ? '✅ Delivery settings save ho gayi!' : '❌ Error!');
+}
+
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 </script>
 </body>
 </html>
