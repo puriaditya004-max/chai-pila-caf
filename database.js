@@ -180,4 +180,137 @@ if (menuCount.c === 0) {
   console.log(`✅ Menu seed ho gaya: ${menuData.length} items add hue`);
 }
 
+// ============================
+// NEW TABLES - Phase 2
+// ============================
+db.exec(`
+  CREATE TABLE IF NOT EXISTS wishlists (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    customer_phone TEXT NOT NULL,
+    item_id INTEGER NOT NULL,
+    item_name TEXT NOT NULL,
+    item_price INTEGER NOT NULL,
+    item_emoji TEXT DEFAULT '🍽️',
+    added_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
+
+  CREATE TABLE IF NOT EXISTS referrals (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    referrer_phone TEXT NOT NULL,
+    referred_phone TEXT NOT NULL,
+    referred_name TEXT DEFAULT '',
+    reward_type TEXT DEFAULT 'fixed',
+    reward_amount INTEGER DEFAULT 0,
+    is_lifetime INTEGER DEFAULT 0,
+    status TEXT DEFAULT 'pending',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
+
+  CREATE TABLE IF NOT EXISTS referral_settings (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    is_active INTEGER DEFAULT 1,
+    reward_type TEXT DEFAULT 'fixed',
+    reward_amount INTEGER DEFAULT 50,
+    is_lifetime INTEGER DEFAULT 0,
+    lifetime_percent INTEGER DEFAULT 5,
+    max_limit INTEGER DEFAULT 0,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
+
+  CREATE TABLE IF NOT EXISTS leaderboard (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    rank INTEGER DEFAULT 0,
+    customer_phone TEXT DEFAULT '',
+    display_name TEXT NOT NULL,
+    tag TEXT DEFAULT 'Food King',
+    orders INTEGER DEFAULT 0,
+    total_spent INTEGER DEFAULT 0,
+    is_manual INTEGER DEFAULT 0,
+    is_visible INTEGER DEFAULT 1,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
+
+  CREATE TABLE IF NOT EXISTS free_item_tasks (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    customer_phone TEXT NOT NULL,
+    task_type TEXT DEFAULT 'order_count',
+    target_count INTEGER DEFAULT 3,
+    current_count INTEGER DEFAULT 0,
+    reward_item TEXT DEFAULT '',
+    status TEXT DEFAULT 'in_progress',
+    completed_at DATETIME,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
+
+  CREATE TABLE IF NOT EXISTS free_item_settings (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    is_active INTEGER DEFAULT 1,
+    task_type TEXT DEFAULT 'order_count',
+    target_count INTEGER DEFAULT 3,
+    reward_item TEXT DEFAULT 'Free Cold Coffee',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
+
+  CREATE TABLE IF NOT EXISTS wallet_transactions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    customer_phone TEXT NOT NULL,
+    coins INTEGER NOT NULL,
+    type TEXT DEFAULT 'credit',
+    reason TEXT DEFAULT '',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
+
+  CREATE TABLE IF NOT EXISTS subscriptions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    customer_phone TEXT NOT NULL,
+    plan_type TEXT DEFAULT 'daily',
+    start_date TEXT DEFAULT '',
+    end_date TEXT DEFAULT '',
+    amount INTEGER DEFAULT 0,
+    status TEXT DEFAULT 'active',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
+
+  CREATE TABLE IF NOT EXISTS today_special (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    item_name TEXT NOT NULL,
+    description TEXT DEFAULT '',
+    price INTEGER DEFAULT 0,
+    old_price INTEGER DEFAULT 0,
+    emoji TEXT DEFAULT '🍽️',
+    is_active INTEGER DEFAULT 1,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
+`);
+
+// Default referral settings
+const refCount = db.prepare('SELECT COUNT(*) as c FROM referral_settings').get();
+if (refCount.c === 0) {
+  db.prepare('INSERT INTO referral_settings (is_active, reward_type, reward_amount, is_lifetime, lifetime_percent, max_limit) VALUES (1, "fixed", 50, 0, 5, 0)').run();
+}
+
+// Default free item settings
+const freeCount = db.prepare('SELECT COUNT(*) as c FROM free_item_settings').get();
+if (freeCount.c === 0) {
+  db.prepare('INSERT INTO free_item_settings (is_active, task_type, target_count, reward_item) VALUES (1, "order_count", 3, "Free Cold Coffee")').run();
+}
+
+// Default leaderboard fake entries
+const lbCount = db.prepare('SELECT COUNT(*) as c FROM leaderboard').get();
+if (lbCount.c === 0) {
+  const fakeEntries = [
+    { rank: 1, display_name: 'Rahul S.', tag: '👑 Food King', orders: 142, total_spent: 18500, is_manual: 1 },
+    { rank: 2, display_name: 'Priya M.', tag: '🌙 Midnight Monster', orders: 118, total_spent: 15200, is_manual: 1 },
+    { rank: 3, display_name: 'Arjun K.', tag: '🔥 Spice Lord', orders: 95, total_spent: 12800, is_manual: 1 },
+    { rank: 4, display_name: 'Sneha T.', tag: '☕ Chai Addict', orders: 87, total_spent: 11000, is_manual: 1 },
+    { rank: 5, display_name: 'Vikram P.', tag: '🍕 Pizza Beast', orders: 74, total_spent: 9500, is_manual: 1 },
+    { rank: 6, display_name: 'Kavya R.', tag: '⭐ Star Customer', orders: 65, total_spent: 8200, is_manual: 1 },
+    { rank: 7, display_name: 'Dev A.', tag: '🍔 Burger Hero', orders: 58, total_spent: 7100, is_manual: 1 },
+    { rank: 8, display_name: 'Anjali B.', tag: '🥟 Momo Queen', orders: 49, total_spent: 6300, is_manual: 1 },
+    { rank: 9, display_name: 'Rohan G.', tag: '🌶️ Chilli Champ', orders: 41, total_spent: 5400, is_manual: 1 },
+    { rank: 10, display_name: 'Meera J.', tag: '🍜 Noodle Ninja', orders: 35, total_spent: 4600, is_manual: 1 },
+  ];
+  const insertLb = db.prepare('INSERT INTO leaderboard (rank, display_name, tag, orders, total_spent, is_manual, is_visible) VALUES (?, ?, ?, ?, ?, ?, 1)');
+  for (const e of fakeEntries) insertLb.run(e.rank, e.display_name, e.tag, e.orders, e.total_spent, e.is_manual);
+}
 module.exports = db;
