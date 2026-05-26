@@ -67,8 +67,11 @@ tr:hover td { background: #fafafa; }
 .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px 14px; border: 2px solid #eee; border-radius: 8px; font-size: 14px; outline: none; }
 .form-group input:focus, .form-group select:focus { border-color: #ff6b35; }
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.toggle { display: flex; align-items: center; gap: 10px; }
-.toggle input[type=checkbox] { width: 40px; height: 20px; cursor: pointer; }
+.analytics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.chart-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.chart-bar-label { width: 140px; font-size: 13px; color: #555; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.chart-bar-fill { height: 24px; background: linear-gradient(90deg, #ff6b35, #f7c59f); border-radius: 4px; min-width: 4px; transition: width 0.5s; }
+.chart-bar-val { font-size: 13px; font-weight: 600; color: #333; }
 </style>
 </head>
 <body>
@@ -87,7 +90,6 @@ tr:hover td { background: #fafafa; }
 
 <!-- ADMIN LAYOUT -->
 <div class="admin-layout" id="adminLayout">
-  <!-- Sidebar -->
   <div class="sidebar">
     <div class="sidebar-logo">
       <h2>☕ Chai Pila</h2>
@@ -101,10 +103,15 @@ tr:hover td { background: #fafafa; }
     <div class="nav-item" onclick="showPage('rewards')"><span>⭐</span> Rewards</div>
     <div class="nav-item" onclick="showPage('sales')"><span>💰</span> Sales</div>
     <div class="nav-item" onclick="showPage('delivery')"><span>🛵</span> Delivery</div>
-    <div class="nav-item" onclick="doLogout()" style="margin-top:auto;color:#ff4444;"><span>🚪</span> Logout</div>
+    <div class="nav-item" onclick="showPage('analytics')"><span>📈</span> Analytics</div>
+    <div class="nav-item" onclick="showPage('referral')"><span>🔗</span> Referral</div>
+    <div class="nav-item" onclick="showPage('wishlist')"><span>❤️</span> Wishlist</div>
+    <div class="nav-item" onclick="showPage('leaderboard')"><span>🏆</span> Leaderboard</div>
+    <div class="nav-item" onclick="showPage('freeitem')"><span>🎁</span> Free Item</div>
+    <div class="nav-item" onclick="showPage('special')"><span>⚡</span> Today Special</div>
+    <div class="nav-item" onclick="doLogout()" style="color:#ff4444;"><span>🚪</span> Logout</div>
   </div>
 
-  <!-- Main Content -->
   <div class="main-content">
 
     <!-- DASHBOARD -->
@@ -168,7 +175,7 @@ tr:hover td { background: #fafafa; }
     <!-- REWARDS -->
     <div class="page" id="page-rewards">
       <div class="page-header"><h1>⭐ Rewards</h1><p>Customer rewards manage karo</p></div>
-      <div class="card" id="reward-settings-card">
+      <div class="card">
         <h3 style="margin-bottom:16px;">⚙️ Reward Settings</h3>
         <div class="form-row">
           <div class="form-group"><label>Active/Inactive</label>
@@ -218,6 +225,126 @@ tr:hover td { background: #fafafa; }
       </div>
     </div>
 
+    <!-- ANALYTICS -->
+    <div class="page" id="page-analytics">
+      <div class="page-header"><h1>📈 Analytics Dashboard</h1><p>Business insights</p></div>
+      <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);">
+        <div class="stat-card"><div class="icon">🔁</div><div class="value" id="ana-repeat">0</div><div class="label">Repeat Customers</div></div>
+        <div class="stat-card"><div class="icon">👥</div><div class="value" id="ana-total-cust">0</div><div class="label">Total Customers</div></div>
+        <div class="stat-card"><div class="icon">📊</div><div class="value" id="ana-retention">0%</div><div class="label">Retention Rate</div></div>
+      </div>
+      <div class="analytics-grid">
+        <div class="card">
+          <h3 style="margin-bottom:16px;">🏆 Best Selling Items</h3>
+          <div id="best-selling-chart"></div>
+        </div>
+        <div class="card">
+          <h3 style="margin-bottom:16px;">⏰ Peak Order Hours</h3>
+          <div id="peak-hours-chart"></div>
+        </div>
+        <div class="card">
+          <h3 style="margin-bottom:16px;">🎟️ Coupon Performance</h3>
+          <table><thead><tr><th>Code</th><th>Used</th><th>Discount Given</th></tr></thead>
+          <tbody id="coupon-perf-table"></tbody></table>
+        </div>
+        <div class="card">
+          <h3 style="margin-bottom:16px;">📅 Last 7 Days Revenue</h3>
+          <div id="revenue-chart"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- REFERRAL -->
+    <div class="page" id="page-referral">
+      <div class="page-header"><h1>🔗 Referral System</h1><p>Refer & Earn manage karo</p></div>
+      <div class="card">
+        <h3 style="margin-bottom:16px;">⚙️ Referral Settings</h3>
+        <div class="form-row">
+          <div class="form-group"><label>Active/Inactive</label>
+            <select id="ref-active"><option value="1">Active ✅</option><option value="0">Inactive ❌</option></select></div>
+          <div class="form-group"><label>Reward Type</label>
+            <select id="ref-type" onchange="toggleRefLifetime()">
+              <option value="fixed">Fixed Amount ₹</option>
+              <option value="percent">Percent %</option>
+            </select></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>One-Time Reward Amount</label><input type="number" id="ref-amount" placeholder="50"></div>
+          <div class="form-group"><label>Max Refer Limit (0 = unlimited)</label><input type="number" id="ref-max" placeholder="0"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Lifetime Rewards?</label>
+            <select id="ref-lifetime"><option value="0">No (One Time)</option><option value="1">Yes (Lifetime)</option></select></div>
+          <div class="form-group"><label>Lifetime % per order</label><input type="number" id="ref-lifetime-percent" placeholder="5"></div>
+        </div>
+        <button class="btn btn-primary" onclick="saveReferralSettings()">Settings Save Karo</button>
+      </div>
+      <div class="card">
+        <h3 style="margin-bottom:16px;">📋 Referral History</h3>
+        <table><thead><tr><th>Referrer</th><th>Referred</th><th>Name</th><th>Reward</th><th>Type</th><th>Status</th><th>Date</th></tr></thead>
+        <tbody id="referral-table"></tbody></table>
+      </div>
+    </div>
+
+    <!-- WISHLIST -->
+    <div class="page" id="page-wishlist">
+      <div class="page-header"><h1>❤️ Wishlist Viewer</h1><p>Customers ki wishlists dekho</p></div>
+      <div class="card">
+        <table><thead><tr><th>Customer</th><th>Phone</th><th>Item</th><th>Price</th><th>Added On</th></tr></thead>
+        <tbody id="wishlist-table"></tbody></table>
+      </div>
+    </div>
+
+    <!-- LEADERBOARD -->
+    <div class="page" id="page-leaderboard">
+      <div class="page-header" style="display:flex;justify-content:space-between;align-items:center;">
+        <div><h1>🏆 Leaderboard</h1><p>Top customers manage karo</p></div>
+        <button class="btn btn-primary" onclick="openAddLeaderboard()">+ Entry Add Karo</button>
+      </div>
+      <div class="card">
+        <table><thead><tr><th>Rank</th><th>Name</th><th>Tag</th><th>Orders</th><th>Spent</th><th>Visible</th><th>Action</th></tr></thead>
+        <tbody id="leaderboard-table"></tbody></table>
+      </div>
+    </div>
+
+    <!-- FREE ITEM -->
+    <div class="page" id="page-freeitem">
+      <div class="page-header"><h1>🎁 Free Item Tasks</h1><p>Task completion manage karo</p></div>
+      <div class="card">
+        <h3 style="margin-bottom:16px;">⚙️ Free Item Settings</h3>
+        <div class="form-row">
+          <div class="form-group"><label>Active/Inactive</label>
+            <select id="fi-active"><option value="1">Active ✅</option><option value="0">Inactive ❌</option></select></div>
+          <div class="form-group"><label>Target Orders Count</label><input type="number" id="fi-target" placeholder="3"></div>
+        </div>
+        <div class="form-group"><label>Free Reward Item Name</label><input type="text" id="fi-reward" placeholder="Free Cold Coffee"></div>
+        <button class="btn btn-primary" onclick="saveFreeItemSettings()">Save Karo</button>
+      </div>
+      <div class="card">
+        <h3 style="margin-bottom:16px;">📋 Task Progress</h3>
+        <table><thead><tr><th>Phone</th><th>Progress</th><th>Target</th><th>Reward</th><th>Status</th></tr></thead>
+        <tbody id="freeitem-table"></tbody></table>
+      </div>
+    </div>
+
+    <!-- TODAY SPECIAL -->
+    <div class="page" id="page-special">
+      <div class="page-header"><h1>⚡ Today's Special</h1><p>Aaj ka special dish set karo</p></div>
+      <div class="card" style="max-width:500px;">
+        <div class="form-row">
+          <div class="form-group"><label>Item Name *</label><input type="text" id="sp-name" placeholder="Paneer Special Thali"></div>
+          <div class="form-group"><label>Emoji</label><input type="text" id="sp-emoji" placeholder="🍛"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Price ₹</label><input type="number" id="sp-price" placeholder="150"></div>
+          <div class="form-group"><label>Old Price ₹</label><input type="number" id="sp-old-price" placeholder="200"></div>
+        </div>
+        <div class="form-group"><label>Description</label><textarea id="sp-desc" rows="2" placeholder="Aaj ka special..."></textarea></div>
+        <button class="btn btn-primary" onclick="saveTodaySpecial()">Set Today's Special</button>
+        <div id="current-special" style="margin-top:16px;padding:12px;background:#fff3e0;border-radius:8px;display:none;"></div>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -237,14 +364,13 @@ tr:hover td { background: #fafafa; }
           <option value="chinese">Chinese</option><option value="pizza">Pizza</option>
           <option value="burger">Burger</option><option value="momos">Momos</option>
           <option value="beverages">Beverages</option><option value="desserts">Desserts</option>
-        </select>
-      </div>
+        </select></div>
       <div class="form-group"><label>Available</label>
         <select id="menu-available"><option value="1">Yes ✅</option><option value="0">No ❌</option></select></div>
     </div>
     <div class="form-row">
       <div class="form-group"><label>Price ₹ *</label><input type="number" id="menu-price" placeholder="150"></div>
-      <div class="form-group"><label>Old Price ₹ (optional)</label><input type="number" id="menu-old-price" placeholder="200"></div>
+      <div class="form-group"><label>Old Price ₹</label><input type="number" id="menu-old-price" placeholder="200"></div>
     </div>
     <div class="form-group"><label>Description</label><textarea id="menu-desc" rows="2" placeholder="Item ki details..."></textarea></div>
     <div class="form-group"><label>Bestseller?</label>
@@ -301,6 +427,29 @@ tr:hover td { background: #fafafa; }
   </div>
 </div>
 
+<!-- LEADERBOARD MODAL -->
+<div class="modal" id="lbModal">
+  <div class="modal-box">
+    <h3 id="lbModalTitle">🏆 Entry Add Karo</h3>
+    <input type="hidden" id="lb-edit-id">
+    <div class="form-row">
+      <div class="form-group"><label>Rank</label><input type="number" id="lb-rank" placeholder="1"></div>
+      <div class="form-group"><label>Display Name</label><input type="text" id="lb-name" placeholder="Rahul S."></div>
+    </div>
+    <div class="form-group"><label>Tag</label><input type="text" id="lb-tag" placeholder="👑 Food King"></div>
+    <div class="form-row">
+      <div class="form-group"><label>Orders</label><input type="number" id="lb-orders" placeholder="100"></div>
+      <div class="form-group"><label>Total Spent ₹</label><input type="number" id="lb-spent" placeholder="15000"></div>
+    </div>
+    <div class="form-group"><label>Visible on Website?</label>
+      <select id="lb-visible"><option value="1">Yes ✅</option><option value="0">No ❌</option></select></div>
+    <div style="display:flex;gap:10px;margin-top:8px;">
+      <button class="btn btn-primary" onclick="saveLeaderboard()">Save Karo</button>
+      <button class="btn" style="background:#eee;" onclick="closeModal('lbModal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
 <script>
 const API = '';
 
@@ -315,16 +464,11 @@ async function doLogin() {
       document.getElementById('loginPage').style.display = 'none';
       document.getElementById('adminLayout').style.display = 'flex';
       loadDashboard();
-    } else {
-      document.getElementById('loginError').textContent = data.message;
-    }
+    } else { document.getElementById('loginError').textContent = data.message; }
   } catch(e) { document.getElementById('loginError').textContent = 'Server se connect nahi ho raha!'; }
 }
 
-function doLogout() {
-  localStorage.removeItem('adminToken');
-  location.reload();
-}
+function doLogout() { localStorage.removeItem('adminToken'); location.reload(); }
 
 window.onload = () => {
   if (localStorage.getItem('adminToken')) {
@@ -347,13 +491,17 @@ function showPage(page) {
   if (page === 'rewards') loadRewardSettings();
   if (page === 'sales') loadSales();
   if (page === 'delivery') loadDelivery();
+  if (page === 'analytics') loadAnalytics();
+  if (page === 'referral') loadReferral();
+  if (page === 'wishlist') loadWishlist();
+  if (page === 'leaderboard') loadLeaderboard();
+  if (page === 'freeitem') loadFreeItem();
+  if (page === 'special') loadTodaySpecial();
 }
 
 async function loadDashboard() {
   try {
-    const [todayRes, custRes, menuRes] = await Promise.all([
-      fetch('/api/sales/today'), fetch('/api/customers'), fetch('/api/menu')
-    ]);
+    const [todayRes, custRes, menuRes] = await Promise.all([fetch('/api/sales/today'), fetch('/api/customers'), fetch('/api/menu')]);
     const today = await todayRes.json();
     const custs = await custRes.json();
     const menu = await menuRes.json();
@@ -361,12 +509,10 @@ async function loadDashboard() {
     document.getElementById('stat-sales').textContent = '₹' + today.data.totalSale;
     document.getElementById('stat-customers').textContent = custs.data.length;
     document.getElementById('stat-menu').textContent = menu.data.length;
-    const tbody = document.getElementById('recent-orders');
-    tbody.innerHTML = today.data.orders.slice(0,10).map(o => `
+    document.getElementById('recent-orders').innerHTML = today.data.orders.slice(0,10).map(o => `
       <tr><td>#${o.id}</td><td>${o.customer_name}</td><td>${o.customer_phone}</td>
       <td>₹${o.total}</td><td><span class="badge badge-${o.status}">${o.status}</span></td>
-      <td>${new Date(o.created_at).toLocaleTimeString('en-IN')}</td></tr>
-    `).join('');
+      <td>${new Date(o.created_at).toLocaleTimeString('en-IN')}</td></tr>`).join('');
   } catch(e) {}
 }
 
@@ -377,33 +523,25 @@ async function loadMenu() {
     <tr>
       <td style="font-size:24px;">${item.emoji}</td>
       <td><strong>${item.name}</strong>${item.is_bestseller ? ' ⭐' : ''}</td>
-      <td>${item.category}</td>
-      <td>₹${item.price}</td>
+      <td>${item.category}</td><td>₹${item.price}</td>
       <td>${item.old_price ? '₹'+item.old_price : '-'}</td>
       <td>${item.is_available ? '✅' : '❌'}</td>
       <td>
         <button class="btn btn-sm btn-primary" onclick="editMenu(${item.id})">Edit</button>
         <button class="btn btn-sm btn-danger" onclick="deleteMenu(${item.id})" style="margin-left:4px;">Delete</button>
       </td>
-    </tr>
-  `).join('');
+    </tr>`).join('');
 }
 
 function openAddMenu() {
   document.getElementById('menuModalTitle').textContent = '🍽️ Item Add Karo';
-  document.getElementById('menu-edit-id').value = '';
-  document.getElementById('menu-name').value = '';
-  document.getElementById('menu-emoji').value = '';
-  document.getElementById('menu-price').value = '';
-  document.getElementById('menu-old-price').value = '';
-  document.getElementById('menu-desc').value = '';
+  ['menu-edit-id','menu-name','menu-emoji','menu-price','menu-old-price','menu-desc'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('menuModal').classList.add('open');
 }
 
 async function editMenu(id) {
   const res = await fetch('/api/menu/' + id);
-  const data = await res.json();
-  const item = data.data;
+  const { data: item } = await res.json();
   document.getElementById('menuModalTitle').textContent = '✏️ Item Edit Karo';
   document.getElementById('menu-edit-id').value = item.id;
   document.getElementById('menu-name').value = item.name;
@@ -429,9 +567,7 @@ async function saveMenuItem() {
     is_bestseller: parseInt(document.getElementById('menu-bestseller').value),
     is_available: parseInt(document.getElementById('menu-available').value)
   };
-  const url = id ? `/api/menu/${id}` : '/api/menu';
-  const method = id ? 'PUT' : 'POST';
-  const res = await fetch(url, { method, headers: {'Content-Type':'application/json'}, body: JSON.stringify(body) });
+  const res = await fetch(id ? `/api/menu/${id}` : '/api/menu', { method: id ? 'PUT' : 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body) });
   const data = await res.json();
   if (data.success) { closeModal('menuModal'); loadMenu(); alert('✅ ' + data.message); }
   else alert('❌ ' + data.message);
@@ -439,9 +575,8 @@ async function saveMenuItem() {
 
 async function deleteMenu(id) {
   if (!confirm('Delete karna hai?')) return;
-  const res = await fetch('/api/menu/' + id, { method: 'DELETE' });
-  const data = await res.json();
-  if (data.success) loadMenu();
+  await fetch('/api/menu/' + id, { method: 'DELETE' });
+  loadMenu();
 }
 
 async function loadOrders() {
@@ -449,17 +584,13 @@ async function loadOrders() {
   const data = await res.json();
   document.getElementById('orders-table').innerHTML = data.data.map(o => `
     <tr>
-      <td><strong>#${o.id}</strong></td>
-      <td>${o.customer_name}</td>
-      <td>${o.customer_phone}</td>
+      <td><strong>#${o.id}</strong></td><td>${o.customer_name}</td><td>${o.customer_phone}</td>
       <td style="max-width:120px;font-size:12px;">${o.customer_address || '-'}</td>
       <td style="max-width:150px;font-size:12px;">${o.items.map(i => i.name + ' x' + i.quantity).join(', ')}</td>
-      <td>₹${o.total}</td>
-      <td>${o.payment_method || 'COD'}</td>
+      <td>₹${o.total}</td><td>${o.payment_method || 'COD'}</td>
       <td><span class="badge badge-${o.status}">${o.status}</span></td>
-      <td><button class="btn btn-sm btn-primary" onclick="openOrderModal(${o.id}, '${o.status}', '${o.customer_name}', ${o.total})">Update</button></td>
-    </tr>
-  `).join('');
+      <td><button class="btn btn-sm btn-primary" onclick="openOrderModal(${o.id},'${o.status}','${o.customer_name}',${o.total})">Update</button></td>
+    </tr>`).join('');
 }
 
 function openOrderModal(id, status, name, total) {
@@ -482,15 +613,11 @@ async function loadCustomers() {
   const data = await res.json();
   document.getElementById('customers-table').innerHTML = data.data.map(c => `
     <tr>
-      <td><strong>${c.name}</strong></td>
-      <td>${c.phone}</td>
-      <td>${c.total_orders}</td>
-      <td>₹${c.total_spent}</td>
-      <td>⭐${c.reward_points}</td>
+      <td><strong>${c.name}</strong></td><td>${c.phone}</td><td>${c.total_orders}</td>
+      <td>₹${c.total_spent}</td><td>⭐${c.reward_points}</td>
       <td><span class="badge badge-${c.category}">${c.category.toUpperCase()}</span></td>
       <td>${c.last_order_at ? new Date(c.last_order_at).toLocaleDateString('en-IN') : '-'}</td>
-    </tr>
-  `).join('');
+    </tr>`).join('');
 }
 
 async function loadCoupons() {
@@ -501,12 +628,10 @@ async function loadCoupons() {
       <td><strong>${c.code}</strong></td>
       <td>${c.type === 'flat' ? 'Flat ₹' : 'Percent %'}</td>
       <td>${c.type === 'flat' ? '₹' : ''}${c.amount}${c.type === 'percent' ? '%' : ''}</td>
-      <td>₹${c.min_order}</td>
-      <td>${c.used_count}/${c.max_uses}</td>
+      <td>₹${c.min_order}</td><td>${c.used_count}/${c.max_uses}</td>
       <td>${c.valid_till || 'No limit'}</td>
       <td><button class="btn btn-sm btn-danger" onclick="deleteCoupon(${c.id})">Delete</button></td>
-    </tr>
-  `).join('');
+    </tr>`).join('');
 }
 
 function openAddCoupon() { document.getElementById('couponModal').classList.add('open'); }
@@ -572,12 +697,10 @@ async function loadSales() {
   document.getElementById('sales-orders').textContent = data.data.totalOrders;
   document.getElementById('sales-total').textContent = '₹' + data.data.totalSale;
   document.getElementById('sales-avg').textContent = data.data.totalOrders > 0 ? '₹' + Math.floor(data.data.totalSale / data.data.totalOrders) : '₹0';
-
   const histRes = await fetch('/api/sales/history');
   const histData = await histRes.json();
   document.getElementById('sales-table').innerHTML = histData.data.map(s => `
-    <tr><td>${s.date}</td><td>${s.total_orders}</td><td>₹${s.total_sale}</td></tr>
-  `).join('');
+    <tr><td>${s.date}</td><td>${s.total_orders}</td><td>₹${s.total_sale}</td></tr>`).join('');
 }
 
 async function loadDelivery() {
@@ -599,6 +722,208 @@ async function saveDelivery() {
   const res = await fetch('/api/delivery/settings', { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body) });
   const data = await res.json();
   alert(data.success ? '✅ Delivery settings save ho gayi!' : '❌ Error!');
+}
+
+async function loadAnalytics() {
+  try {
+    const res = await fetch('/api/analytics');
+    const data = await res.json();
+    const d = data.data;
+    document.getElementById('ana-repeat').textContent = d.repeatCustomers;
+    document.getElementById('ana-total-cust').textContent = d.totalCustomers;
+    document.getElementById('ana-retention').textContent = d.totalCustomers > 0 ? Math.round((d.repeatCustomers / d.totalCustomers) * 100) + '%' : '0%';
+    const maxQty = d.bestSelling[0]?.total_qty || 1;
+    document.getElementById('best-selling-chart').innerHTML = d.bestSelling.map(i => `
+      <div class="chart-bar">
+        <div class="chart-bar-label">${i.item_name}</div>
+        <div class="chart-bar-fill" style="width:${Math.round((i.total_qty/maxQty)*200)}px"></div>
+        <div class="chart-bar-val">${i.total_qty}</div>
+      </div>`).join('');
+    const maxPeak = d.peakHours[0]?.count || 1;
+    document.getElementById('peak-hours-chart').innerHTML = d.peakHours.map(h => `
+      <div class="chart-bar">
+        <div class="chart-bar-label">${h.hour}:00 - ${h.hour}:59</div>
+        <div class="chart-bar-fill" style="width:${Math.round((h.count/maxPeak)*200)}px"></div>
+        <div class="chart-bar-val">${h.count} orders</div>
+      </div>`).join('');
+    document.getElementById('coupon-perf-table').innerHTML = d.couponPerf.length ? d.couponPerf.map(c => `
+      <tr><td><strong>${c.coupon_code}</strong></td><td>${c.used_times}</td><td>₹${c.total_discount}</td></tr>`).join('') : '<tr><td colspan="3" style="text-align:center;color:#aaa;">No coupon data yet</td></tr>';
+    const maxRev = Math.max(...d.dailyRevenue.map(r => r.revenue), 1);
+    document.getElementById('revenue-chart').innerHTML = d.dailyRevenue.map(r => `
+      <div class="chart-bar">
+        <div class="chart-bar-label">${r.date}</div>
+        <div class="chart-bar-fill" style="width:${Math.round((r.revenue/maxRev)*200)}px"></div>
+        <div class="chart-bar-val">₹${r.revenue}</div>
+      </div>`).join('');
+  } catch(e) {}
+}
+
+async function loadReferral() {
+  try {
+    const [settRes, histRes] = await Promise.all([fetch('/api/referral/settings'), fetch('/api/referral/history')]);
+    const sett = await settRes.json();
+    const hist = await histRes.json();
+    if (sett.data) {
+      document.getElementById('ref-active').value = sett.data.is_active;
+      document.getElementById('ref-type').value = sett.data.reward_type;
+      document.getElementById('ref-amount').value = sett.data.reward_amount;
+      document.getElementById('ref-max').value = sett.data.max_limit;
+      document.getElementById('ref-lifetime').value = sett.data.is_lifetime;
+      document.getElementById('ref-lifetime-percent').value = sett.data.lifetime_percent;
+    }
+    document.getElementById('referral-table').innerHTML = hist.data.length ? hist.data.map(r => `
+      <tr>
+        <td>${r.referrer_phone}</td><td>${r.referred_phone}</td><td>${r.referred_name || '-'}</td>
+        <td>${r.reward_amount}</td><td>${r.is_lifetime ? 'Lifetime' : 'One Time'}</td>
+        <td><span class="badge badge-confirmed">${r.status}</span></td>
+        <td>${new Date(r.created_at).toLocaleDateString('en-IN')}</td>
+      </tr>`).join('') : '<tr><td colspan="7" style="text-align:center;color:#aaa;">No referrals yet</td></tr>';
+  } catch(e) {}
+}
+
+async function saveReferralSettings() {
+  const body = {
+    is_active: parseInt(document.getElementById('ref-active').value),
+    reward_type: document.getElementById('ref-type').value,
+    reward_amount: parseInt(document.getElementById('ref-amount').value),
+    max_limit: parseInt(document.getElementById('ref-max').value) || 0,
+    is_lifetime: parseInt(document.getElementById('ref-lifetime').value),
+    lifetime_percent: parseInt(document.getElementById('ref-lifetime-percent').value) || 5
+  };
+  const res = await fetch('/api/referral/settings', { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body) });
+  const data = await res.json();
+  alert(data.success ? '✅ Referral settings save ho gayi!' : '❌ Error!');
+}
+
+async function loadWishlist() {
+  try {
+    const res = await fetch('/api/admin/wishlists');
+    const data = await res.json();
+    document.getElementById('wishlist-table').innerHTML = data.data.length ? data.data.map(w => `
+      <tr>
+        <td>${w.customer_name || 'Unknown'}</td><td>${w.customer_phone}</td>
+        <td>${w.item_emoji} ${w.item_name}</td><td>₹${w.item_price}</td>
+        <td>${new Date(w.added_at).toLocaleDateString('en-IN')}</td>
+      </tr>`).join('') : '<tr><td colspan="5" style="text-align:center;color:#aaa;">No wishlist data yet</td></tr>';
+  } catch(e) {}
+}
+
+async function loadLeaderboard() {
+  try {
+    const res = await fetch('/api/admin/leaderboard');
+    const data = await res.json();
+    document.getElementById('leaderboard-table').innerHTML = data.data.map(e => `
+      <tr>
+        <td><strong>#${e.rank}</strong></td><td>${e.display_name}</td><td>${e.tag}</td>
+        <td>${e.orders}</td><td>₹${e.total_spent}</td>
+        <td>${e.is_visible ? '✅' : '❌'}</td>
+        <td>
+          <button class="btn btn-sm btn-primary" onclick="editLeaderboard(${e.id},${e.rank},'${e.display_name}','${e.tag}',${e.orders},${e.total_spent},${e.is_visible})">Edit</button>
+          <button class="btn btn-sm btn-danger" onclick="deleteLeaderboard(${e.id})" style="margin-left:4px;">Del</button>
+        </td>
+      </tr>`).join('');
+  } catch(e) {}
+}
+
+function openAddLeaderboard() {
+  document.getElementById('lbModalTitle').textContent = '🏆 Entry Add Karo';
+  ['lb-edit-id','lb-rank','lb-name','lb-tag','lb-orders','lb-spent'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('lbModal').classList.add('open');
+}
+
+function editLeaderboard(id, rank, name, tag, orders, spent, visible) {
+  document.getElementById('lbModalTitle').textContent = '✏️ Entry Edit Karo';
+  document.getElementById('lb-edit-id').value = id;
+  document.getElementById('lb-rank').value = rank;
+  document.getElementById('lb-name').value = name;
+  document.getElementById('lb-tag').value = tag;
+  document.getElementById('lb-orders').value = orders;
+  document.getElementById('lb-spent').value = spent;
+  document.getElementById('lb-visible').value = visible;
+  document.getElementById('lbModal').classList.add('open');
+}
+
+async function saveLeaderboard() {
+  const id = document.getElementById('lb-edit-id').value;
+  const body = {
+    rank: parseInt(document.getElementById('lb-rank').value),
+    display_name: document.getElementById('lb-name').value,
+    tag: document.getElementById('lb-tag').value,
+    orders: parseInt(document.getElementById('lb-orders').value) || 0,
+    total_spent: parseInt(document.getElementById('lb-spent').value) || 0,
+    is_visible: parseInt(document.getElementById('lb-visible').value),
+    is_manual: 1
+  };
+  const url = id ? `/api/admin/leaderboard/${id}` : '/api/admin/leaderboard';
+  const method = id ? 'PUT' : 'POST';
+  const res = await fetch(url, { method, headers: {'Content-Type':'application/json'}, body: JSON.stringify(body) });
+  const data = await res.json();
+  if (data.success) { closeModal('lbModal'); loadLeaderboard(); alert('✅ ' + data.message); }
+  else alert('❌ ' + data.message);
+}
+
+async function deleteLeaderboard(id) {
+  if (!confirm('Delete karna hai?')) return;
+  await fetch('/api/admin/leaderboard/' + id, { method: 'DELETE' });
+  loadLeaderboard();
+}
+
+async function loadFreeItem() {
+  try {
+    const [settRes, taskRes] = await Promise.all([fetch('/api/free-item/settings'), fetch('/api/free-item/tasks')]);
+    const sett = await settRes.json();
+    const tasks = await taskRes.json();
+    if (sett.data) {
+      document.getElementById('fi-active').value = sett.data.is_active;
+      document.getElementById('fi-target').value = sett.data.target_count;
+      document.getElementById('fi-reward').value = sett.data.reward_item;
+    }
+    document.getElementById('freeitem-table').innerHTML = tasks.data.length ? tasks.data.map(t => `
+      <tr>
+        <td>${t.customer_phone}</td>
+        <td><strong>${t.current_count}/${t.target_count}</strong></td>
+        <td>${t.target_count}</td><td>${t.reward_item}</td>
+        <td><span class="badge ${t.status === 'completed' ? 'badge-confirmed' : 'badge-pending'}">${t.status}</span></td>
+      </tr>`).join('') : '<tr><td colspan="5" style="text-align:center;color:#aaa;">No task data yet</td></tr>';
+  } catch(e) {}
+}
+
+async function saveFreeItemSettings() {
+  const body = {
+    is_active: parseInt(document.getElementById('fi-active').value),
+    task_type: 'order_count',
+    target_count: parseInt(document.getElementById('fi-target').value),
+    reward_item: document.getElementById('fi-reward').value
+  };
+  const res = await fetch('/api/free-item/settings', { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body) });
+  const data = await res.json();
+  alert(data.success ? '✅ Settings save ho gayi!' : '❌ Error!');
+}
+
+async function loadTodaySpecial() {
+  try {
+    const res = await fetch('/api/today-special');
+    const data = await res.json();
+    const box = document.getElementById('current-special');
+    if (data.data) {
+      box.style.display = 'block';
+      box.innerHTML = `<strong>Current Special:</strong> ${data.data.emoji} ${data.data.item_name} — ₹${data.data.price} <span style="text-decoration:line-through;color:#aaa;">₹${data.data.old_price}</span>`;
+    }
+  } catch(e) {}
+}
+
+async function saveTodaySpecial() {
+  const body = {
+    item_name: document.getElementById('sp-name').value,
+    emoji: document.getElementById('sp-emoji').value || '🍽️',
+    price: parseInt(document.getElementById('sp-price').value),
+    old_price: parseInt(document.getElementById('sp-old-price').value) || 0,
+    description: document.getElementById('sp-desc').value
+  };
+  const res = await fetch('/api/today-special', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body) });
+  const data = await res.json();
+  if (data.success) { loadTodaySpecial(); alert('✅ ' + data.message); }
+  else alert('❌ ' + data.message);
 }
 
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
