@@ -430,6 +430,223 @@ app.get('*', (req, res) => {
 // ============================
 //  SERVER START
 // ============================
+// ============================
+//  WISHLIST ROUTES
+// ============================
+app.post('/api/wishlist/add', (req, res) => {
+  try {
+    const { customer_phone, item_id, item_name, item_price, item_emoji } = req.body;
+    const existing = db.prepare('SELECT * FROM wishlists WHERE customer_phone = ? AND item_id = ?').get(customer_phone, item_id);
+    if (existing) return res.json({ success: false, message: 'Already wishlist mein hai!' });
+    db.prepare('INSERT INTO wishlists (customer_phone, item_id, item_name, item_price, item_emoji) VALUES (?, ?, ?, ?, ?)').run(customer_phone, item_id, item_name, item_price, item_emoji || '🍽️');
+    res.json({ success: true, message: 'Wishlist mein add ho gaya! ❤️' });
+  } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
+});
+
+app.get('/api/wishlist/:phone', (req, res) => {
+  try {
+    const items = db.prepare('SELECT * FROM wishlists WHERE customer_phone = ? ORDER BY added_at DESC').all(req.params.phone);
+    res.json({ success: true, data: items });
+  } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
+});
+
+app.delete('/api/wishlist/:phone/:item_id', (req, res) => {
+  try {
+    db.prepare('DELETE FROM wishlists WHERE customer_phone = ? AND item_id = ?').run(req.params.phone, req.params.item_id);
+    res.json({ success: true, message: 'Wishlist se remove ho gaya!' });
+  } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
+});
+
+app.get('/api/admin/wishlists', (req, res) => {
+  try {
+    const items = db.prepare('SELECT w.*, c.name as customer_name FROM wishlists w LEFT JOIN customers c ON w.customer_phone = c.phone ORDER BY w.added_at DESC').all();
+    res.json({ success: true, data: items });
+  } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
+});
+
+// ============================
+//  REFERRAL ROUTES
+// ============================
+app.get('/api/referral/settings', (req, res) => {
+  try {
+    const settings = db.prepare('SELECT * FROM referral_settings WHERE id = 1').get();
+    res.json({ success: true, data: settings });
+  } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
+});
+
+app.put('/api/referral/settings', (req, res) => {
+  try {
+    const { is_active, reward_type, reward_amount, is_lifetime, lifetime_percent, max_limit } = req.body;
+    db.prepare('UPDATE referral_settings SET is_active=?, reward_type=?, reward_amount=?, is_lifetime=?, lifetime_percent=?, max_limit=? WHERE id=1')
+      .run(is_active, reward_type, reward_amount, is_lifetime, lifetime_percent, max_limit);
+    res.json({ success: true, message: 'Referral settings save ho gayi!' });
+  } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
+});
+
+app.post('/api/referral/apply', (req, res) => {
+  try {
+    const { referrer_phone, referred_phone, referred_name } = req.body;
+    if (referrer_phone === referred_phone) return res.status(400).json({ success: false, message: 'Apne aap ko refer nahi kar sakte!' });
+    const existing = db.prepare('SELECT * FROM referrals WHERE referred_phone = ?').get(referred_phone);
+    if (existing) return res.status(400).json({ success: false, message: 'Yeh number pehle se refer ho chuka hai!' });
+    const settings = db.prepare('SELECT * FROM referral_settings WHERE id = 1').get();
+    db.prepare('INSERT INTO referrals (referrer_phone, referred_phone, referred_name, reward_type, reward_amount, is_lifetime, status) VALUES (?, ?, ?, ?, ?, ?, "active")')
+      .run(referrer_phone, referred_phone, referred_name || '', settings.reward_type, settings.reward_amount, settings.is_lifetime);
+    // Referrer ko coins do
+    db.prepare('INSERT INTO wallet_transactions (customer_phone, coins, type, reason) VALUES (?, ?, "credit", "Referral Bonus")').run(referrer_phone, settings.reward_amount);
+    db.prepare('UPDATE customers SET reward_points = reward_points + ? WHERE phone = ?').run(settings.reward_amount, referrer_phone);
+    res.json({ success: true, message: `Referral applied! ${settings.reward_amount} coins mile! 🎉` });
+  } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
+});
+
+app.get('/api/referral/history', (req, res) => {
+  try {
+    const referrals = db.prepare('SELECT * FROM referrals ORDER BY created_at DESC').all();
+    res.json({ success: true, data: referrals });
+  } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
+});
+
+app.get('/api/referral/history/:phone', (req, res) => {
+  try {
+    const referrals = db.prepare('SELECT * FROM referrals WHERE referrer_phone = ? ORDER BY created_at DESC').all(req.params.phone);
+    res.json({ success: true, data: referrals });
+  } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
+});
+
+// ============================
+//  LEADERBOARD ROUTES
+// ============================
+app.get('/api/leaderboard', (req, res) => {
+  try {
+    const entries = db.prepare('SELECT * FROM leaderboard WHERE is_visible = 1 ORDER BY rank ASC').all();
+    res.json({ success: true, data: entries });
+  } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
+});
+
+app.get('/api/admin/leaderboard', (req, res) => {
+  try {
+    const entries = db.prepare('SELECT * FROM leaderboard ORDER BY rank ASC').all();
+    res.json({ success: true, data: entries });
+  } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
+});
+
+app.post('/api/admin/leaderboard', (req, res) => {
+  try {
+    const { rank, display_name, tag, orders, total_spent, is_manual, is_visible } = req.body;
+    db.prepare('INSERT INTO leaderboard (rank, display_name, tag, orders, total_spent, is_manual, is_visible) VALUES (?, ?, ?, ?, ?, ?, ?)')
+      .run(rank, display_name, tag, orders || 0, total_spent || 0, is_manual || 1, is_visible ?? 1);
+    res.json({ success: true, message: 'Entry add ho gayi!' });
+  } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
+});
+
+app.put('/api/admin/leaderboard/:id', (req, res) => {
+  try {
+    const { rank, display_name, tag, orders, total_spent, is_visible } = req.body;
+    db.prepare('UPDATE leaderboard SET rank=?, display_name=?, tag=?, orders=?, total_spent=?, is_visible=? WHERE id=?')
+      .run(rank, display_name, tag, orders, total_spent, is_visible, req.params.id);
+    res.json({ success: true, message: 'Updated!' });
+  } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
+});
+
+app.delete('/api/admin/leaderboard/:id', (req, res) => {
+  try {
+    db.prepare('DELETE FROM leaderboard WHERE id = ?').run(req.params.id);
+    res.json({ success: true, message: 'Delete ho gaya!' });
+  } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
+});
+
+// ============================
+//  FREE ITEM ROUTES
+// ============================
+app.get('/api/free-item/settings', (req, res) => {
+  try {
+    const settings = db.prepare('SELECT * FROM free_item_settings WHERE id = 1').get();
+    res.json({ success: true, data: settings });
+  } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
+});
+
+app.put('/api/free-item/settings', (req, res) => {
+  try {
+    const { is_active, task_type, target_count, reward_item } = req.body;
+    db.prepare('UPDATE free_item_settings SET is_active=?, task_type=?, target_count=?, reward_item=? WHERE id=1')
+      .run(is_active, task_type, target_count, reward_item);
+    res.json({ success: true, message: 'Free item settings save ho gayi!' });
+  } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
+});
+
+app.get('/api/free-item/tasks', (req, res) => {
+  try {
+    const tasks = db.prepare('SELECT * FROM free_item_tasks ORDER BY created_at DESC').all();
+    res.json({ success: true, data: tasks });
+  } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
+});
+
+app.get('/api/free-item/progress/:phone', (req, res) => {
+  try {
+    const settings = db.prepare('SELECT * FROM free_item_settings WHERE id = 1').get();
+    let task = db.prepare('SELECT * FROM free_item_tasks WHERE customer_phone = ? AND status = "in_progress"').get(req.params.phone);
+    if (!task) {
+      db.prepare('INSERT INTO free_item_tasks (customer_phone, task_type, target_count, reward_item) VALUES (?, ?, ?, ?)')
+        .run(req.params.phone, settings.task_type, settings.target_count, settings.reward_item);
+      task = db.prepare('SELECT * FROM free_item_tasks WHERE customer_phone = ? AND status = "in_progress"').get(req.params.phone);
+    }
+    res.json({ success: true, data: task });
+  } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
+});
+
+// ============================
+//  WALLET ROUTES
+// ============================
+app.get('/api/wallet/:phone', (req, res) => {
+  try {
+    const customer = db.prepare('SELECT reward_points FROM customers WHERE phone = ?').get(req.params.phone);
+    const history = db.prepare('SELECT * FROM wallet_transactions WHERE customer_phone = ? ORDER BY created_at DESC LIMIT 20').all(req.params.phone);
+    res.json({ success: true, data: { balance: customer ? customer.reward_points : 0, history } });
+  } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
+});
+
+// ============================
+//  ANALYTICS ROUTES
+// ============================
+app.get('/api/analytics', (req, res) => {
+  try {
+    const bestSelling = db.prepare(`
+      SELECT item_name, SUM(quantity) as total_qty FROM order_items GROUP BY item_name ORDER BY total_qty DESC LIMIT 10
+    `).all();
+    const peakHours = db.prepare(`
+      SELECT strftime('%H', created_at) as hour, COUNT(*) as count FROM orders GROUP BY hour ORDER BY count DESC LIMIT 5
+    `).all();
+    const repeatCustomers = db.prepare('SELECT COUNT(*) as count FROM customers WHERE total_orders > 1').get();
+    const totalCustomers = db.prepare('SELECT COUNT(*) as count FROM customers').get();
+    const couponPerf = db.prepare(`
+      SELECT coupon_code, COUNT(*) as used_times, SUM(discount) as total_discount FROM orders WHERE coupon_code != '' GROUP BY coupon_code
+    `).all();
+    const dailyRevenue = db.prepare(`
+      SELECT DATE(created_at) as date, SUM(total) as revenue, COUNT(*) as orders FROM orders WHERE status != 'cancelled' GROUP BY DATE(created_at) ORDER BY date DESC LIMIT 7
+    `).all();
+    res.json({ success: true, data: { bestSelling, peakHours, repeatCustomers: repeatCustomers.count, totalCustomers: totalCustomers.count, couponPerf, dailyRevenue } });
+  } catch (err) { res.status(500).json({ success: false, message: 'Analytics error' }); }
+});
+
+// ============================
+//  TODAY SPECIAL ROUTES
+// ============================
+app.get('/api/today-special', (req, res) => {
+  try {
+    const special = db.prepare('SELECT * FROM today_special WHERE is_active = 1 ORDER BY created_at DESC LIMIT 1').get();
+    res.json({ success: true, data: special || null });
+  } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
+});
+
+app.post('/api/today-special', (req, res) => {
+  try {
+    const { item_name, description, price, old_price, emoji } = req.body;
+    db.prepare('UPDATE today_special SET is_active = 0').run();
+    db.prepare('INSERT INTO today_special (item_name, description, price, old_price, emoji, is_active) VALUES (?, ?, ?, ?, ?, 1)')
+      .run(item_name, description || '', price, old_price || 0, emoji || '🍽️');
+    res.json({ success: true, message: "Today's special set ho gaya!" });
+  } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
+});
 app.listen(PORT, () => {
   console.log(`☕ Chai Pila Backend chal raha hai! Port: ${PORT}`);
 });
