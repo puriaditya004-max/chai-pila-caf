@@ -21,9 +21,7 @@
   * { margin:0; padding:0; box-sizing:border-box; }
   body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text); transition:background 0.3s,color 0.3s; }
   a { text-decoration:none; color:inherit; }
-
   .topbar { background:var(--primary); color:white; text-align:center; font-size:13px; padding:6px; letter-spacing:0.5px; }
-
   .navbar { background:var(--bg); border-bottom:1px solid var(--border); padding:0 24px; display:flex; align-items:center; gap:20px; height:70px; position:sticky; top:0; z-index:200; }
   .logo { display:flex; align-items:center; gap:10px; cursor:pointer; }
   .logo-icon { width:44px; height:44px; background:var(--primary); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:22px; }
@@ -48,27 +46,22 @@
   .nav-btn:hover { background:var(--bg-secondary); }
   .cart-badge { position:absolute; top:4px; right:4px; background:var(--primary); color:white; border-radius:50%; width:18px; height:18px; font-size:10px; display:flex; align-items:center; justify-content:center; font-weight:700; }
   .dark-toggle { background:var(--bg-secondary); border:1.5px solid var(--border); border-radius:20px; padding:6px 14px; cursor:pointer; font-size:13px; font-weight:500; color:var(--text); display:flex; align-items:center; gap:6px; }
-
   .cat-nav { background:var(--bg); border-bottom:1px solid var(--border); display:flex; align-items:center; overflow-x:auto; padding:0 24px; scrollbar-width:none; }
   .cat-nav::-webkit-scrollbar { display:none; }
   .all-cat { background:var(--text); color:var(--bg); padding:0 20px; height:48px; display:flex; align-items:center; gap:8px; font-size:14px; font-weight:600; cursor:pointer; white-space:nowrap; flex-shrink:0; margin-right:4px; }
   .cat-link { padding:0 16px; height:48px; display:flex; align-items:center; font-size:14px; font-weight:500; cursor:pointer; white-space:nowrap; color:var(--text-muted); border-bottom:2px solid transparent; transition:all 0.2s; flex-shrink:0; }
   .cat-link:hover,.cat-link.active { color:var(--primary); border-bottom-color:var(--primary); }
-
-  /* LIVE ACTIVITY TICKER */
   .live-ticker { background:linear-gradient(90deg,#1a0a02,#3d1a08); color:white; padding:8px 24px; display:flex; align-items:center; gap:12px; overflow:hidden; }
   .live-dot { width:8px; height:8px; background:#00ff88; border-radius:50%; animation:pulse 1.5s infinite; flex-shrink:0; }
   @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(1.3)} }
   .ticker-text { font-size:13px; white-space:nowrap; animation:ticker 12s linear infinite; }
   @keyframes ticker { 0%{transform:translateX(100%)} 100%{transform:translateX(-100%)} }
-
   .main-layout { display:flex; max-width:1400px; margin:0 auto; }
   .left-sidebar { width:200px; flex-shrink:0; padding:16px 0; background:var(--bg); border-right:1px solid var(--border); min-height:calc(100vh - 120px); }
   .sidebar-item { display:flex; align-items:center; gap:10px; padding:12px 20px; cursor:pointer; font-size:14px; font-weight:500; color:var(--text-muted); transition:all 0.2s; }
   .sidebar-item:hover { background:var(--bg-secondary); color:var(--primary); }
   .sidebar-item .si-icon { width:36px; height:36px; border-radius:50%; background:var(--bg-secondary); display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; }
   .center-content { flex:1; padding:20px; overflow:hidden; }
-
   .hero { background:linear-gradient(135deg,#1A0A02 0%,#3D1A08 40%,#C84B11 100%); border-radius:16px; padding:36px 40px; display:flex; align-items:center; justify-content:space-between; margin-bottom:24px; overflow:hidden; position:relative; min-height:220px; }
   .hero::before { content:''; position:absolute; top:-40px; right:-40px; width:300px; height:300px; background:radial-gradient(circle,rgba(245,166,35,0.15) 0%,transparent 70%); border-radius:50%; }
   .hero-text h2 { font-family:'Playfair Display',serif; font-size:38px; color:white; line-height:1.1; margin-bottom:6px; }
@@ -80,8 +73,6 @@
   .hero-image { position:absolute; right:30px; top:50%; transform:translateY(-50%); width:280px; height:200px; }
   .pizza-circle { width:180px; height:180px; border-radius:50%; background:radial-gradient(circle at 40% 40%,#E8851A,#C84B11,#8B2E0D); position:absolute; right:60px; top:10px; display:flex; align-items:center; justify-content:center; font-size:80px; box-shadow:0 8px 32px rgba(200,75,17,0.4); }
   .burger-circle { width:100px; height:100px; border-radius:50%; background:radial-gradient(circle at 40% 40%,#F5A623,#E8851A); position:absolute; left:0; bottom:-10px; display:flex; align-items:center; justify-content:center; font-size:44px; box-shadow:0 4px 16px rgba(245,166,35,0.3); }
-
-  /* TODAY SPECIAL */
   .today-special-banner { background:linear-gradient(135deg,#ff6b35,#f7c59f); border-radius:12px; padding:16px 20px; margin-bottom:20px; display:flex; align-items:center; justify-content:space-between; cursor:pointer; }
   .ts-left { display:flex; align-items:center; gap:14px; }
   .ts-emoji { font-size:44px; }
@@ -91,11 +82,9 @@
   .ts-price .new { font-size:22px; font-weight:800; color:white; }
   .ts-price .old { font-size:13px; color:rgba(255,255,255,0.7); text-decoration:line-through; }
   .ts-badge { background:white; color:#ff6b35; font-size:11px; font-weight:800; padding:3px 10px; border-radius:20px; margin-top:4px; display:inline-block; }
-
   .section-title { font-size:18px; font-weight:700; color:var(--text); margin-bottom:14px; }
   .section-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
   .view-all { font-size:14px; font-weight:600; color:var(--primary); cursor:pointer; }
-
   .combo-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:28px; }
   .combo-card { background:var(--bg); border:1.5px solid var(--border); border-radius:12px; padding:16px; display:flex; align-items:center; justify-content:space-between; cursor:pointer; transition:all 0.2s; box-shadow:var(--card-shadow); }
   .combo-card:hover { border-color:var(--primary); transform:translateY(-2px); }
@@ -105,7 +94,6 @@
   .price-new { font-size:20px; font-weight:700; color:var(--primary); }
   .price-old { font-size:13px; color:var(--text-light); text-decoration:line-through; }
   .combo-emoji { font-size:52px; line-height:1; }
-
   .items-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:12px; margin-bottom:28px; }
   .food-card { background:var(--bg); border:1.5px solid var(--border); border-radius:12px; overflow:hidden; cursor:pointer; transition:all 0.2s; }
   .food-card:hover { border-color:var(--primary); transform:translateY(-2px); box-shadow:var(--card-shadow); }
@@ -117,10 +105,6 @@
   .food-price { font-size:15px; font-weight:700; color:var(--primary); }
   .add-btn { background:var(--bg); border:1.5px solid var(--primary); color:var(--primary); padding:4px 12px; border-radius:6px; font-size:12px; font-weight:700; cursor:pointer; font-family:'DM Sans',sans-serif; transition:all 0.2s; }
   .add-btn:hover { background:var(--primary); color:white; }
-
-  /* LEADERBOARD PAGE */
-  .leaderboard-page { display:none; }
-  .leaderboard-page.active { display:block; }
   .lb-hero { background:linear-gradient(135deg,#1a1a2e,#16213e,#0f3460); border-radius:16px; padding:32px; text-align:center; margin-bottom:24px; }
   .lb-hero h2 { font-family:'Playfair Display',serif; font-size:32px; color:white; margin-bottom:8px; }
   .lb-hero p { color:rgba(255,255,255,0.7); font-size:14px; }
@@ -147,13 +131,11 @@
   .lb-stats { text-align:right; }
   .lb-stats .orders { font-size:13px; font-weight:700; color:var(--primary); }
   .lb-stats .spent { font-size:12px; color:var(--text-muted); }
-
   .features { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; padding:20px 0; border-top:1px solid var(--border); }
   .feature-item { display:flex; align-items:center; gap:10px; }
   .feature-icon { font-size:28px; }
   .feature-text strong { font-size:13px; font-weight:700; display:block; }
   .feature-text span { font-size:12px; color:var(--text-muted); }
-
   .right-sidebar { width:var(--sidebar-width); flex-shrink:0; background:var(--bg); border-left:1px solid var(--border); padding:16px; display:flex; flex-direction:column; gap:16px; }
   .ai-section { background:var(--bg-tertiary); border:1.5px solid var(--border); border-radius:12px; padding:14px; }
   .ai-header { display:flex; align-items:center; gap:8px; font-size:13px; font-weight:700; color:var(--text); margin-bottom:12px; letter-spacing:0.3px; text-transform:uppercase; }
@@ -172,15 +154,11 @@
   .ai-list-img { width:40px; height:40px; border-radius:6px; background:var(--bg-secondary); display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; }
   .ai-list-name { font-size:13px; font-weight:600; }
   .ai-list-price { font-size:13px; font-weight:700; color:var(--primary); }
-
   .order-section { background:var(--bg-tertiary); border:1.5px solid var(--border); border-radius:12px; padding:14px; }
   .order-header { font-size:14px; font-weight:700; color:var(--text); margin-bottom:12px; text-transform:uppercase; letter-spacing:0.3px; }
-
-  /* ORDER TYPE SELECTOR */
   .order-type-selector { display:flex; gap:6px; margin-bottom:12px; }
   .order-type-btn { flex:1; padding:7px 4px; border:1.5px solid var(--border); border-radius:8px; background:var(--bg); color:var(--text-muted); font-size:11px; font-weight:600; cursor:pointer; font-family:'DM Sans',sans-serif; text-align:center; transition:all 0.2s; }
   .order-type-btn.active { border-color:var(--primary); background:var(--primary); color:white; }
-
   .order-item { display:flex; align-items:center; gap:8px; padding:8px 0; border-bottom:1px solid var(--border); }
   .order-item-img { width:36px; height:36px; border-radius:6px; background:var(--bg-secondary); display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; }
   .order-item-info { flex:1; }
@@ -198,10 +176,8 @@
   .checkout-btn:hover { background:var(--primary-dark); }
   .empty-cart { text-align:center; padding:24px 0; color:var(--text-muted); font-size:13px; }
   .empty-cart div { font-size:36px; margin-bottom:8px; }
-
   .skeleton { background:linear-gradient(90deg,var(--bg-secondary) 25%,var(--border) 50%,var(--bg-secondary) 75%); background-size:200% 100%; animation:shimmer 1.4s infinite; border-radius:8px; }
   @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
-
   .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:999; align-items:center; justify-content:center; }
   .modal-overlay.open { display:flex; }
   .modal-box { background:var(--bg); border-radius:16px; padding:28px; width:440px; max-width:95vw; box-shadow:0 8px 40px rgba(0,0,0,0.3); }
@@ -215,25 +191,19 @@
   .btn-confirm { flex:2; padding:12px; border-radius:8px; border:none; background:var(--primary); color:white; font-size:14px; font-weight:700; cursor:pointer; font-family:'DM Sans',sans-serif; transition:background 0.2s; }
   .btn-confirm:hover { background:var(--primary-dark); }
   .btn-confirm:disabled { opacity:0.6; cursor:not-allowed; }
-
   .toast { display:none; position:fixed; bottom:90px; left:50%; transform:translateX(-50%); background:#1a7a4a; color:white; padding:14px 28px; border-radius:12px; font-size:15px; font-weight:600; z-index:9999; box-shadow:0 4px 20px rgba(0,0,0,0.3); animation:slideUp 0.3s ease; white-space:nowrap; }
   .toast.show { display:block; }
   @keyframes slideUp { from{transform:translateX(-50%) translateY(20px);opacity:0} to{transform:translateX(-50%) translateY(0);opacity:1} }
-
-  /* FLOATING BUTTONS */
   .floating-btns { position:fixed; bottom:80px; right:20px; display:flex; flex-direction:column; gap:12px; z-index:500; }
   .float-btn { width:52px; height:52px; border-radius:50%; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:22px; box-shadow:0 4px 16px rgba(0,0,0,0.2); transition:transform 0.2s,box-shadow 0.2s; }
   .float-btn:hover { transform:scale(1.1); box-shadow:0 6px 20px rgba(0,0,0,0.3); }
   .float-whatsapp { background:#25D366; }
   .float-directions { background:#4285F4; }
-
-  /* BOTTOM NAV (mobile) */
   .bottom-nav { display:none; position:fixed; bottom:0; left:0; right:0; background:var(--bg); border-top:1.5px solid var(--border); z-index:400; padding:8px 0 6px; }
   .bottom-nav-inner { display:flex; justify-content:space-around; }
   .bn-item { display:flex; flex-direction:column; align-items:center; gap:2px; cursor:pointer; padding:4px 16px; font-size:10px; font-weight:600; color:var(--text-muted); transition:color 0.2s; }
   .bn-item.active { color:var(--primary); }
   .bn-item span:first-child { font-size:20px; }
-
   @media (max-width:768px) {
     .bottom-nav { display:block; }
     .left-sidebar { display:none; }
@@ -254,7 +224,6 @@
 
 <div class="topbar">🎉 Free Delivery on orders above ₹299 | Order Now & Get 10% Off First Order!</div>
 
-<!-- LIVE TICKER -->
 <div class="live-ticker">
   <div class="live-dot"></div>
   <div class="ticker-text" id="liveTicker">🍕 Rahul from Nagpur just ordered Paneer Pizza • 🍔 Priya just ordered Chicken Burger • ☕ Arjun just ordered Cold Coffee • 🥟 Sneha just ordered Chicken Momos</div>
@@ -294,7 +263,6 @@
   <a class="cat-link" onclick="showLeaderboard()">🏆 Leaderboard</a>
 </div>
 
-<!-- HOME PAGE -->
 <div id="homePage">
   <div class="main-layout">
     <div class="left-sidebar">
@@ -322,7 +290,6 @@
         </div>
       </div>
 
-      <!-- TODAY SPECIAL -->
       <div id="todaySpecialBanner" style="display:none"></div>
 
       <div id="menuContainer">
@@ -373,14 +340,11 @@
 
       <div class="order-section">
         <div class="order-header">🛒 Your Order</div>
-
-        <!-- ORDER TYPE -->
         <div class="order-type-selector">
           <button class="order-type-btn active" onclick="setOrderType('delivery',this)">🛵 Delivery</button>
           <button class="order-type-btn" onclick="setOrderType('dine_in',this)">🍽️ Dine In</button>
           <button class="order-type-btn" onclick="setOrderType('takeaway',this)">🥡 Takeaway</button>
         </div>
-
         <div id="cartItems">
           <div class="empty-cart"><div>🍽️</div>Cart khali hai<br>Kuch add karo!</div>
         </div>
@@ -413,7 +377,7 @@
   <button class="float-btn float-whatsapp" onclick="openWhatsApp()" title="Chat on WhatsApp">💬</button>
 </div>
 
-<!-- BOTTOM NAV (mobile) -->
+<!-- BOTTOM NAV -->
 <div class="bottom-nav">
   <div class="bottom-nav-inner">
     <div class="bn-item active" onclick="showHomePage();setBottomNav(this)"><span>🏠</span><span>Home</span></div>
@@ -431,7 +395,7 @@
     <div class="modal-sub">Apni details bharo</div>
     <input class="modal-input" id="co-name" placeholder="Aapka naam" />
     <input class="modal-input" id="co-phone" placeholder="Phone number" type="tel" />
-    <input class="modal-input" id="co-address" placeholder="Delivery address" id="co-address-input" style="display:none" />
+    <input class="modal-input" id="co-address" placeholder="Delivery address" style="display:none" />
     <div class="modal-summary" id="co-summary"></div>
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeCheckout()">Cancel</button>
@@ -444,10 +408,10 @@
 
 <script>
   const API = '';
-  const WHATSAPP_NUMBER = '919XXXXXXXXX'; // Apna WhatsApp number yahan daal — 91 ke saath
-  const CAFE_LAT = '21.1458';  // Apna cafe ka latitude
-  const CAFE_LNG = '79.0882';  // Apna cafe ka longitude
-  const CAFE_NAME = 'Chai Pila Cafe';
+  const WHATSAPP_NUMBER = '919325865871';
+  const CAFE_LAT = '19.6500';
+  const CAFE_LNG = '73.1667';
+  const CAFE_NAME = 'Chai Pila Cafe Vada';
 
   let currentOrderType = 'delivery';
 
@@ -456,7 +420,7 @@
   }
 
   function openDirections() {
-    window.open(`https://www.google.com/maps/dir/?api=1&destination=${CAFE_LAT},${CAFE_LNG}&destination_place_id=${encodeURIComponent(CAFE_NAME)}`, '_blank');
+    window.open(`https://www.google.com/maps/dir/?api=1&destination=${CAFE_LAT},${CAFE_LNG}`, '_blank');
   }
 
   function setOrderType(type, btn) {
@@ -500,12 +464,10 @@
       const entries = data.data || [];
       const podium = document.getElementById('lbPodium');
       const list = document.getElementById('lbList');
-
       const top3 = entries.slice(0,3);
       const podiumOrder = [top3[1], top3[0], top3[2]].filter(Boolean);
       const posClass = ['second','first','third'];
       const crowns = ['🥈','👑','🥉'];
-
       podium.innerHTML = podiumOrder.map((e, i) => {
         const cls = posClass[i];
         return `<div class="lb-podium-item ${cls}">
@@ -515,15 +477,11 @@
           <div class="lb-podium-orders">${e.orders} orders</div>
         </div>`;
       }).join('');
-
       const rankClass = ['gold','silver','bronze'];
       list.innerHTML = entries.map((e, i) => `
         <div class="lb-row">
           <div class="lb-rank ${rankClass[i] || ''}">${e.rank}</div>
-          <div class="lb-info">
-            <h4>${e.display_name}</h4>
-            <span>${e.tag}</span>
-          </div>
+          <div class="lb-info"><h4>${e.display_name}</h4><span>${e.tag}</span></div>
           <div class="lb-stats">
             <div class="orders">${e.orders} orders</div>
             <div class="spent">₹${e.total_spent} spent</div>
@@ -534,7 +492,6 @@
     }
   }
 
-  // DARK MODE
   let isDark = false;
   function toggleDark() {
     isDark = !isDark;
@@ -577,13 +534,11 @@
     document.getElementById('subtotal').textContent = '₹' + sub;
     document.getElementById('totalPrice').textContent = '₹' + (sub + deliveryFee);
     document.getElementById('cartBadge').textContent = count;
-
     const savingsRow = document.getElementById('savingsRow');
     if (savedAmt > 0) {
       savingsRow.style.display = 'flex';
       document.getElementById('savingsAmt').textContent = '₹' + savedAmt;
     } else { savingsRow.style.display = 'none'; }
-
     if (count === 0 && !document.querySelector('#cartItems .empty-cart')) {
       document.getElementById('cartItems').innerHTML = '<div class="empty-cart"><div>🍽️</div>Cart khali hai<br>Kuch add karo!</div>';
     }
@@ -643,7 +598,6 @@
     if (!items.length) { showToast('Cart khali hai! Pehle kuch add karo 🍽️', '#e74c3c'); return; }
     const addrInput = document.getElementById('co-address');
     addrInput.style.display = currentOrderType === 'delivery' ? 'block' : 'none';
-    addrInput.placeholder = 'Delivery address';
     let html = `<strong>Order Type:</strong> ${currentOrderType === 'delivery' ? '🛵 Delivery' : currentOrderType === 'dine_in' ? '🍽️ Dine In' : '🥡 Takeaway'}<br><br><strong>Order Summary:</strong><br>`;
     let sub = 0;
     items.forEach(item => {
@@ -702,7 +656,6 @@
     setTimeout(() => { t.classList.remove('show'); t.style.background = ''; }, 4500);
   }
 
-  // SEARCH
   const searchInput = document.getElementById('searchInput');
   const searchDropdown = document.getElementById('searchDropdown');
   let searchTimer;
@@ -736,7 +689,6 @@
     if (e.target === document.getElementById('checkoutModal')) closeCheckout();
   });
 
-  // TODAY SPECIAL
   async function loadTodaySpecial() {
     try {
       const res = await fetch('/api/today-special');
@@ -763,7 +715,6 @@
     } catch(e) {}
   }
 
-  // MENU
   const CATEGORY_LABELS = {
     combos:   { label:'🎁 Combo Offers', layout:'combo' },
     thali:    { label:'🍛 Sasuryadi Thali', layout:'grid' },
