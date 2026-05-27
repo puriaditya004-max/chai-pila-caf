@@ -373,6 +373,7 @@
     <div class="nav-btn" style="cursor:pointer" onclick="showLeaderboard()">🏆 <span>Leaderboard</span></div>
     <button class="nav-btn" onclick="window.location.href='/admin'">⚙️ <span>Admin</span></button>
     <button class="nav-btn" style="position:relative">🛒 <span>Cart</span> <span class="cart-badge" id="cartBadge">0</span></button>
+    <div class="nav-btn" style="cursor:pointer;max-width:160px;overflow:hidden" onclick="currentUser ? openUserPanel() : openAuthModal()" title="Delivery location">📍 <span id="navAddressLabel" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:110px;display:inline-block;vertical-align:middle">Nagpur, MH</span></div>
     <button class="dark-toggle" onclick="toggleDark()">🌙 Dark Mode</button>
     <!-- LOGIN / USER BUTTON -->
     <div id="authBtnArea">
@@ -761,8 +762,8 @@
 <script>
   const API = '';
   const WHATSAPP_NUMBER = '919325865871';
-  const CAFE_LAT = '19.6500';
-  const CAFE_LNG = '73.1667';
+  const CAFE_LAT = '21.1458'; // Nagpur latitude
+  const CAFE_LNG = '79.0882'; // Nagpur longitude
   const COIN_VALUE = 0.5; // 1 coin = ₹0.50
 
   // ── USER STATE ──
@@ -867,6 +868,9 @@
       document.getElementById('pf-phone').value = currentUser.phone || '';
       document.getElementById('pf-email').value = currentUser.email || '';
       document.getElementById('pf-address').value = currentUser.address || '';
+      // Update navbar address
+      const navAddr = document.getElementById('navAddressLabel');
+      if (navAddr) navAddr.textContent = currentUser.address ? currentUser.address.split(',').slice(0,2).join(',') : 'Nagpur, MH';
       updateWalletTab();
       updateOrdersTab();
       updateWishlistTab();
@@ -1331,6 +1335,23 @@
     else t.style.background = '';
     t.classList.add('show');
     setTimeout(() => { t.classList.remove('show'); t.style.background = ''; }, 4500);
+  }
+
+  // ── WHATSAPP & DIRECTIONS ──
+  function openWhatsApp() {
+    const cartCount = cart.length;
+    let msg = 'Namaste! Chai Pila se order karna chahta hoon. 😊';
+    if (cartCount > 0) {
+      const items = cart.map(i => `• ${i.name} x${i.qty} = ₹${i.price * i.qty}`).join('\n');
+      const total = cart.reduce((s, i) => s + i.price * i.qty, 0);
+      msg = `Namaste! Chai Pila se order karna chahta hoon:\n\n${items}\n\nTotal: ₹${total + 20} (delivery included)\n\nPlease confirm! 🙏`;
+    }
+    window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank');
+  }
+
+  function openDirections() {
+    const url = `https://www.google.com/maps/dir/?api=1&destination=${CAFE_LAT},${CAFE_LNG}&travelmode=driving`;
+    window.open(url, '_blank');
   }
 
   // ── SEARCH ──
