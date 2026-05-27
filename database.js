@@ -34,6 +34,7 @@ db.exec(`
     payment_method TEXT DEFAULT 'COD',
     instructions TEXT DEFAULT '',
     coupon_code TEXT DEFAULT '',
+    order_type TEXT DEFAULT 'delivery',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   );
 
@@ -56,6 +57,8 @@ db.exec(`
     total_orders INTEGER DEFAULT 0,
     total_spent INTEGER DEFAULT 0,
     reward_points INTEGER DEFAULT 0,
+    coins INTEGER DEFAULT 0,
+    referral_code TEXT DEFAULT '',
     category TEXT DEFAULT 'bronze',
     last_order_at DATETIME,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
@@ -313,4 +316,20 @@ if (lbCount.c === 0) {
   const insertLb = db.prepare('INSERT INTO leaderboard (rank, display_name, tag, orders, total_spent, is_manual, is_visible) VALUES (?, ?, ?, ?, ?, ?, 1)');
   for (const e of fakeEntries) insertLb.run(e.rank, e.display_name, e.tag, e.orders, e.total_spent, e.is_manual);
 }
+
+// ── MIGRATIONS - Purane database ke liye missing columns add karo ──
+const migrations = [
+  `ALTER TABLE referrals ADD COLUMN reward_type TEXT DEFAULT 'fixed'`,
+  `ALTER TABLE referrals ADD COLUMN reward_amount INTEGER DEFAULT 0`,
+  `ALTER TABLE referrals ADD COLUMN is_lifetime INTEGER DEFAULT 0`,
+  `ALTER TABLE orders ADD COLUMN order_type TEXT DEFAULT 'delivery'`,
+  `ALTER TABLE customers ADD COLUMN coins INTEGER DEFAULT 0`,
+  `ALTER TABLE customers ADD COLUMN referral_code TEXT DEFAULT ''`,
+];
+
+for (const sql of migrations) {
+  try { db.exec(sql); } catch(e) { /* column already exists - ignore */ }
+}
+
+console.log('✅ Database ready!');
 module.exports = db;
