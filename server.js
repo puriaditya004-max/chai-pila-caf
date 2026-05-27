@@ -1,13 +1,11 @@
-
-cat << 'ENDOFFILE' > /home/claude/server.js
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const db = require('./database');
-
+ 
 const app = express();
 const PORT = process.env.PORT || 5000;
-
+ 
 // ── MIGRATIONS - Purane database ke liye ──
 const migrations = [
   `ALTER TABLE referrals ADD COLUMN reward_type TEXT DEFAULT 'fixed'`,
@@ -21,14 +19,14 @@ for (const sql of migrations) {
   try { db.exec(sql); } catch(e) { /* already exists */ }
 }
 console.log('✅ Migrations done!');
-
+ 
 // ============================
 //  MIDDLEWARE
 // ============================
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
-
+ 
 // ============================
 //  ADMIN AUTH
 // ============================
@@ -42,7 +40,7 @@ app.post('/api/admin/login', (req, res) => {
     res.status(500).json({ success: false, message: 'Login error' });
   }
 });
-
+ 
 // ============================
 //  MENU ROUTES
 // ============================
@@ -60,7 +58,7 @@ app.get('/api/menu', (req, res) => {
     res.status(500).json({ success: false, message: 'Menu load karne mein error' });
   }
 });
-
+ 
 app.get('/api/menu/categories', (req, res) => {
   try {
     const categories = db.prepare('SELECT DISTINCT category FROM menu_items WHERE is_available = 1').all();
@@ -69,7 +67,7 @@ app.get('/api/menu/categories', (req, res) => {
     res.status(500).json({ success: false, message: 'Categories load karne mein error' });
   }
 });
-
+ 
 app.get('/api/menu/:id', (req, res) => {
   try {
     const item = db.prepare('SELECT * FROM menu_items WHERE id = ?').get(req.params.id);
@@ -79,7 +77,7 @@ app.get('/api/menu/:id', (req, res) => {
     res.status(500).json({ success: false, message: 'Error aaya' });
   }
 });
-
+ 
 app.post('/api/menu', (req, res) => {
   try {
     const { name, category, price, old_price, emoji, description, is_bestseller } = req.body;
@@ -92,7 +90,7 @@ app.post('/api/menu', (req, res) => {
     res.status(500).json({ success: false, message: 'Item add karne mein error' });
   }
 });
-
+ 
 app.put('/api/menu/:id', (req, res) => {
   try {
     const { name, category, price, old_price, emoji, description, is_bestseller, is_available } = req.body;
@@ -105,7 +103,7 @@ app.put('/api/menu/:id', (req, res) => {
     res.status(500).json({ success: false, message: 'Update mein error' });
   }
 });
-
+ 
 app.delete('/api/menu/:id', (req, res) => {
   try {
     db.prepare('DELETE FROM menu_items WHERE id = ?').run(req.params.id);
@@ -114,7 +112,7 @@ app.delete('/api/menu/:id', (req, res) => {
     res.status(500).json({ success: false, message: 'Delete mein error' });
   }
 });
-
+ 
 app.get('/api/search', (req, res) => {
   try {
     const { q } = req.query;
@@ -127,18 +125,18 @@ app.get('/api/search', (req, res) => {
     res.status(500).json({ success: false, message: 'Search mein error' });
   }
 });
-
+ 
 // ============================
 //  ORDER ROUTES
 // ============================
 app.post('/api/orders', (req, res) => {
   try {
     const { items, subtotal, deliveryFee, total, customer_name, customer_phone, customer_address, instructions, coupon_code, discount, payment_method, order_type } = req.body;
-
+ 
     if (!items || items.length === 0) {
       return res.status(400).json({ success: false, message: 'Cart khali hai bhai!' });
     }
-
+ 
     const orderResult = db.prepare(`
       INSERT INTO orders (customer_name, customer_phone, customer_address, items_json, subtotal, delivery_fee, discount, total, status, payment_method, instructions, coupon_code, order_type)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'confirmed', ?, ?, ?, ?)
@@ -156,20 +154,20 @@ app.post('/api/orders', (req, res) => {
       coupon_code || '',
       order_type || 'delivery'
     );
-
+ 
     const orderId = orderResult.lastInsertRowid;
-
+ 
     const insertOrderItem = db.prepare(`
       INSERT INTO order_items (order_id, item_name, price, quantity)
       VALUES (?, ?, ?, ?)
     `);
-
+ 
     db.transaction((orderItems) => {
       for (const item of orderItems) {
         insertOrderItem.run(orderId, item.name, item.price, item.quantity);
       }
     })(items);
-
+ 
     if (customer_phone) {
       const existing = db.prepare('SELECT * FROM customers WHERE phone = ?').get(customer_phone);
       if (existing) {
@@ -184,20 +182,20 @@ app.post('/api/orders', (req, res) => {
       }
       updateCustomerCategory(customer_phone);
     }
-
+ 
     res.status(201).json({
       success: true,
       message: '🎉 Order place ho gaya! Thoda wait karo, jaldi aayega.',
       order_id: orderId,
       estimated_time: '25-35 minutes'
     });
-
+ 
   } catch (err) {
     console.error('Order error:', err);
     res.status(500).json({ success: false, message: 'Order place karne mein error aaya' });
   }
 });
-
+ 
 function updateCustomerCategory(phone) {
   try {
     const customer = db.prepare('SELECT * FROM customers WHERE phone = ?').get(phone);
@@ -217,20 +215,20 @@ function updateCustomerCategory(phone) {
     console.error('Category update error:', err);
   }
 }
-
+ 
 app.get('/api/orders', (req, res) => {
   try {
     const orders = db.prepare('SELECT * FROM orders ORDER BY created_at DESC').all();
     const ordersWithItems = orders.map(order => ({
       ...order,
-      items: JSON.parse(order.items_json)
+      items: JSON.parse(order.items_json || '[]')
     }));
     res.json({ success: true, data: ordersWithItems });
   } catch (err) {
     res.status(500).json({ success: false, message: 'Orders fetch karne mein error' });
   }
 });
-
+ 
 app.get('/api/orders/:id', (req, res) => {
   try {
     const order = db.prepare('SELECT * FROM orders WHERE id = ?').get(req.params.id);
@@ -241,7 +239,7 @@ app.get('/api/orders/:id', (req, res) => {
     res.status(500).json({ success: false, message: 'Error aaya' });
   }
 });
-
+ 
 app.put('/api/orders/:id/status', (req, res) => {
   try {
     const { status } = req.body;
@@ -255,7 +253,7 @@ app.put('/api/orders/:id/status', (req, res) => {
     res.status(500).json({ success: false, message: 'Status update mein error' });
   }
 });
-
+ 
 // ============================
 //  COUPON ROUTES
 // ============================
@@ -267,7 +265,7 @@ app.get('/api/coupons', (req, res) => {
     res.status(500).json({ success: false, message: 'Coupons fetch error' });
   }
 });
-
+ 
 app.post('/api/coupons', (req, res) => {
   try {
     const { code, type, amount, min_order, max_uses, valid_till } = req.body;
@@ -278,7 +276,7 @@ app.post('/api/coupons', (req, res) => {
     res.status(500).json({ success: false, message: 'Coupon create error' });
   }
 });
-
+ 
 app.post('/api/coupons/validate', (req, res) => {
   try {
     const { code, order_total } = req.body;
@@ -294,7 +292,7 @@ app.post('/api/coupons/validate', (req, res) => {
     res.status(500).json({ success: false, message: 'Coupon validate error' });
   }
 });
-
+ 
 app.delete('/api/coupons/:id', (req, res) => {
   try {
     db.prepare('DELETE FROM coupons WHERE id = ?').run(req.params.id);
@@ -303,7 +301,7 @@ app.delete('/api/coupons/:id', (req, res) => {
     res.status(500).json({ success: false, message: 'Delete error' });
   }
 });
-
+ 
 // ============================
 //  CUSTOMER ROUTES
 // ============================
@@ -315,7 +313,7 @@ app.get('/api/customers', (req, res) => {
     res.status(500).json({ success: false, message: 'Customers fetch error' });
   }
 });
-
+ 
 app.put('/api/customers/:id', (req, res) => {
   try {
     const { name, address, dob, gender } = req.body;
@@ -325,7 +323,7 @@ app.put('/api/customers/:id', (req, res) => {
     res.status(500).json({ success: false, message: 'Update error' });
   }
 });
-
+ 
 // ============================
 //  REWARD ROUTES
 // ============================
@@ -337,7 +335,7 @@ app.get('/api/rewards/settings', (req, res) => {
     res.status(500).json({ success: false, message: 'Settings fetch error' });
   }
 });
-
+ 
 app.put('/api/rewards/settings', (req, res) => {
   try {
     const { is_active, points_per_order, point_value, validity_days } = req.body;
@@ -348,7 +346,7 @@ app.put('/api/rewards/settings', (req, res) => {
     res.status(500).json({ success: false, message: 'Settings update error' });
   }
 });
-
+ 
 app.post('/api/rewards/add', (req, res) => {
   try {
     const { customer_phone, points, reason } = req.body;
@@ -359,7 +357,7 @@ app.post('/api/rewards/add', (req, res) => {
     res.status(500).json({ success: false, message: 'Reward add error' });
   }
 });
-
+ 
 // ============================
 //  SALES ROUTES
 // ============================
@@ -373,7 +371,7 @@ app.get('/api/sales/today', (req, res) => {
     res.status(500).json({ success: false, message: 'Sales fetch error' });
   }
 });
-
+ 
 app.get('/api/sales/history', (req, res) => {
   try {
     const sales = db.prepare(`
@@ -386,7 +384,7 @@ app.get('/api/sales/history', (req, res) => {
     res.status(500).json({ success: false, message: 'History fetch error' });
   }
 });
-
+ 
 // ============================
 //  DELIVERY SETTINGS
 // ============================
@@ -398,7 +396,7 @@ app.get('/api/delivery/settings', (req, res) => {
     res.status(500).json({ success: false, message: 'Delivery settings fetch error' });
   }
 });
-
+ 
 app.put('/api/delivery/settings', (req, res) => {
   try {
     const { base_charge, per_km_charge, free_delivery_above } = req.body;
@@ -409,14 +407,14 @@ app.put('/api/delivery/settings', (req, res) => {
     res.status(500).json({ success: false, message: 'Settings update error' });
   }
 });
-
+ 
 // ============================
 //  HEALTH CHECK
 // ============================
 app.get('/api/health', (req, res) => {
   res.json({ success: true, message: 'Chai Pila Backend chal raha hai! ☕', timestamp: new Date().toISOString() });
 });
-
+ 
 // ============================
 //  WISHLIST ROUTES
 // ============================
@@ -429,28 +427,28 @@ app.post('/api/wishlist/add', (req, res) => {
     res.json({ success: true, message: 'Wishlist mein add ho gaya! ❤️' });
   } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
 });
-
+ 
 app.get('/api/wishlist/:phone', (req, res) => {
   try {
     const items = db.prepare('SELECT * FROM wishlists WHERE customer_phone = ? ORDER BY added_at DESC').all(req.params.phone);
     res.json({ success: true, data: items });
   } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
 });
-
+ 
 app.delete('/api/wishlist/:phone/:item_id', (req, res) => {
   try {
     db.prepare('DELETE FROM wishlists WHERE customer_phone = ? AND item_id = ?').run(req.params.phone, req.params.item_id);
     res.json({ success: true, message: 'Wishlist se remove ho gaya!' });
   } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
 });
-
+ 
 app.get('/api/admin/wishlists', (req, res) => {
   try {
     const items = db.prepare('SELECT w.*, c.name as customer_name FROM wishlists w LEFT JOIN customers c ON w.customer_phone = c.phone ORDER BY w.added_at DESC').all();
     res.json({ success: true, data: items });
   } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
 });
-
+ 
 // ============================
 //  REFERRAL ROUTES
 // ============================
@@ -460,7 +458,7 @@ app.get('/api/referral/settings', (req, res) => {
     res.json({ success: true, data: settings });
   } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
 });
-
+ 
 app.put('/api/referral/settings', (req, res) => {
   try {
     const { is_active, reward_type, reward_amount, is_lifetime, lifetime_percent, max_limit } = req.body;
@@ -469,7 +467,7 @@ app.put('/api/referral/settings', (req, res) => {
     res.json({ success: true, message: 'Referral settings save ho gayi!' });
   } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
 });
-
+ 
 app.post('/api/referral/apply', (req, res) => {
   try {
     const { referrer_phone, referred_phone, referred_name } = req.body;
@@ -484,21 +482,21 @@ app.post('/api/referral/apply', (req, res) => {
     res.json({ success: true, message: `Referral applied! ${settings.reward_amount} coins mile! 🎉` });
   } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
 });
-
+ 
 app.get('/api/referral/history', (req, res) => {
   try {
     const referrals = db.prepare('SELECT * FROM referrals ORDER BY created_at DESC').all();
     res.json({ success: true, data: referrals });
   } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
 });
-
+ 
 app.get('/api/referral/history/:phone', (req, res) => {
   try {
     const referrals = db.prepare('SELECT * FROM referrals WHERE referrer_phone = ? ORDER BY created_at DESC').all(req.params.phone);
     res.json({ success: true, data: referrals });
   } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
 });
-
+ 
 // ============================
 //  LEADERBOARD ROUTES
 // ============================
@@ -508,14 +506,14 @@ app.get('/api/leaderboard', (req, res) => {
     res.json({ success: true, data: entries });
   } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
 });
-
+ 
 app.get('/api/admin/leaderboard', (req, res) => {
   try {
     const entries = db.prepare('SELECT * FROM leaderboard ORDER BY rank ASC').all();
     res.json({ success: true, data: entries });
   } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
 });
-
+ 
 app.post('/api/admin/leaderboard', (req, res) => {
   try {
     const { rank, display_name, tag, orders, total_spent, is_manual, is_visible } = req.body;
@@ -524,7 +522,7 @@ app.post('/api/admin/leaderboard', (req, res) => {
     res.json({ success: true, message: 'Entry add ho gayi!' });
   } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
 });
-
+ 
 app.put('/api/admin/leaderboard/:id', (req, res) => {
   try {
     const { rank, display_name, tag, orders, total_spent, is_visible } = req.body;
@@ -533,14 +531,14 @@ app.put('/api/admin/leaderboard/:id', (req, res) => {
     res.json({ success: true, message: 'Updated!' });
   } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
 });
-
+ 
 app.delete('/api/admin/leaderboard/:id', (req, res) => {
   try {
     db.prepare('DELETE FROM leaderboard WHERE id = ?').run(req.params.id);
     res.json({ success: true, message: 'Delete ho gaya!' });
   } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
 });
-
+ 
 // ============================
 //  FREE ITEM ROUTES
 // ============================
@@ -550,7 +548,7 @@ app.get('/api/free-item/settings', (req, res) => {
     res.json({ success: true, data: settings });
   } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
 });
-
+ 
 app.put('/api/free-item/settings', (req, res) => {
   try {
     const { is_active, task_type, target_count, reward_item } = req.body;
@@ -559,14 +557,14 @@ app.put('/api/free-item/settings', (req, res) => {
     res.json({ success: true, message: 'Free item settings save ho gayi!' });
   } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
 });
-
+ 
 app.get('/api/free-item/tasks', (req, res) => {
   try {
     const tasks = db.prepare('SELECT * FROM free_item_tasks ORDER BY created_at DESC').all();
     res.json({ success: true, data: tasks });
   } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
 });
-
+ 
 app.get('/api/free-item/progress/:phone', (req, res) => {
   try {
     const settings = db.prepare('SELECT * FROM free_item_settings WHERE id = 1').get();
@@ -579,7 +577,7 @@ app.get('/api/free-item/progress/:phone', (req, res) => {
     res.json({ success: true, data: task });
   } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
 });
-
+ 
 // ============================
 //  WALLET ROUTES
 // ============================
@@ -590,7 +588,7 @@ app.get('/api/wallet/:phone', (req, res) => {
     res.json({ success: true, data: { balance: customer ? customer.reward_points : 0, history } });
   } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
 });
-
+ 
 // ============================
 //  ANALYTICS ROUTES
 // ============================
@@ -605,7 +603,7 @@ app.get('/api/analytics', (req, res) => {
     res.json({ success: true, data: { bestSelling, peakHours, repeatCustomers: repeatCustomers.count, totalCustomers: totalCustomers.count, couponPerf, dailyRevenue } });
   } catch (err) { res.status(500).json({ success: false, message: 'Analytics error' }); }
 });
-
+ 
 // ============================
 //  TODAY SPECIAL ROUTES
 // ============================
@@ -615,7 +613,7 @@ app.get('/api/today-special', (req, res) => {
     res.json({ success: true, data: special || null });
   } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
 });
-
+ 
 app.post('/api/today-special', (req, res) => {
   try {
     const { item_name, description, price, old_price, emoji } = req.body;
@@ -625,23 +623,21 @@ app.post('/api/today-special', (req, res) => {
     res.json({ success: true, message: "Today's special set ho gaya!" });
   } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
 });
-
+ 
 // ============================
 //  FRONTEND SERVE
 // ============================
 app.get('/admin', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin.html'));
 });
-
+ 
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
-
+ 
 // ============================
 //  SERVER START
 // ============================
 app.listen(PORT, () => {
   console.log(`☕ Chai Pila Backend chal raha hai! Port: ${PORT}`);
 });
-ENDOFFILE
-echo "Done! Lines: $(wc -l < /home/claude/server.js)"
