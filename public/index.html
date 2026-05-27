@@ -46,14 +46,14 @@
   .sr-price { margin-left:auto; font-size:14px; font-weight:700; color:var(--primary); }
   .search-empty { padding:20px; text-align:center; color:var(--text-muted); font-size:13px; }
   .nav-actions { display:flex; align-items:center; gap:4px; margin-left:auto; }
-  .nav-btn { display:flex; align-items:center; gap:6px; padding:8px 14px; border-radius:8px; cursor:pointer; font-size:13px; font-weight:500; border:none; background:transparent; color:var(--text); font-family:'DM Sans',sans-serif; position:relative; transition:background 0.2s; }
+  .nav-btn { display:flex; align-items:center; gap:6px; padding:8px 10px; border-radius:8px; cursor:pointer; font-size:13px; font-weight:500; border:none; background:transparent; color:var(--text); font-family:'DM Sans',sans-serif; position:relative; transition:background 0.2s; white-space:nowrap; }
   .nav-btn:hover { background:var(--bg-secondary); }
   .cart-badge { position:absolute; top:4px; right:4px; background:var(--primary); color:white; border-radius:50%; width:18px; height:18px; font-size:10px; display:flex; align-items:center; justify-content:center; font-weight:700; }
   .dark-toggle { background:var(--bg-secondary); border:1.5px solid var(--border); border-radius:20px; padding:6px 14px; cursor:pointer; font-size:13px; font-weight:500; color:var(--text); display:flex; align-items:center; gap:6px; }
 
   /* ── USER AVATAR BTN ── */
   .user-avatar-btn { width:36px; height:36px; border-radius:50%; background:var(--primary); color:white; font-size:15px; font-weight:700; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
-  .login-btn { background:var(--primary); color:white; border:none; padding:8px 18px; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; font-family:'DM Sans',sans-serif; transition:background 0.2s; }
+  .login-btn { background:var(--primary); color:white; border:none; padding:8px 14px; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; font-family:'DM Sans',sans-serif; transition:background 0.2s; white-space:nowrap; }
   .login-btn:hover { background:var(--primary-dark); }
 
   /* ── CAT NAV ── */
@@ -370,11 +370,11 @@
     <div class="search-dropdown" id="searchDropdown"></div>
   </div>
   <div class="nav-actions">
-    <div class="nav-btn" style="cursor:pointer" onclick="showLeaderboard()">🏆 <span>Leaderboard</span></div>
-    <button class="nav-btn" onclick="window.location.href='/admin'">⚙️ <span>Admin</span></button>
-    <button class="nav-btn" style="position:relative">🛒 <span>Cart</span> <span class="cart-badge" id="cartBadge">0</span></button>
+    <div class="nav-btn" style="cursor:pointer" onclick="showLeaderboard()" title="Leaderboard">🏆</div>
+    <button class="nav-btn" onclick="window.location.href='/admin'" title="Admin Panel">⚙️</button>
+    <button class="nav-btn" style="position:relative" title="Cart">🛒 <span class="cart-badge" id="cartBadge">0</span></button>
     <div class="nav-btn" style="cursor:pointer" onclick="currentUser ? openUserPanel() : openAuthModal()" title="Delivery location">📍 <span id="navAddressLabel">Nagpur, MH</span></div>
-    <button class="dark-toggle" onclick="toggleDark()">🌙 Dark Mode</button>
+    <button class="dark-toggle" onclick="toggleDark()">🌙</button>
     <!-- LOGIN / USER BUTTON -->
     <div id="authBtnArea">
       <button class="login-btn" onclick="openAuthModal()">Login / Sign Up</button>
