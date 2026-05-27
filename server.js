@@ -1,3 +1,5 @@
+
+cat << 'ENDOFFILE' > /home/claude/server.js
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
@@ -5,6 +7,20 @@ const db = require('./database');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+
+// ── MIGRATIONS - Purane database ke liye ──
+const migrations = [
+  `ALTER TABLE referrals ADD COLUMN reward_type TEXT DEFAULT 'fixed'`,
+  `ALTER TABLE referrals ADD COLUMN reward_amount INTEGER DEFAULT 0`,
+  `ALTER TABLE referrals ADD COLUMN is_lifetime INTEGER DEFAULT 0`,
+  `ALTER TABLE orders ADD COLUMN order_type TEXT DEFAULT 'delivery'`,
+  `ALTER TABLE customers ADD COLUMN coins INTEGER DEFAULT 0`,
+  `ALTER TABLE customers ADD COLUMN referral_code TEXT DEFAULT ''`,
+];
+for (const sql of migrations) {
+  try { db.exec(sql); } catch(e) { /* already exists */ }
+}
+console.log('✅ Migrations done!');
 
 // ============================
 //  MIDDLEWARE
@@ -64,7 +80,6 @@ app.get('/api/menu/:id', (req, res) => {
   }
 });
 
-// Menu item add karo (admin)
 app.post('/api/menu', (req, res) => {
   try {
     const { name, category, price, old_price, emoji, description, is_bestseller } = req.body;
@@ -78,7 +93,6 @@ app.post('/api/menu', (req, res) => {
   }
 });
 
-// Menu item update karo (admin)
 app.put('/api/menu/:id', (req, res) => {
   try {
     const { name, category, price, old_price, emoji, description, is_bestseller, is_available } = req.body;
@@ -92,7 +106,6 @@ app.put('/api/menu/:id', (req, res) => {
   }
 });
 
-// Menu item delete karo (admin)
 app.delete('/api/menu/:id', (req, res) => {
   try {
     db.prepare('DELETE FROM menu_items WHERE id = ?').run(req.params.id);
@@ -120,15 +133,15 @@ app.get('/api/search', (req, res) => {
 // ============================
 app.post('/api/orders', (req, res) => {
   try {
-    const { items, subtotal, deliveryFee, total, customer_name, customer_phone, customer_address, instructions, coupon_code, discount, payment_method } = req.body;
+    const { items, subtotal, deliveryFee, total, customer_name, customer_phone, customer_address, instructions, coupon_code, discount, payment_method, order_type } = req.body;
 
     if (!items || items.length === 0) {
       return res.status(400).json({ success: false, message: 'Cart khali hai bhai!' });
     }
 
     const orderResult = db.prepare(`
-      INSERT INTO orders (customer_name, customer_phone, customer_address, items_json, subtotal, delivery_fee, discount, total, status, payment_method, instructions, coupon_code)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'confirmed', ?, ?, ?)
+      INSERT INTO orders (customer_name, customer_phone, customer_address, items_json, subtotal, delivery_fee, discount, total, status, payment_method, instructions, coupon_code, order_type)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'confirmed', ?, ?, ?, ?)
     `).run(
       customer_name || 'Guest',
       customer_phone || '',
@@ -140,7 +153,8 @@ app.post('/api/orders', (req, res) => {
       total,
       payment_method || 'COD',
       instructions || '',
-      coupon_code || ''
+      coupon_code || '',
+      order_type || 'delivery'
     );
 
     const orderId = orderResult.lastInsertRowid;
@@ -156,7 +170,6 @@ app.post('/api/orders', (req, res) => {
       }
     })(items);
 
-    // Customer save/update karo
     if (customer_phone) {
       const existing = db.prepare('SELECT * FROM customers WHERE phone = ?').get(customer_phone);
       if (existing) {
@@ -169,8 +182,6 @@ app.post('/api/orders', (req, res) => {
           VALUES (?, ?, ?, 1, ?, CURRENT_TIMESTAMP)
         `).run(customer_name || 'Guest', customer_phone, customer_address || '', total);
       }
-
-      // Customer category update karo
       updateCustomerCategory(customer_phone);
     }
 
@@ -191,11 +202,9 @@ function updateCustomerCategory(phone) {
   try {
     const customer = db.prepare('SELECT * FROM customers WHERE phone = ?').get(phone);
     if (!customer) return;
-
     const lastOrder = customer.last_order_at ? new Date(customer.last_order_at) : null;
     const now = new Date();
     const daysDiff = lastOrder ? (now - lastOrder) / (1000 * 60 * 60 * 24) : 999;
-
     let category = 'bronze';
     if (customer.total_spent > 5000) category = 'vip';
     else if (daysDiff <= 1) category = 'platinum';
@@ -203,7 +212,6 @@ function updateCustomerCategory(phone) {
     else if (daysDiff <= 6) category = 'gold';
     else if (daysDiff <= 15) category = 'silver';
     else category = 'bronze';
-
     db.prepare('UPDATE customers SET category = ? WHERE phone = ?').run(category, phone);
   } catch (err) {
     console.error('Category update error:', err);
@@ -263,10 +271,8 @@ app.get('/api/coupons', (req, res) => {
 app.post('/api/coupons', (req, res) => {
   try {
     const { code, type, amount, min_order, max_uses, valid_till } = req.body;
-    db.prepare(`
-      INSERT INTO coupons (code, type, amount, min_order, max_uses, valid_till)
-      VALUES (?, ?, ?, ?, ?, ?)
-    `).run(code.toUpperCase(), type || 'flat', amount, min_order || 0, max_uses || 1, valid_till || '');
+    db.prepare(`INSERT INTO coupons (code, type, amount, min_order, max_uses, valid_till) VALUES (?, ?, ?, ?, ?, ?)`)
+      .run(code.toUpperCase(), type || 'flat', amount, min_order || 0, max_uses || 1, valid_till || '');
     res.json({ success: true, message: 'Coupon ban gaya!' });
   } catch (err) {
     res.status(500).json({ success: false, message: 'Coupon create error' });
@@ -281,10 +287,8 @@ app.post('/api/coupons/validate', (req, res) => {
     if (coupon.used_count >= coupon.max_uses) return res.status(400).json({ success: false, message: 'Coupon limit khatam ho gayi!' });
     if (coupon.min_order > 0 && order_total < coupon.min_order) return res.status(400).json({ success: false, message: `Minimum order ₹${coupon.min_order} hona chahiye!` });
     if (coupon.valid_till && new Date(coupon.valid_till) < new Date()) return res.status(400).json({ success: false, message: 'Coupon expire ho gaya!' });
-
     let discount = coupon.amount;
     if (coupon.type === 'percent') discount = Math.floor((order_total * coupon.amount) / 100);
-
     res.json({ success: true, discount, message: `🎉 ₹${discount} discount mila!` });
   } catch (err) {
     res.status(500).json({ success: false, message: 'Coupon validate error' });
@@ -357,15 +361,14 @@ app.post('/api/rewards/add', (req, res) => {
 });
 
 // ============================
-//  MONEY / SALES ROUTES
+//  SALES ROUTES
 // ============================
 app.get('/api/sales/today', (req, res) => {
   try {
     const today = new Date().toISOString().split('T')[0];
     const orders = db.prepare(`SELECT * FROM orders WHERE DATE(created_at) = ? AND status != 'cancelled'`).all(today);
     const totalSale = orders.reduce((sum, o) => sum + o.total, 0);
-    const totalOrders = orders.length;
-    res.json({ success: true, data: { totalSale, totalOrders, orders } });
+    res.json({ success: true, data: { totalSale, totalOrders: orders.length, orders } });
   } catch (err) {
     res.status(500).json({ success: false, message: 'Sales fetch error' });
   }
@@ -376,9 +379,7 @@ app.get('/api/sales/history', (req, res) => {
     const sales = db.prepare(`
       SELECT DATE(created_at) as date, COUNT(*) as total_orders, SUM(total) as total_sale
       FROM orders WHERE status != 'cancelled'
-      GROUP BY DATE(created_at)
-      ORDER BY date DESC
-      LIMIT 30
+      GROUP BY DATE(created_at) ORDER BY date DESC LIMIT 30
     `).all();
     res.json({ success: true, data: sales });
   } catch (err) {
@@ -416,20 +417,6 @@ app.get('/api/health', (req, res) => {
   res.json({ success: true, message: 'Chai Pila Backend chal raha hai! ☕', timestamp: new Date().toISOString() });
 });
 
-// ============================
-//  FRONTEND SERVE
-// ============================
-app.get('/admin', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'admin.html'));
-});
-
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
-
-// ============================
-//  SERVER START
-// ============================
 // ============================
 //  WISHLIST ROUTES
 // ============================
@@ -492,7 +479,6 @@ app.post('/api/referral/apply', (req, res) => {
     const settings = db.prepare('SELECT * FROM referral_settings WHERE id = 1').get();
     db.prepare('INSERT INTO referrals (referrer_phone, referred_phone, referred_name, reward_type, reward_amount, is_lifetime, status) VALUES (?, ?, ?, ?, ?, ?, "active")')
       .run(referrer_phone, referred_phone, referred_name || '', settings.reward_type, settings.reward_amount, settings.is_lifetime);
-    // Referrer ko coins do
     db.prepare('INSERT INTO wallet_transactions (customer_phone, coins, type, reason) VALUES (?, ?, "credit", "Referral Bonus")').run(referrer_phone, settings.reward_amount);
     db.prepare('UPDATE customers SET reward_points = reward_points + ? WHERE phone = ?').run(settings.reward_amount, referrer_phone);
     res.json({ success: true, message: `Referral applied! ${settings.reward_amount} coins mile! 🎉` });
@@ -610,20 +596,12 @@ app.get('/api/wallet/:phone', (req, res) => {
 // ============================
 app.get('/api/analytics', (req, res) => {
   try {
-    const bestSelling = db.prepare(`
-      SELECT item_name, SUM(quantity) as total_qty FROM order_items GROUP BY item_name ORDER BY total_qty DESC LIMIT 10
-    `).all();
-    const peakHours = db.prepare(`
-      SELECT strftime('%H', created_at) as hour, COUNT(*) as count FROM orders GROUP BY hour ORDER BY count DESC LIMIT 5
-    `).all();
+    const bestSelling = db.prepare(`SELECT item_name, SUM(quantity) as total_qty FROM order_items GROUP BY item_name ORDER BY total_qty DESC LIMIT 10`).all();
+    const peakHours = db.prepare(`SELECT strftime('%H', created_at) as hour, COUNT(*) as count FROM orders GROUP BY hour ORDER BY count DESC LIMIT 5`).all();
     const repeatCustomers = db.prepare('SELECT COUNT(*) as count FROM customers WHERE total_orders > 1').get();
     const totalCustomers = db.prepare('SELECT COUNT(*) as count FROM customers').get();
-    const couponPerf = db.prepare(`
-      SELECT coupon_code, COUNT(*) as used_times, SUM(discount) as total_discount FROM orders WHERE coupon_code != '' GROUP BY coupon_code
-    `).all();
-    const dailyRevenue = db.prepare(`
-      SELECT DATE(created_at) as date, SUM(total) as revenue, COUNT(*) as orders FROM orders WHERE status != 'cancelled' GROUP BY DATE(created_at) ORDER BY date DESC LIMIT 7
-    `).all();
+    const couponPerf = db.prepare(`SELECT coupon_code, COUNT(*) as used_times, SUM(discount) as total_discount FROM orders WHERE coupon_code != '' GROUP BY coupon_code`).all();
+    const dailyRevenue = db.prepare(`SELECT DATE(created_at) as date, SUM(total) as revenue, COUNT(*) as orders FROM orders WHERE status != 'cancelled' GROUP BY DATE(created_at) ORDER BY date DESC LIMIT 7`).all();
     res.json({ success: true, data: { bestSelling, peakHours, repeatCustomers: repeatCustomers.count, totalCustomers: totalCustomers.count, couponPerf, dailyRevenue } });
   } catch (err) { res.status(500).json({ success: false, message: 'Analytics error' }); }
 });
@@ -647,6 +625,23 @@ app.post('/api/today-special', (req, res) => {
     res.json({ success: true, message: "Today's special set ho gaya!" });
   } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
 });
+
+// ============================
+//  FRONTEND SERVE
+// ============================
+app.get('/admin', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'admin.html'));
+});
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+// ============================
+//  SERVER START
+// ============================
 app.listen(PORT, () => {
   console.log(`☕ Chai Pila Backend chal raha hai! Port: ${PORT}`);
 });
+ENDOFFILE
+echo "Done! Lines: $(wc -l < /home/claude/server.js)"
