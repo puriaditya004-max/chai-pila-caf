@@ -26,12 +26,12 @@
   .topbar { background:var(--primary); color:white; text-align:center; font-size:13px; padding:6px; letter-spacing:0.5px; }
 
   /* ── NAVBAR ── */
-  .navbar { background:var(--bg); border-bottom:1px solid var(--border); padding:0 24px; display:flex; align-items:center; gap:20px; height:70px; position:sticky; top:0; z-index:200; }
+  .navbar { background:var(--bg); border-bottom:1px solid var(--border); padding:0 16px; display:flex; align-items:center; gap:10px; height:70px; position:sticky; top:0; z-index:200; }
   .logo { display:flex; align-items:center; gap:10px; cursor:pointer; }
   .logo-icon { width:44px; height:44px; background:var(--primary); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:22px; }
   .logo-text h1 { font-family:'Playfair Display',serif; font-size:18px; color:var(--primary); line-height:1; }
   .logo-text span { font-size:11px; color:var(--text-muted); }
-  .search-bar { flex:1; max-width:420px; position:relative; }
+  .search-bar { flex:1; max-width:280px; position:relative; }
   .search-bar input { width:100%; padding:10px 44px 10px 16px; border:1.5px solid var(--border); border-radius:8px; font-size:14px; background:var(--bg-secondary); color:var(--text); font-family:'DM Sans',sans-serif; outline:none; transition:border-color 0.2s; }
   .search-bar input:focus { border-color:var(--primary); }
   .search-btn { position:absolute; right:0; top:0; height:100%; width:44px; background:var(--primary); border:none; border-radius:0 8px 8px 0; cursor:pointer; color:white; font-size:16px; display:flex; align-items:center; justify-content:center; }
@@ -45,7 +45,7 @@
   .sr-info span { font-size:12px; color:var(--text-muted); }
   .sr-price { margin-left:auto; font-size:14px; font-weight:700; color:var(--primary); }
   .search-empty { padding:20px; text-align:center; color:var(--text-muted); font-size:13px; }
-  .nav-actions { display:flex; align-items:center; gap:4px; margin-left:auto; }
+  .nav-actions { display:flex; align-items:center; gap:2px; margin-left:auto; flex-shrink:0; }
   .nav-btn { display:flex; align-items:center; gap:6px; padding:8px 10px; border-radius:8px; cursor:pointer; font-size:13px; font-weight:500; border:none; background:transparent; color:var(--text); font-family:'DM Sans',sans-serif; position:relative; transition:background 0.2s; white-space:nowrap; }
   .nav-btn:hover { background:var(--bg-secondary); }
   .cart-badge { position:absolute; top:4px; right:4px; background:var(--primary); color:white; border-radius:50%; width:18px; height:18px; font-size:10px; display:flex; align-items:center; justify-content:center; font-weight:700; }
