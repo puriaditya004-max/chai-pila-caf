@@ -300,13 +300,8 @@ const migrations = [
 ];
 
 for (const sql of migrations) {
-  try {
-    db.exec(sql);
-  } catch (e) {
-    // Column already exists — ignore
-  }
+  try { db.exec(sql); } catch (e) { /* Column already exists — ignore */ }
 }
 
 console.log('✅ Database ready!');
-
 module.exports = db;
