@@ -335,8 +335,9 @@ app.get('/api/admin/upsell', (req, res) => {
 app.post('/api/admin/upsell', (req, res) => {
   try {
     const { name, emoji, original_price, offer_price, offer_text, sort_order } = req.body;
+    if (!name || !offer_price) return res.status(400).json({ success: false, message: 'Naam aur price zaroori hai!' });
     db.prepare('INSERT INTO upsell_items (name, emoji, original_price, offer_price, offer_text, sort_order) VALUES (?, ?, ?, ?, ?, ?)')
-      .run(name, emoji || '🍽️', original_price, offer_price, offer_text || '', sort_order || 0);
+      .run(name, emoji || '🍽️', original_price || 0, offer_price, offer_text || '', sort_order || 0);
     res.json({ success: true, message: 'Upsell item add ho gaya!' });
   } catch (err) {
     res.status(500).json({ success: false, message: 'Error aaya' });
@@ -773,10 +774,10 @@ app.get('/api/wallet/:phone', (req, res) => {
 app.get('/api/analytics', (req, res) => {
   try {
     const { range, from, to } = req.query;
-    const today = new Date().toISOString().split('T')[0];
 
     let dateFilter = '';
     if (range === 'today') {
+      const today = new Date().toISOString().split('T')[0];
       dateFilter = `AND DATE(created_at) = '${today}'`;
     } else if (range === 'yesterday') {
       const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
@@ -805,23 +806,33 @@ app.get('/api/analytics', (req, res) => {
       GROUP BY DATE(created_at) ORDER BY date ASC
     `).all();
 
-    // AI Tomorrow Prediction — moving average of last 7 days
+    // AI Tomorrow Prediction — weighted moving average of last 7 days
     const last7 = db.prepare(`
       SELECT SUM(total) as revenue FROM orders
       WHERE status != 'cancelled' AND DATE(created_at) >= DATE('now', '-7 days')
       GROUP BY DATE(created_at) ORDER BY DATE(created_at) ASC
     `).all();
+
     let predictedTomorrow = 0;
+    let predictionConfidence = 'Low';
     if (last7.length > 0) {
       const avg = last7.reduce((s, d) => s + (d.revenue || 0), 0) / last7.length;
-      // Simple linear trend
       if (last7.length >= 3) {
         const recent = last7.slice(-3).reduce((s, d) => s + (d.revenue || 0), 0) / 3;
         predictedTomorrow = Math.round((avg * 0.4) + (recent * 0.6));
+        predictionConfidence = last7.length >= 5 ? 'High' : 'Medium';
       } else {
         predictedTomorrow = Math.round(avg);
+        predictionConfidence = 'Low';
       }
     }
+
+    // Order type breakdown
+    const orderTypeBreakdown = db.prepare(`
+      SELECT order_type, COUNT(*) as count, SUM(total) as revenue
+      FROM orders WHERE status != 'cancelled'
+      GROUP BY order_type
+    `).all();
 
     res.json({
       success: true,
@@ -830,7 +841,9 @@ app.get('/api/analytics', (req, res) => {
         repeatCustomers: repeatCustomers.count,
         totalCustomers: totalCustomers.count,
         couponPerf, dailyRevenue,
-        predictedTomorrow
+        predictedTomorrow,
+        predictionConfidence,
+        orderTypeBreakdown
       }
     });
   } catch (err) {
