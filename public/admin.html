@@ -109,6 +109,7 @@ tr:hover td { background: #fafafa; }
     <div class="nav-item" onclick="showPage('leaderboard')"><span>🏆</span> Leaderboard</div>
     <div class="nav-item" onclick="showPage('freeitem')"><span>🎁</span> Free Item</div>
     <div class="nav-item" onclick="showPage('special')"><span>⚡</span> Today Special</div>
+    <div class="nav-item" onclick="showPage('upsell')"><span>🔼</span> Upsell Manager</div>
     <div class="nav-item" onclick="doLogout()" style="color:#ff4444;"><span>🚪</span> Logout</div>
   </div>
 
@@ -357,7 +358,18 @@ tr:hover td { background: #fafafa; }
         <tbody id="freeitem-table"></tbody></table>
       </div>
     </div>
-
+<!-- UPSELL MANAGER -->
+<div class="page" id="page-upsell">
+  <div class="page-header" style="display:flex;justify-content:space-between;align-items:center;">
+    <div><h1>🔼 Upsell Manager</h1><p>Customers ko smart suggestions do</p></div>
+    <button class="btn btn-primary" onclick="openAddUpsell()">+ Upsell Add Karo</button>
+  </div>
+  <div class="card">
+    <table><thead><tr><th>Trigger Item</th><th>Suggest Item</th><th>Message</th><th>Active</th><th>Action</th></tr></thead>
+    <tbody id="upsell-table"><tr><td colspan="5" style="text-align:center;color:#aaa;">Loading...</td></tr></tbody></table>
+  </div>
+</div>
+    
     <!-- TODAY SPECIAL -->
     <div class="page" id="page-special">
       <div class="page-header"><h1>⚡ Today's Special</h1><p>Aaj ka special dish set karo</p></div>
@@ -457,7 +469,26 @@ tr:hover td { background: #fafafa; }
     </div>
   </div>
 </div>
-
+<!-- UPSELL MODAL -->
+<div class="modal" id="upsellModal">
+  <div class="modal-box">
+    <h3>🔼 Upsell Rule Banao</h3>
+    <input type="hidden" id="upsell-edit-id">
+    <div class="form-group"><label>Trigger Item (customer ne kya add kiya)</label>
+      <input type="text" id="upsell-trigger" placeholder="e.g. Burger"></div>
+    <div class="form-group"><label>Suggest Item (kya suggest karna hai)</label>
+      <input type="text" id="upsell-suggest" placeholder="e.g. Cold Coffee"></div>
+    <div class="form-group"><label>Message (customer ko dikhega)</label>
+      <input type="text" id="upsell-msg" placeholder="e.g. Burger ke saath Cold Coffee try karo!"></div>
+    <div class="form-group"><label>Active?</label>
+      <select id="upsell-active"><option value="1">Yes ✅</option><option value="0">No ❌</option></select></div>
+    <div style="display:flex;gap:10px;margin-top:8px;">
+      <button class="btn btn-primary" onclick="saveUpsell()">Save Karo</button>
+      <button class="btn" style="background:#eee;" onclick="closeModal('upsellModal')">Cancel</button>
+    </div>
+  </div>
+</div>
+  
 <!-- LEADERBOARD MODAL -->
 <div class="modal" id="lbModal">
   <div class="modal-box">
@@ -528,6 +559,7 @@ function showPage(page) {
   if (page === 'leaderboard') loadLeaderboard();
   if (page === 'freeitem') loadFreeItem();
   if (page === 'special') loadTodaySpecial();
+  if (page === 'upsell') loadUpsell();
 }
 
 async function loadDashboard() {
@@ -1034,6 +1066,65 @@ async function saveCafeSettings() {
   closeModal('cafeSettingsModal');
   updateCafeUI(cafeIsOpen, body.opens_at, body.closes_at);
   alert('✅ Timing save ho gayi!');
+}
+  // ── UPSELL MANAGER ──
+async function loadUpsell() {
+  try {
+    const res = await fetch('/api/upsell');
+    const data = await res.json();
+    document.getElementById('upsell-table').innerHTML = data.data.length ? data.data.map(u => `
+      <tr>
+        <td><strong>${u.trigger_item}</strong></td>
+        <td>${u.suggest_item}</td>
+        <td style="font-size:13px;color:#555;">${u.message}</td>
+        <td>${u.is_active ? '✅' : '❌'}</td>
+        <td>
+          <button class="btn btn-sm btn-primary" onclick="editUpsell(${u.id},'${u.trigger_item}','${u.suggest_item}','${u.message}',${u.is_active})">Edit</button>
+          <button class="btn btn-sm btn-danger" onclick="deleteUpsell(${u.id})" style="margin-left:4px;">Delete</button>
+        </td>
+      </tr>`).join('') : '<tr><td colspan="5" style="text-align:center;color:#aaa;">Koi upsell rule nahi hai. Add karo!</td></tr>';
+  } catch(e) {
+    document.getElementById('upsell-table').innerHTML = '<tr><td colspan="5" style="text-align:center;color:#aaa;">Load nahi ho paya</td></tr>';
+  }
+}
+
+function openAddUpsell() {
+  ['upsell-edit-id','upsell-trigger','upsell-suggest','upsell-msg'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('upsell-active').value = '1';
+  document.getElementById('upsellModal').classList.add('open');
+}
+
+function editUpsell(id, trigger, suggest, msg, active) {
+  document.getElementById('upsell-edit-id').value = id;
+  document.getElementById('upsell-trigger').value = trigger;
+  document.getElementById('upsell-suggest').value = suggest;
+  document.getElementById('upsell-msg').value = msg;
+  document.getElementById('upsell-active').value = active;
+  document.getElementById('upsellModal').classList.add('open');
+}
+
+async function saveUpsell() {
+  const id = document.getElementById('upsell-edit-id').value;
+  const body = {
+    trigger_item: document.getElementById('upsell-trigger').value,
+    suggest_item: document.getElementById('upsell-suggest').value,
+    message: document.getElementById('upsell-msg').value,
+    is_active: parseInt(document.getElementById('upsell-active').value)
+  };
+  const res = await fetch(id ? `/api/upsell/${id}` : '/api/upsell', {
+    method: id ? 'PUT' : 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify(body)
+  });
+  const data = await res.json();
+  if (data.success) { closeModal('upsellModal'); loadUpsell(); alert('✅ ' + data.message); }
+  else alert('❌ ' + data.message);
+}
+
+async function deleteUpsell(id) {
+  if (!confirm('Delete karna hai?')) return;
+  await fetch('/api/upsell/' + id, { method: 'DELETE' });
+  loadUpsell();
 }
 </script>
 </body>
