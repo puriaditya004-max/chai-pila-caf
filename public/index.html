@@ -1,3 +1,4 @@
+cat > /mnt/user-data/outputs/index.html << 'HTMLEOF'
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -21,11 +22,7 @@
   * { margin:0; padding:0; box-sizing:border-box; }
   body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text); transition:background 0.3s,color 0.3s; }
   a { text-decoration:none; color:inherit; }
-
-  /* ── TOPBAR ── */
   .topbar { background:var(--primary); color:white; text-align:center; font-size:13px; padding:6px; letter-spacing:0.5px; }
-
-  /* ── NAVBAR ── */
   .navbar { background:var(--bg); border-bottom:1px solid var(--border); padding:0 16px; display:flex; align-items:center; gap:10px; height:70px; position:sticky; top:0; z-index:200; }
   .logo { display:flex; align-items:center; gap:10px; cursor:pointer; }
   .logo-icon { width:44px; height:44px; background:var(--primary); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:22px; }
@@ -50,35 +47,25 @@
   .nav-btn:hover { background:var(--bg-secondary); }
   .cart-badge { position:absolute; top:4px; right:4px; background:var(--primary); color:white; border-radius:50%; width:18px; height:18px; font-size:10px; display:flex; align-items:center; justify-content:center; font-weight:700; }
   .dark-toggle { background:var(--bg-secondary); border:1.5px solid var(--border); border-radius:20px; padding:6px 14px; cursor:pointer; font-size:13px; font-weight:500; color:var(--text); display:flex; align-items:center; gap:6px; }
-
-  /* ── USER AVATAR BTN ── */
   .user-avatar-btn { width:36px; height:36px; border-radius:50%; background:var(--primary); color:white; font-size:15px; font-weight:700; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
   .login-btn { background:var(--primary); color:white; border:none; padding:8px 14px; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; font-family:'DM Sans',sans-serif; transition:background 0.2s; white-space:nowrap; }
   .login-btn:hover { background:var(--primary-dark); }
-
-  /* ── CAT NAV ── */
   .cat-nav { background:var(--bg); border-bottom:1px solid var(--border); display:flex; align-items:center; overflow-x:auto; padding:0 24px; scrollbar-width:none; }
   .cat-nav::-webkit-scrollbar { display:none; }
   .all-cat { background:var(--text); color:var(--bg); padding:0 20px; height:48px; display:flex; align-items:center; gap:8px; font-size:14px; font-weight:600; cursor:pointer; white-space:nowrap; flex-shrink:0; margin-right:4px; }
   .cat-link { padding:0 16px; height:48px; display:flex; align-items:center; font-size:14px; font-weight:500; cursor:pointer; white-space:nowrap; color:var(--text-muted); border-bottom:2px solid transparent; transition:all 0.2s; flex-shrink:0; }
   .cat-link:hover,.cat-link.active { color:var(--primary); border-bottom-color:var(--primary); }
-
-  /* ── TICKER ── */
   .live-ticker { background:linear-gradient(90deg,#1a0a02,#3d1a08); color:white; padding:8px 24px; display:flex; align-items:center; gap:12px; overflow:hidden; }
   .live-dot { width:8px; height:8px; background:#00ff88; border-radius:50%; animation:pulse 1.5s infinite; flex-shrink:0; }
   @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(1.3)} }
   .ticker-text { font-size:13px; white-space:nowrap; animation:ticker 12s linear infinite; }
   @keyframes ticker { 0%{transform:translateX(100%)} 100%{transform:translateX(-100%)} }
-
-  /* ── LAYOUT ── */
   .main-layout { display:flex; max-width:1400px; margin:0 auto; }
   .left-sidebar { width:200px; flex-shrink:0; padding:16px 0; background:var(--bg); border-right:1px solid var(--border); min-height:calc(100vh - 120px); }
   .sidebar-item { display:flex; align-items:center; gap:10px; padding:12px 20px; cursor:pointer; font-size:14px; font-weight:500; color:var(--text-muted); transition:all 0.2s; }
   .sidebar-item:hover { background:var(--bg-secondary); color:var(--primary); }
   .sidebar-item .si-icon { width:36px; height:36px; border-radius:50%; background:var(--bg-secondary); display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; }
   .center-content { flex:1; padding:20px; overflow:hidden; }
-
-  /* ── HERO ── */
   .hero { background:linear-gradient(135deg,#1A0A02 0%,#3D1A08 40%,#C84B11 100%); border-radius:16px; padding:36px 40px; display:flex; align-items:center; justify-content:space-between; margin-bottom:24px; overflow:hidden; position:relative; min-height:220px; }
   .hero::before { content:''; position:absolute; top:-40px; right:-40px; width:300px; height:300px; background:radial-gradient(circle,rgba(245,166,35,0.15) 0%,transparent 70%); border-radius:50%; }
   .hero-text h2 { font-family:'Playfair Display',serif; font-size:38px; color:white; line-height:1.1; margin-bottom:6px; }
@@ -122,8 +109,6 @@
   .food-price { font-size:15px; font-weight:700; color:var(--primary); }
   .add-btn { background:var(--bg); border:1.5px solid var(--primary); color:var(--primary); padding:4px 12px; border-radius:6px; font-size:12px; font-weight:700; cursor:pointer; font-family:'DM Sans',sans-serif; transition:all 0.2s; }
   .add-btn:hover { background:var(--primary); color:white; }
-
-  /* ── LEADERBOARD ── */
   .lb-hero { background:linear-gradient(135deg,#1a1a2e,#16213e,#0f3460); border-radius:16px; padding:32px; text-align:center; margin-bottom:24px; }
   .lb-hero h2 { font-family:'Playfair Display',serif; font-size:32px; color:white; margin-bottom:8px; }
   .lb-hero p { color:rgba(255,255,255,0.7); font-size:14px; }
@@ -150,15 +135,11 @@
   .lb-stats { text-align:right; }
   .lb-stats .orders { font-size:13px; font-weight:700; color:var(--primary); }
   .lb-stats .spent { font-size:12px; color:var(--text-muted); }
-
-  /* ── FEATURES STRIP ── */
   .features { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; padding:20px 0; border-top:1px solid var(--border); }
   .feature-item { display:flex; align-items:center; gap:10px; }
   .feature-icon { font-size:28px; }
   .feature-text strong { font-size:13px; font-weight:700; display:block; }
   .feature-text span { font-size:12px; color:var(--text-muted); }
-
-  /* ── RIGHT SIDEBAR / CART ── */
   .right-sidebar { width:var(--sidebar-width); flex-shrink:0; background:var(--bg); border-left:1px solid var(--border); padding:16px; display:flex; flex-direction:column; gap:16px; }
   .ai-section { background:var(--bg-tertiary); border:1.5px solid var(--border); border-radius:12px; padding:14px; }
   .ai-header { display:flex; align-items:center; gap:8px; font-size:13px; font-weight:700; color:var(--text); margin-bottom:12px; letter-spacing:0.3px; text-transform:uppercase; }
@@ -179,9 +160,12 @@
   .ai-list-price { font-size:13px; font-weight:700; color:var(--primary); }
   .order-section { background:var(--bg-tertiary); border:1.5px solid var(--border); border-radius:12px; padding:14px; }
   .order-header { font-size:14px; font-weight:700; color:var(--text); margin-bottom:12px; text-transform:uppercase; letter-spacing:0.3px; }
-  .order-type-selector { display:flex; gap:6px; margin-bottom:12px; }
+  .order-type-selector { display:flex; gap:6px; margin-bottom:10px; }
   .order-type-btn { flex:1; padding:7px 4px; border:1.5px solid var(--border); border-radius:8px; background:var(--bg); color:var(--text-muted); font-size:11px; font-weight:600; cursor:pointer; font-family:'DM Sans',sans-serif; text-align:center; transition:all 0.2s; }
   .order-type-btn.active { border-color:var(--primary); background:var(--primary); color:white; }
+  .order-type-extra { margin-bottom:10px; }
+  .order-type-extra input { width:100%; padding:8px 12px; border:1.5px solid var(--border); border-radius:8px; font-size:13px; background:var(--bg-secondary); color:var(--text); font-family:'DM Sans',sans-serif; outline:none; transition:border-color 0.2s; }
+  .order-type-extra input:focus { border-color:var(--primary); }
   .order-item { display:flex; align-items:center; gap:8px; padding:8px 0; border-bottom:1px solid var(--border); }
   .order-item-img { width:36px; height:36px; border-radius:6px; background:var(--bg-secondary); display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; }
   .order-item-info { flex:1; }
@@ -199,8 +183,17 @@
   .checkout-btn:hover { background:var(--primary-dark); }
   .empty-cart { text-align:center; padding:24px 0; color:var(--text-muted); font-size:13px; }
   .empty-cart div { font-size:36px; margin-bottom:8px; }
-
-  /* ── LOGIN / AUTH MODAL ── */
+  /* UPSELL POPUP */
+  .upsell-popup { display:none; position:fixed; bottom:100px; right:20px; background:white; border:2px solid var(--primary); border-radius:14px; padding:14px 16px; width:260px; box-shadow:0 8px 32px rgba(200,75,17,0.2); z-index:600; animation:slideInRight 0.3s ease; }
+  .upsell-popup.show { display:block; }
+  @keyframes slideInRight { from{transform:translateX(60px);opacity:0} to{transform:translateX(0);opacity:1} }
+  .upsell-popup .up-title { font-size:13px; font-weight:700; color:var(--primary); margin-bottom:6px; }
+  .upsell-popup .up-msg { font-size:12px; color:var(--text-muted); margin-bottom:10px; }
+  .upsell-popup .up-actions { display:flex; gap:8px; }
+  .upsell-popup .up-yes { flex:1; background:var(--primary); color:white; border:none; padding:8px; border-radius:7px; font-size:12px; font-weight:700; cursor:pointer; font-family:'DM Sans',sans-serif; }
+  .upsell-popup .up-no { background:none; border:1.5px solid var(--border); padding:8px 12px; border-radius:7px; font-size:12px; color:var(--text-muted); cursor:pointer; font-family:'DM Sans',sans-serif; }
+  .upsell-popup .up-close { position:absolute; top:8px; right:10px; background:none; border:none; font-size:16px; cursor:pointer; color:var(--text-muted); }
+  /* MODAL */
   .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:999; align-items:center; justify-content:center; }
   .modal-overlay.open { display:flex; }
   .modal-box { background:var(--bg); border-radius:16px; padding:28px; width:440px; max-width:95vw; box-shadow:0 8px 40px rgba(0,0,0,0.3); }
@@ -220,15 +213,24 @@
   .auth-divider { text-align:center; font-size:12px; color:var(--text-muted); margin:10px 0; }
   .social-login { width:100%; padding:11px; border:1.5px solid var(--border); border-radius:8px; background:var(--bg); color:var(--text); font-size:14px; font-weight:600; cursor:pointer; font-family:'DM Sans',sans-serif; display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:8px; transition:background 0.2s; }
   .social-login:hover { background:var(--bg-secondary); }
-
-  /* ── USER PANEL / PROFILE PAGE ── */
+  /* USER PANEL */
   .user-panel { display:none; max-width:900px; margin:0 auto; padding:24px; }
   .user-panel.show { display:block; }
   .up-back { background:var(--bg-secondary); border:1.5px solid var(--border); padding:8px 16px; border-radius:8px; cursor:pointer; font-size:14px; font-weight:600; color:var(--text); margin-bottom:20px; }
-  .up-header { background:linear-gradient(135deg,#1A0A02,#C84B11); border-radius:16px; padding:28px; display:flex; align-items:center; gap:20px; margin-bottom:24px; }
+  .up-header { background:linear-gradient(135deg,#1A0A02,#C84B11); border-radius:16px; padding:28px; display:flex; align-items:center; gap:20px; margin-bottom:20px; }
   .up-avatar { width:72px; height:72px; border-radius:50%; background:var(--accent); display:flex; align-items:center; justify-content:center; font-size:32px; font-weight:700; color:white; flex-shrink:0; border:3px solid rgba(255,255,255,0.3); }
   .up-info h2 { font-size:22px; font-weight:700; color:white; margin-bottom:4px; }
   .up-info p { font-size:13px; color:rgba(255,255,255,0.7); }
+  /* LEVEL BADGE */
+  .up-level-badge { display:inline-flex; align-items:center; gap:6px; padding:4px 12px; border-radius:20px; font-size:12px; font-weight:700; margin-top:6px; }
+  .level-bronze { background:#cd7f32; color:white; }
+  .level-silver { background:#a8a8a8; color:white; }
+  .level-gold { background:linear-gradient(90deg,#f7c948,#e6a817); color:#333; }
+  .level-diamond { background:linear-gradient(90deg,#74ebd5,#acb6e5); color:#333; }
+  .level-platinum { background:linear-gradient(90deg,#e0e0e0,#bdbdbd); color:#333; }
+  .level-vip { background:linear-gradient(90deg,#f093fb,#f5576c); color:white; }
+  .up-tags-row { display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+  .up-tag-chip { padding:3px 10px; border-radius:20px; font-size:11px; font-weight:700; background:rgba(255,255,255,0.15); color:white; border:1px solid rgba(255,255,255,0.3); }
   .up-coins { margin-left:auto; text-align:right; }
   .up-coins .coin-val { font-size:28px; font-weight:800; color:var(--accent); }
   .up-coins .coin-label { font-size:12px; color:rgba(255,255,255,0.7); }
@@ -245,7 +247,17 @@
   .up-field input:focus { border-color:var(--primary); }
   .up-save-btn { background:var(--primary); color:white; border:none; padding:11px 28px; border-radius:8px; font-size:14px; font-weight:700; cursor:pointer; font-family:'DM Sans',sans-serif; transition:background 0.2s; }
   .up-save-btn:hover { background:var(--primary-dark); }
-
+  /* PAYMENT INFO CARD */
+  .payment-info-card { background:linear-gradient(135deg,#1A0A02,#3D1A08); border-radius:12px; padding:18px; margin-bottom:14px; }
+  .payment-info-card h3 { color:white; font-size:15px; font-weight:700; margin-bottom:14px; }
+  .pay-field { margin-bottom:12px; }
+  .pay-field label { font-size:11px; color:rgba(255,255,255,0.6); font-weight:600; display:block; margin-bottom:4px; text-transform:uppercase; letter-spacing:0.5px; }
+  .pay-field input { width:100%; padding:10px 14px; border:1.5px solid rgba(255,255,255,0.15); border-radius:8px; font-size:14px; background:rgba(255,255,255,0.08); color:white; font-family:'DM Sans',sans-serif; outline:none; transition:border-color 0.2s; }
+  .pay-field input::placeholder { color:rgba(255,255,255,0.35); }
+  .pay-field input:focus { border-color:var(--accent); }
+  .pay-tabs { display:flex; gap:6px; margin-bottom:14px; }
+  .pay-tab { flex:1; padding:8px; border-radius:8px; border:1.5px solid rgba(255,255,255,0.15); background:rgba(255,255,255,0.05); color:rgba(255,255,255,0.6); font-size:12px; font-weight:700; cursor:pointer; font-family:'DM Sans',sans-serif; text-align:center; transition:all 0.2s; }
+  .pay-tab.active { border-color:var(--accent); background:rgba(245,166,35,0.15); color:var(--accent); }
   /* wallet */
   .wallet-balance { background:linear-gradient(135deg,#C84B11,#F5A623); border-radius:12px; padding:20px; margin-bottom:16px; text-align:center; }
   .wallet-balance .bal-coins { font-size:42px; font-weight:800; color:white; }
@@ -257,8 +269,6 @@
   .whi-left .whi-date { font-size:12px; color:var(--text-muted); }
   .whi-coins.earn { color:#2e7d32; font-weight:700; font-size:14px; }
   .whi-coins.spend { color:var(--primary); font-weight:700; font-size:14px; }
-
-  /* orders */
   .order-hist-card { background:var(--bg); border:1.5px solid var(--border); border-radius:12px; padding:16px; margin-bottom:12px; }
   .ohc-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
   .ohc-id { font-size:13px; font-weight:700; color:var(--primary); }
@@ -271,8 +281,6 @@
   .ohc-total { font-size:15px; font-weight:700; color:var(--text); }
   .reorder-btn { background:var(--primary); color:white; border:none; padding:7px 16px; border-radius:7px; font-size:12px; font-weight:700; cursor:pointer; font-family:'DM Sans',sans-serif; }
   .stars { color:var(--accent); font-size:14px; cursor:pointer; }
-
-  /* wishlist */
   .wishlist-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
   .wishlist-item { background:var(--bg); border:1.5px solid var(--border); border-radius:12px; padding:14px; text-align:center; position:relative; }
   .wishlist-item .wi-emoji { font-size:40px; margin-bottom:8px; }
@@ -280,8 +288,6 @@
   .wishlist-item .wi-price { font-size:14px; font-weight:700; color:var(--primary); margin-bottom:8px; }
   .wishlist-item .wi-add { background:var(--primary); color:white; border:none; padding:6px 14px; border-radius:6px; font-size:12px; font-weight:700; cursor:pointer; font-family:'DM Sans',sans-serif; width:100%; }
   .wishlist-remove { position:absolute; top:8px; right:8px; background:none; border:none; cursor:pointer; font-size:14px; color:var(--text-muted); }
-
-  /* referral */
   .refer-card { background:linear-gradient(135deg,#1A0A02,#3D1A08); border-radius:12px; padding:20px; margin-bottom:16px; text-align:center; }
   .refer-card h3 { color:white; font-size:18px; margin-bottom:6px; }
   .refer-card p { color:rgba(255,255,255,0.7); font-size:13px; margin-bottom:16px; }
@@ -293,40 +299,25 @@
   .rr-box { background:var(--bg-secondary); border-radius:10px; padding:14px; text-align:center; border:1.5px solid var(--border); }
   .rr-box .rr-val { font-size:22px; font-weight:800; color:var(--primary); }
   .rr-box .rr-label { font-size:12px; color:var(--text-muted); margin-top:2px; }
-  .refer-hist-item { display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid var(--border); }
-  .rhi-avatar { width:36px; height:36px; border-radius:50%; background:var(--primary); color:white; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:700; flex-shrink:0; }
-  .rhi-info .rhi-name { font-size:14px; font-weight:600; }
-  .rhi-info .rhi-date { font-size:12px; color:var(--text-muted); }
-  .rhi-coins { font-size:14px; font-weight:700; color:#2e7d32; margin-left:auto; }
-
-  /* coupons */
   .coupon-card { background:var(--bg); border:1.5px dashed var(--primary); border-radius:12px; padding:16px; margin-bottom:12px; display:flex; align-items:center; gap:16px; }
   .coupon-tag { background:var(--primary); color:white; font-size:11px; font-weight:800; padding:4px 10px; border-radius:6px; writing-mode:vertical-rl; text-orientation:mixed; letter-spacing:1px; flex-shrink:0; }
   .coupon-info h4 { font-size:15px; font-weight:800; color:var(--primary); margin-bottom:3px; }
   .coupon-info p { font-size:12px; color:var(--text-muted); }
   .coupon-info .coup-exp { font-size:11px; color:var(--text-light); margin-top:4px; }
   .coupon-apply { margin-left:auto; background:var(--primary); color:white; border:none; padding:8px 16px; border-radius:7px; font-size:13px; font-weight:700; cursor:pointer; font-family:'DM Sans',sans-serif; flex-shrink:0; }
-
-  /* ── TOAST ── */
   .toast { display:none; position:fixed; bottom:90px; left:50%; transform:translateX(-50%); background:#1a7a4a; color:white; padding:14px 28px; border-radius:12px; font-size:15px; font-weight:600; z-index:9999; box-shadow:0 4px 20px rgba(0,0,0,0.3); animation:slideUp 0.3s ease; white-space:nowrap; }
   .toast.show { display:block; }
   @keyframes slideUp { from{transform:translateX(-50%) translateY(20px);opacity:0} to{transform:translateX(-50%) translateY(0);opacity:1} }
-
-  /* ── FLOATING BTNS ── */
   .floating-btns { position:fixed; bottom:80px; right:20px; display:flex; flex-direction:column; gap:12px; z-index:500; }
   .float-btn { width:52px; height:52px; border-radius:50%; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:22px; box-shadow:0 4px 16px rgba(0,0,0,0.2); transition:transform 0.2s,box-shadow 0.2s; }
   .float-btn:hover { transform:scale(1.1); box-shadow:0 6px 20px rgba(0,0,0,0.3); }
   .float-whatsapp { background:#25D366; }
   .float-directions { background:#4285F4; }
-
-  /* ── BOTTOM NAV ── */
   .bottom-nav { display:none; position:fixed; bottom:0; left:0; right:0; background:var(--bg); border-top:1.5px solid var(--border); z-index:400; padding:8px 0 6px; }
   .bottom-nav-inner { display:flex; justify-content:space-around; }
   .bn-item { display:flex; flex-direction:column; align-items:center; gap:2px; cursor:pointer; padding:4px 16px; font-size:10px; font-weight:600; color:var(--text-muted); transition:color 0.2s; }
   .bn-item.active { color:var(--primary); }
   .bn-item span:first-child { font-size:20px; }
-
-  /* ── RESPONSIVE ── */
   @media (max-width:768px) {
     .bottom-nav { display:block; }
     .left-sidebar { display:none; }
@@ -359,10 +350,7 @@
 <nav class="navbar">
   <div class="logo" onclick="showHomePage()">
     <div class="logo-icon">☕</div>
-    <div class="logo-text">
-      <h1>Chai Pila</h1>
-      <span>Cafe & Restaurant</span>
-    </div>
+    <div class="logo-text"><h1>Chai Pila</h1><span>Cafe & Restaurant</span></div>
   </div>
   <div class="search-bar">
     <input type="text" id="searchInput" placeholder="Search for pizza, burger, noodles..." autocomplete="off"/>
@@ -373,12 +361,9 @@
     <div class="nav-btn" style="cursor:pointer" onclick="showLeaderboard()" title="Leaderboard">🏆</div>
     <button class="nav-btn" onclick="window.location.href='/admin'" title="Admin Panel">⚙️</button>
     <button class="nav-btn" style="position:relative" title="Cart">🛒 <span class="cart-badge" id="cartBadge">0</span></button>
-    <div class="nav-btn" style="cursor:pointer" onclick="currentUser ? openUserPanel() : openAuthModal()" title="Delivery location">📍 <span id="navAddressLabel">Nagpur, MH</span></div>
+    <div class="nav-btn" style="cursor:pointer" onclick="currentUser ? openUserPanel() : openAuthModal()" title="Location">📍 <span id="navAddressLabel">Nagpur, MH</span></div>
     <button class="dark-toggle" onclick="toggleDark()">🌙</button>
-    <!-- LOGIN / USER BUTTON -->
-    <div id="authBtnArea">
-      <button class="login-btn" onclick="openAuthModal()">Login / Sign Up</button>
-    </div>
+    <div id="authBtnArea"><button class="login-btn" onclick="openAuthModal()">Login / Sign Up</button></div>
   </div>
 </nav>
 
@@ -395,7 +380,7 @@
   <a class="cat-link" onclick="showLeaderboard()">🏆 Leaderboard</a>
 </div>
 
-<!-- ══ HOME PAGE ══ -->
+<!-- HOME PAGE -->
 <div id="homePage">
   <div class="main-layout">
     <div class="left-sidebar">
@@ -410,7 +395,6 @@
       <div class="sidebar-item" onclick="showLeaderboard()"><div class="si-icon">🏆</div>Leaderboard</div>
       <div class="sidebar-item" onclick="openAuthModal()"><div class="si-icon">👤</div>My Account</div>
     </div>
-
     <div class="center-content">
       <div class="hero">
         <div class="hero-text">
@@ -423,7 +407,6 @@
           <div class="burger-circle">🍔</div>
         </div>
       </div>
-
       <div id="todaySpecialBanner" style="display:none"></div>
       <div id="menuContainer">
         <div style="text-align:center;padding:40px;color:var(--text-muted)">
@@ -431,7 +414,6 @@
           <div>Menu load ho raha hai...</div>
         </div>
       </div>
-
       <div class="features">
         <div class="feature-item"><span class="feature-icon">🛵</span><div class="feature-text"><strong>Fast Delivery</strong><span>On time, every time</span></div></div>
         <div class="feature-item"><span class="feature-icon">⭐</span><div class="feature-text"><strong>Best Quality</strong><span>Fresh & Tasty Food</span></div></div>
@@ -439,7 +421,6 @@
         <div class="feature-item"><span class="feature-icon">🎧</span><div class="feature-text"><strong>24/7 Support</strong><span>We are here to help</span></div></div>
       </div>
     </div>
-
     <div class="right-sidebar">
       <div class="ai-section">
         <div class="ai-header"><span class="ai-star">✦</span> Today's Picks</div>
@@ -471,20 +452,29 @@
         </div>
       </div>
 
+      <!-- ORDER SECTION — FEATURE 2: Dine-in default + table number + delivery address -->
       <div class="order-section">
         <div class="order-header">🛒 Your Order</div>
         <div class="order-type-selector">
-          <button class="order-type-btn active" onclick="setOrderType('delivery',this)">🛵 Delivery</button>
-          <button class="order-type-btn" onclick="setOrderType('dine_in',this)">🍽️ Dine In</button>
+          <button class="order-type-btn" onclick="setOrderType('delivery',this)">🛵 Delivery</button>
+          <button class="order-type-btn active" onclick="setOrderType('dine_in',this)">🍽️ Dine In</button>
           <button class="order-type-btn" onclick="setOrderType('takeaway',this)">🥡 Takeaway</button>
+        </div>
+        <!-- Table Number — Dine In ke liye -->
+        <div class="order-type-extra" id="tableNumberBox">
+          <input type="number" id="tableNumber" min="1" max="50" placeholder="🪑 Table Number daalo (1-50)" />
+        </div>
+        <!-- Delivery Address — Delivery ke liye -->
+        <div class="order-type-extra" id="deliveryAddressBox" style="display:none;">
+          <input type="text" id="quickAddress" placeholder="📍 Delivery address daalo..." />
         </div>
         <div id="cartItems">
           <div class="empty-cart"><div>🍽️</div>Cart khali hai<br>Kuch add karo!</div>
         </div>
         <div class="order-totals">
           <div class="order-row"><span>Subtotal</span><span id="subtotal">₹0</span></div>
-          <div class="order-row" id="deliveryRow"><span>Delivery Fee</span><span>₹20</span></div>
-          <div class="order-total-row"><span>Total</span><span id="totalPrice">₹20</span></div>
+          <div class="order-row" id="deliveryRow" style="display:none;"><span>Delivery Fee</span><span>₹20</span></div>
+          <div class="order-total-row"><span>Total</span><span id="totalPrice">₹0</span></div>
           <div class="savings-row" id="savingsRow" style="display:none"><span>🎉 You saved</span><span id="savingsAmt">₹0</span></div>
         </div>
         <button class="checkout-btn" onclick="openCheckout()">Proceed to Checkout →</button>
@@ -493,7 +483,7 @@
   </div>
 </div>
 
-<!-- ══ LEADERBOARD PAGE ══ -->
+<!-- LEADERBOARD PAGE -->
 <div id="leaderboardPage" style="display:none; max-width:900px; margin:0 auto; padding:24px;">
   <button onclick="showHomePage()" style="background:var(--bg-secondary);border:1.5px solid var(--border);padding:8px 16px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:600;color:var(--text);margin-bottom:20px;">← Back to Menu</button>
   <div class="lb-hero">
@@ -504,16 +494,19 @@
   <div class="lb-list" id="lbList"></div>
 </div>
 
-<!-- ══ USER PANEL PAGE ══ -->
+<!-- USER PANEL PAGE — FEATURE 5: Level/tags + UPI/bank info -->
 <div id="userPanelPage" class="user-panel">
   <button class="up-back" onclick="showHomePage()">← Back to Menu</button>
-
   <div class="up-header">
     <div class="up-avatar" id="upAvatar">👤</div>
     <div class="up-info">
       <h2 id="upName">My Account</h2>
       <p id="upEmail">user@example.com</p>
       <p id="upPhone" style="color:rgba(255,255,255,0.6);font-size:12px;margin-top:2px"></p>
+      <!-- LEVEL BADGE -->
+      <div id="upLevelBadge" class="up-level-badge level-bronze" style="margin-top:8px;">🥉 Bronze Member</div>
+      <!-- TAGS ROW -->
+      <div class="up-tags-row" id="upTagsRow"></div>
     </div>
     <div class="up-coins">
       <div class="coin-val" id="upCoins">0 🪙</div>
@@ -530,6 +523,7 @@
     <button class="up-tab" onclick="switchUpTab('coupons',this)">🎟️ Coupons</button>
     <button class="up-tab" onclick="switchUpTab('referral',this)">🤝 Refer & Earn</button>
     <button class="up-tab" onclick="switchUpTab('freeitem',this)">🎁 Free Item</button>
+    <button class="up-tab" onclick="switchUpTab('payments',this)">💳 Payment Info</button>
   </div>
 
   <!-- PROFILE TAB -->
@@ -543,11 +537,34 @@
         <label>Delivery Address</label>
         <div style="display:flex;gap:8px">
           <input id="pf-address" placeholder="Ghar ka address" style="flex:1" />
-          <button onclick="detectAddress()" style="background:var(--primary);color:white;border:none;padding:10px 14px;border-radius:8px;cursor:pointer;font-size:20px;flex-shrink:0;" title="Auto-detect location">📍</button>
+          <button onclick="detectAddress()" style="background:var(--primary);color:white;border:none;padding:10px 14px;border-radius:8px;cursor:pointer;font-size:20px;flex-shrink:0;">📍</button>
         </div>
       </div>
       <button class="up-save-btn" onclick="saveProfile()">Save Changes</button>
       <button onclick="logoutUser()" style="margin-left:12px;background:transparent;border:1.5px solid var(--border);color:var(--text-muted);padding:11px 20px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;">Logout</button>
+    </div>
+    <!-- LEVEL INFO CARD -->
+    <div class="up-card">
+      <h3>🏅 My Level & Badges</h3>
+      <div id="levelInfoCard" style="background:var(--bg-secondary);border-radius:10px;padding:16px;">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+          <div id="levelIcon" style="font-size:40px;">🥉</div>
+          <div>
+            <div id="levelName" style="font-size:16px;font-weight:700;">Bronze Member</div>
+            <div id="levelDesc" style="font-size:13px;color:var(--text-muted);">0 orders karo — Silver ke liye 10 orders chahiye</div>
+          </div>
+        </div>
+        <div style="background:var(--border);border-radius:20px;height:8px;overflow:hidden;">
+          <div id="levelProgressBar" style="height:100%;background:linear-gradient(90deg,var(--primary),var(--accent));border-radius:20px;transition:width 0.5s;width:0%"></div>
+        </div>
+        <div id="levelProgressText" style="font-size:12px;color:var(--text-muted);margin-top:6px;text-align:right;">0 / 10 orders</div>
+      </div>
+      <div style="margin-top:14px;">
+        <div style="font-size:13px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;">My Tags</div>
+        <div id="profileTagsContainer" style="display:flex;flex-wrap:wrap;gap:8px;">
+          <div style="color:var(--text-muted);font-size:13px;">Koi tags nahi abhi. Orders karo!</div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -570,9 +587,7 @@
     </div>
     <div class="up-card">
       <h3>Coin History</h3>
-      <div id="walletHistContainer">
-        <div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px">Koi transactions nahi hain abhi</div>
-      </div>
+      <div id="walletHistContainer"><div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px">Koi transactions nahi hain abhi</div></div>
     </div>
   </div>
 
@@ -581,10 +596,7 @@
     <div class="up-card">
       <h3>My Wishlist ❤️</h3>
       <div class="wishlist-grid" id="wishlistContainer">
-        <div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--text-muted)">
-          <div style="font-size:36px">❤️</div>
-          <div>Wishlist khali hai! Items add karo.</div>
-        </div>
+        <div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--text-muted)"><div style="font-size:36px">❤️</div><div>Wishlist khali hai!</div></div>
       </div>
     </div>
   </div>
@@ -596,29 +608,17 @@
       <div id="couponsContainer">
         <div class="coupon-card">
           <div class="coupon-tag">SAVE</div>
-          <div class="coupon-info">
-            <h4>WELCOME10</h4>
-            <p>First order pe 10% discount milega</p>
-            <div class="coup-exp">Valid till: 31 Dec 2025</div>
-          </div>
+          <div class="coupon-info"><h4>WELCOME10</h4><p>First order pe 10% discount milega</p><div class="coup-exp">Valid till: 31 Dec 2025</div></div>
           <button class="coupon-apply" onclick="applyCoupon('WELCOME10',10,'percent')">Apply</button>
         </div>
         <div class="coupon-card">
           <div class="coupon-tag">FREE</div>
-          <div class="coupon-info">
-            <h4>FREEDEL</h4>
-            <p>Free delivery on any order</p>
-            <div class="coup-exp">Valid till: 31 Dec 2025</div>
-          </div>
+          <div class="coupon-info"><h4>FREEDEL</h4><p>Free delivery on any order</p><div class="coup-exp">Valid till: 31 Dec 2025</div></div>
           <button class="coupon-apply" onclick="applyCoupon('FREEDEL',20,'flat')">Apply</button>
         </div>
         <div class="coupon-card">
           <div class="coupon-tag">50 OFF</div>
-          <div class="coupon-info">
-            <h4>CHAI50</h4>
-            <p>₹50 off on orders above ₹299</p>
-            <div class="coup-exp">Valid till: 31 Dec 2025</div>
-          </div>
+          <div class="coupon-info"><h4>CHAI50</h4><p>₹50 off on orders above ₹299</p><div class="coup-exp">Valid till: 31 Dec 2025</div></div>
           <button class="coupon-apply" onclick="applyCoupon('CHAI50',50,'flat')">Apply</button>
         </div>
       </div>
@@ -637,20 +637,12 @@
       <button class="refer-share-btn" onclick="shareReferral()">Share on WhatsApp 📱</button>
     </div>
     <div class="refer-rewards">
-      <div class="rr-box">
-        <div class="rr-val">50 🪙</div>
-        <div class="rr-label">One-time reward jab dost pehli baar order kare</div>
-      </div>
-      <div class="rr-box">
-        <div class="rr-val">5%</div>
-        <div class="rr-label">Lifetime — har order pe coins milte rahenge</div>
-      </div>
+      <div class="rr-box"><div class="rr-val">50 🪙</div><div class="rr-label">One-time reward jab dost pehli baar order kare</div></div>
+      <div class="rr-box"><div class="rr-val">5%</div><div class="rr-label">Lifetime — har order pe coins milte rahenge</div></div>
     </div>
     <div class="up-card">
       <h3>Referral History</h3>
-      <div id="referHistContainer">
-        <div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px">Abhi tak koi referral nahi</div>
-      </div>
+      <div id="referHistContainer"><div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px">Abhi tak koi referral nahi</div></div>
     </div>
   </div>
 
@@ -663,40 +655,66 @@
         <div style="font-size:16px;font-weight:700;margin-bottom:4px">3+ Orders Karo, Free Item Pao!</div>
         <div style="font-size:13px;color:var(--text-muted)">Aapke abhi <strong id="freeItemOrderCount">0</strong> orders hain. <strong>3 orders ke baad</strong> ek free item choose kar sakte ho!</div>
       </div>
-      <div style="margin-top:8px;">
-        <div style="font-size:13px;font-weight:700;margin-bottom:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px">Free Items Available:</div>
-        <div id="freeItemOptions" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
-          <div style="text-align:center;padding:12px;background:var(--bg-secondary);border-radius:10px;border:1.5px solid var(--border);opacity:0.5">
-            <div style="font-size:30px">☕</div>
-            <div style="font-size:12px;font-weight:600;margin-top:4px">Masala Chai</div>
-          </div>
-          <div style="text-align:center;padding:12px;background:var(--bg-secondary);border-radius:10px;border:1.5px solid var(--border);opacity:0.5">
-            <div style="font-size:30px">🍟</div>
-            <div style="font-size:12px;font-weight:600;margin-top:4px">French Fries</div>
-          </div>
-          <div style="text-align:center;padding:12px;background:var(--bg-secondary);border-radius:10px;border:1.5px solid var(--border);opacity:0.5">
-            <div style="font-size:30px">🧁</div>
-            <div style="font-size:12px;font-weight:600;margin-top:4px">Brownie</div>
-          </div>
-        </div>
-        <div id="freeItemClaim" style="display:none;margin-top:14px;text-align:center">
-          <div style="font-size:14px;color:#2e7d32;font-weight:700;margin-bottom:8px">🎉 Congratulations! Free item choose karo:</div>
-          <button onclick="claimFreeItem('Masala Chai')" style="background:var(--primary);color:white;border:none;padding:10px 20px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;margin:4px">☕ Masala Chai</button>
-          <button onclick="claimFreeItem('French Fries')" style="background:var(--primary);color:white;border:none;padding:10px 20px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;margin:4px">🍟 French Fries</button>
-          <button onclick="claimFreeItem('Brownie')" style="background:var(--primary);color:white;border:none;padding:10px 20px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;margin:4px">🧁 Brownie</button>
-        </div>
+      <div id="freeItemOptions" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
+        <div style="text-align:center;padding:12px;background:var(--bg-secondary);border-radius:10px;border:1.5px solid var(--border);opacity:0.5"><div style="font-size:30px">☕</div><div style="font-size:12px;font-weight:600;margin-top:4px">Masala Chai</div></div>
+        <div style="text-align:center;padding:12px;background:var(--bg-secondary);border-radius:10px;border:1.5px solid var(--border);opacity:0.5"><div style="font-size:30px">🍟</div><div style="font-size:12px;font-weight:600;margin-top:4px">French Fries</div></div>
+        <div style="text-align:center;padding:12px;background:var(--bg-secondary);border-radius:10px;border:1.5px solid var(--border);opacity:0.5"><div style="font-size:30px">🧁</div><div style="font-size:12px;font-weight:600;margin-top:4px">Brownie</div></div>
       </div>
+      <div id="freeItemClaim" style="display:none;margin-top:14px;text-align:center">
+        <div style="font-size:14px;color:#2e7d32;font-weight:700;margin-bottom:8px">🎉 Congratulations! Free item choose karo:</div>
+        <button onclick="claimFreeItem('Masala Chai')" style="background:var(--primary);color:white;border:none;padding:10px 20px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;margin:4px">☕ Masala Chai</button>
+        <button onclick="claimFreeItem('French Fries')" style="background:var(--primary);color:white;border:none;padding:10px 20px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;margin:4px">🍟 French Fries</button>
+        <button onclick="claimFreeItem('Brownie')" style="background:var(--primary);color:white;border:none;padding:10px 20px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;margin:4px">🧁 Brownie</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAYMENT INFO TAB — FEATURE 5 -->
+  <div class="up-section" id="tab-payments">
+    <div class="payment-info-card">
+      <h3>💳 Payment Info Save Karo</h3>
+      <div class="pay-tabs">
+        <button class="pay-tab active" id="payTabUpi" onclick="switchPayTab('upi')">📱 UPI</button>
+        <button class="pay-tab" id="payTabBank" onclick="switchPayTab('bank')">🏦 Bank</button>
+      </div>
+      <!-- UPI -->
+      <div id="payUpiSection">
+        <div class="pay-field"><label>UPI ID</label><input id="pf-upi" placeholder="yourname@upi" /></div>
+        <div class="pay-field"><label>UPI App</label><input id="pf-upi-app" placeholder="GPay / PhonePe / Paytm" /></div>
+      </div>
+      <!-- Bank -->
+      <div id="payBankSection" style="display:none;">
+        <div class="pay-field"><label>Account Holder Name</label><input id="pf-bank-name" placeholder="Full name as per bank" /></div>
+        <div class="pay-field"><label>Account Number</label><input id="pf-bank-acc" placeholder="XXXXXXXXXXXX" type="password" /></div>
+        <div class="pay-field"><label>IFSC Code</label><input id="pf-bank-ifsc" placeholder="SBIN0001234" /></div>
+        <div class="pay-field"><label>Bank Name</label><input id="pf-bank-bname" placeholder="State Bank of India" /></div>
+      </div>
+      <button onclick="savePaymentInfo()" style="background:var(--accent);color:#1A0A02;border:none;padding:11px 28px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;width:100%;margin-top:4px;">Save Payment Info 💾</button>
+    </div>
+    <div class="up-card">
+      <h3 style="color:var(--text-muted);font-size:13px;">🔒 Yeh info sirf aapke device pe save hoti hai. Koi bhi nahi dekh sakta.</h3>
     </div>
   </div>
 </div>
 
-<!-- ══ FLOATING BUTTONS ══ -->
+<!-- UPSELL POPUP -->
+<div class="upsell-popup" id="upsellPopup">
+  <button class="up-close" onclick="closeUpsell()">✕</button>
+  <div class="up-title">🔥 Perfect Match!</div>
+  <div class="up-msg" id="upsellMsg">Burger ke saath Cold Coffee try karo!</div>
+  <div class="up-actions">
+    <button class="up-yes" id="upsellAddBtn" onclick="addUpsellItem()">Add karo ₹0</button>
+    <button class="up-no" onclick="closeUpsell()">Nahi</button>
+  </div>
+</div>
+
+<!-- FLOATING BUTTONS -->
 <div class="floating-btns">
   <button class="float-btn float-directions" onclick="openDirections()" title="Get Directions">🗺️</button>
   <button class="float-btn float-whatsapp" onclick="openWhatsApp()" title="Chat on WhatsApp">💬</button>
 </div>
 
-<!-- ══ BOTTOM NAV ══ -->
+<!-- BOTTOM NAV -->
 <div class="bottom-nav">
   <div class="bottom-nav-inner">
     <div class="bn-item active" onclick="showHomePage();setBottomNav(this)"><span>🏠</span><span>Home</span></div>
@@ -707,7 +725,7 @@
   </div>
 </div>
 
-<!-- ══ AUTH MODAL ══ -->
+<!-- AUTH MODAL -->
 <div class="modal-overlay" id="authModal">
   <div class="modal-box">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
@@ -718,7 +736,6 @@
       <button class="auth-tab active" id="loginTab" onclick="switchAuthTab('login')">Login</button>
       <button class="auth-tab" id="signupTab" onclick="switchAuthTab('signup')">Sign Up</button>
     </div>
-    <!-- LOGIN FORM -->
     <div id="loginForm">
       <input class="modal-input" id="auth-phone" placeholder="Phone number (10 digits)" type="tel" maxlength="10" />
       <input class="modal-input" id="auth-pass" placeholder="Password" type="password" />
@@ -728,7 +745,6 @@
       <div class="auth-divider">— ya —</div>
       <button class="social-login" onclick="guestLogin()">👤 Guest ke taur pe continue karo</button>
     </div>
-    <!-- SIGNUP FORM -->
     <div id="signupForm" style="display:none">
       <input class="modal-input" id="su-name" placeholder="Aapka naam" />
       <input class="modal-input" id="su-phone" placeholder="Phone number (10 digits)" type="tel" maxlength="10" />
@@ -741,7 +757,7 @@
   </div>
 </div>
 
-<!-- ══ CHECKOUT MODAL ══ -->
+<!-- CHECKOUT MODAL -->
 <div class="modal-overlay" id="checkoutModal">
   <div class="modal-box">
     <div class="modal-title">🛒 Order Confirm Karo</div>
@@ -749,6 +765,7 @@
     <input class="modal-input" id="co-name" placeholder="Aapka naam" />
     <input class="modal-input" id="co-phone" placeholder="Phone number" type="tel" />
     <input class="modal-input" id="co-address" placeholder="Delivery address" style="display:none" />
+    <input class="modal-input" id="co-table" placeholder="Table number" style="display:none" />
     <div class="modal-summary" id="co-summary"></div>
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeCheckout()">Cancel</button>
@@ -757,704 +774,857 @@
   </div>
 </div>
 
-<div class="toast" id="successToast">🎉 Order Place Ho Gaya! 25-35 min mein aayega 🛵</div>
+<div class="toast" id="successToast">🎉 Order Place Ho Gaya!</div>
 
 <script>
-  const API = '';
-  const WHATSAPP_NUMBER = '919325865871';
-  const CAFE_LAT = '21.1458';
-  const CAFE_LNG = '79.0882';
-  const COIN_VALUE = 0.5; // 1 coin = ₹0.50
+const API = '';
+const WHATSAPP_NUMBER = '919325865871';
+const CAFE_LAT = '21.1458';
+const CAFE_LNG = '79.0882';
+const COIN_VALUE = 0.5;
 
-  // ── USER STATE ──
-  let currentUser = JSON.parse(localStorage.getItem('cpUser') || 'null');
-  let currentOrderType = 'delivery';
+// ── LEVEL SYSTEM ──
+const LEVELS = [
+  { name:'Bronze',   icon:'🥉', cls:'level-bronze',   min:0,   max:9,   desc:'Silver ke liye {next} orders chahiye' },
+  { name:'Silver',   icon:'🥈', cls:'level-silver',   min:10,  max:24,  desc:'Gold ke liye {next} orders chahiye' },
+  { name:'Gold',     icon:'🥇', cls:'level-gold',     min:25,  max:49,  desc:'Diamond ke liye {next} orders chahiye' },
+  { name:'Diamond',  icon:'💎', cls:'level-diamond',  min:50,  max:99,  desc:'Platinum ke liye {next} orders chahiye' },
+  { name:'Platinum', icon:'🏅', cls:'level-platinum', min:100, max:199, desc:'VIP ke liye {next} orders chahiye' },
+  { name:'VIP',      icon:'👑', cls:'level-vip',      min:200, max:Infinity, desc:'Aap hamare VIP member hain!' },
+];
 
-  // ── AUTH FUNCTIONS ──
-  function openAuthModal() {
-    if (currentUser) { openUserPanel(); return; }
-    document.getElementById('authModal').classList.add('open');
+const TAGS = [
+  { id:'first_order',   label:'🌟 First Timer',    condition: o => o >= 1 },
+  { id:'regular',       label:'☕ Regular',         condition: o => o >= 5 },
+  { id:'loyal',         label:'💛 Loyal Customer',  condition: o => o >= 15 },
+  { id:'champion',      label:'🏆 Champion',        condition: o => o >= 30 },
+  { id:'legend',        label:'🔥 Legend',           condition: o => o >= 50 },
+  { id:'big_spender',   label:'💰 Big Spender',     condition: (o,s) => s >= 5000 },
+  { id:'foodie',        label:'🍽️ Foodie',          condition: (o,s) => s >= 2000 },
+];
+
+function getUserLevel(orderCount) {
+  for (let i = LEVELS.length - 1; i >= 0; i--) {
+    if (orderCount >= LEVELS[i].min) return { ...LEVELS[i], index: i };
   }
-  function closeAuthModal() { document.getElementById('authModal').classList.remove('open'); }
-  function switchAuthTab(tab) {
-    document.getElementById('loginForm').style.display = tab === 'login' ? 'block' : 'none';
-    document.getElementById('signupForm').style.display = tab === 'signup' ? 'block' : 'none';
-    document.getElementById('loginTab').classList.toggle('active', tab === 'login');
-    document.getElementById('signupTab').classList.toggle('active', tab === 'signup');
-  }
+  return { ...LEVELS[0], index: 0 };
+}
 
-  function doLogin() {
-    const phone = document.getElementById('auth-phone').value.trim();
-    const pass = document.getElementById('auth-pass').value.trim();
-    if (!phone || phone.length < 10) { showToast('Sahi phone number daalo!', '#e74c3c'); return; }
-    if (!pass || pass.length < 4) { showToast('Password daalo!', '#e74c3c'); return; }
-    // Check local storage for existing user
-    const stored = JSON.parse(localStorage.getItem('cpUsers') || '{}');
-    if (stored[phone] && stored[phone].password === pass) {
-      loginSuccess(stored[phone]);
-    } else if (stored[phone]) {
-      showToast('Galat password!', '#e74c3c');
-    } else {
-      showToast('Account nahi mila. Pehle Sign Up karo!', '#e74c3c');
-    }
-  }
+function getUserTags(orderCount, totalSpent) {
+  return TAGS.filter(t => t.condition(orderCount, totalSpent));
+}
 
-  function doSignup() {
-    const name = document.getElementById('su-name').value.trim();
-    const phone = document.getElementById('su-phone').value.trim();
-    const pass = document.getElementById('su-pass').value.trim();
-    const ref = document.getElementById('su-ref').value.trim().toUpperCase();
-    if (!name) { showToast('Naam daalo!', '#e74c3c'); return; }
-    if (!phone || phone.length < 10) { showToast('Sahi phone number daalo!', '#e74c3c'); return; }
-    if (!pass || pass.length < 6) { showToast('Password kam se kam 6 characters ka hona chahiye!', '#e74c3c'); return; }
-    const stored = JSON.parse(localStorage.getItem('cpUsers') || '{}');
-    if (stored[phone]) { showToast('Ye number already registered hai! Login karo.', '#e74c3c'); return; }
-    const refCode = 'CHAI' + Math.random().toString(36).substr(2,4).toUpperCase();
-    let coins = 0;
-    // Referral reward
-    if (ref) {
-      for (const u in stored) {
-        if (stored[u].referralCode === ref) {
-          stored[u].coins = (stored[u].coins || 0) + 50;
-          stored[u].coinHistory = stored[u].coinHistory || [];
-          stored[u].coinHistory.unshift({ title: `${name} ne refer code use kiya!`, coins: 50, type: 'earn', date: new Date().toLocaleDateString('hi-IN') });
-          coins = 10; // new user also gets small reward
-          break;
-        }
+function updateLevelUI() {
+  if (!currentUser) return;
+  const orderCount = (currentUser.orders || []).length;
+  const totalSpent = (currentUser.orders || []).reduce((s,o) => s + (o.total||0), 0);
+  const level = getUserLevel(orderCount);
+  const tags = getUserTags(orderCount, totalSpent);
+
+  // Header badge
+  const badge = document.getElementById('upLevelBadge');
+  badge.className = 'up-level-badge ' + level.cls;
+  badge.textContent = level.icon + ' ' + level.name + ' Member';
+
+  // Tags row in header
+  const tagsRow = document.getElementById('upTagsRow');
+  tagsRow.innerHTML = tags.map(t => `<span class="up-tag-chip">${t.label}</span>`).join('');
+
+  // Level info card
+  document.getElementById('levelIcon').textContent = level.icon;
+  document.getElementById('levelName').textContent = level.name + ' Member';
+  const nextLevel = LEVELS[level.index + 1];
+  const desc = nextLevel
+    ? level.desc.replace('{next}', nextLevel.min - orderCount)
+    : 'Aap highest level pe hain! 🎉';
+  document.getElementById('levelDesc').textContent = orderCount + ' orders — ' + desc;
+
+  // Progress bar
+  const progressMax = nextLevel ? nextLevel.min : level.min + 1;
+  const progressVal = Math.min(orderCount, progressMax);
+  const pct = Math.round(((progressVal - level.min) / (progressMax - level.min)) * 100);
+  document.getElementById('levelProgressBar').style.width = pct + '%';
+  document.getElementById('levelProgressText').textContent = orderCount + ' / ' + (nextLevel ? nextLevel.min : level.min) + ' orders';
+
+  // Profile tags container
+  const ptc = document.getElementById('profileTagsContainer');
+  if (tags.length) {
+    ptc.innerHTML = tags.map(t => `<span style="padding:6px 14px;border-radius:20px;background:var(--bg-secondary);border:1.5px solid var(--border);font-size:13px;font-weight:600;">${t.label}</span>`).join('');
+  } else {
+    ptc.innerHTML = '<div style="color:var(--text-muted);font-size:13px;">Koi tags nahi abhi. Orders karo!</div>';
+  }
+}
+
+// ── PAYMENT INFO ──
+function switchPayTab(tab) {
+  document.getElementById('payUpiSection').style.display = tab === 'upi' ? 'block' : 'none';
+  document.getElementById('payBankSection').style.display = tab === 'bank' ? 'block' : 'none';
+  document.getElementById('payTabUpi').classList.toggle('active', tab === 'upi');
+  document.getElementById('payTabBank').classList.toggle('active', tab === 'bank');
+}
+
+function loadPaymentInfo() {
+  if (!currentUser) return;
+  const pi = currentUser.paymentInfo || {};
+  document.getElementById('pf-upi').value = pi.upiId || '';
+  document.getElementById('pf-upi-app').value = pi.upiApp || '';
+  document.getElementById('pf-bank-name').value = pi.bankName || '';
+  document.getElementById('pf-bank-acc').value = pi.bankAcc || '';
+  document.getElementById('pf-bank-ifsc').value = pi.bankIfsc || '';
+  document.getElementById('pf-bank-bname').value = pi.bankBname || '';
+}
+
+function savePaymentInfo() {
+  if (!currentUser) { openAuthModal(); return; }
+  currentUser.paymentInfo = {
+    upiId:    document.getElementById('pf-upi').value.trim(),
+    upiApp:   document.getElementById('pf-upi-app').value.trim(),
+    bankName: document.getElementById('pf-bank-name').value.trim(),
+    bankAcc:  document.getElementById('pf-bank-acc').value.trim(),
+    bankIfsc: document.getElementById('pf-bank-ifsc').value.trim(),
+    bankBname:document.getElementById('pf-bank-bname').value.trim(),
+  };
+  saveUser();
+  showToast('💳 Payment info save ho gaya! ✅');
+}
+
+// ── USER STATE ──
+let currentUser = JSON.parse(localStorage.getItem('cpUser') || 'null');
+let currentOrderType = 'dine_in';
+
+// ── AUTH ──
+function openAuthModal() {
+  if (currentUser) { openUserPanel(); return; }
+  document.getElementById('authModal').classList.add('open');
+}
+function closeAuthModal() { document.getElementById('authModal').classList.remove('open'); }
+function switchAuthTab(tab) {
+  document.getElementById('loginForm').style.display = tab === 'login' ? 'block' : 'none';
+  document.getElementById('signupForm').style.display = tab === 'signup' ? 'block' : 'none';
+  document.getElementById('loginTab').classList.toggle('active', tab === 'login');
+  document.getElementById('signupTab').classList.toggle('active', tab === 'signup');
+}
+
+function doLogin() {
+  const phone = document.getElementById('auth-phone').value.trim();
+  const pass = document.getElementById('auth-pass').value.trim();
+  if (!phone || phone.length < 10) { showToast('Sahi phone number daalo!', '#e74c3c'); return; }
+  if (!pass || pass.length < 4) { showToast('Password daalo!', '#e74c3c'); return; }
+  const stored = JSON.parse(localStorage.getItem('cpUsers') || '{}');
+  if (stored[phone] && stored[phone].password === pass) {
+    loginSuccess(stored[phone]);
+  } else if (stored[phone]) {
+    showToast('Galat password!', '#e74c3c');
+  } else {
+    showToast('Account nahi mila. Pehle Sign Up karo!', '#e74c3c');
+  }
+}
+
+function doSignup() {
+  const name = document.getElementById('su-name').value.trim();
+  const phone = document.getElementById('su-phone').value.trim();
+  const pass = document.getElementById('su-pass').value.trim();
+  const ref = document.getElementById('su-ref').value.trim().toUpperCase();
+  if (!name) { showToast('Naam daalo!', '#e74c3c'); return; }
+  if (!phone || phone.length < 10) { showToast('Sahi phone number daalo!', '#e74c3c'); return; }
+  if (!pass || pass.length < 6) { showToast('Password kam se kam 6 characters ka hona chahiye!', '#e74c3c'); return; }
+  const stored = JSON.parse(localStorage.getItem('cpUsers') || '{}');
+  if (stored[phone]) { showToast('Ye number already registered hai! Login karo.', '#e74c3c'); return; }
+  const refCode = 'CHAI' + Math.random().toString(36).substr(2,4).toUpperCase();
+  let coins = 0;
+  if (ref) {
+    for (const u in stored) {
+      if (stored[u].referralCode === ref) {
+        stored[u].coins = (stored[u].coins || 0) + 50;
+        stored[u].coinHistory = stored[u].coinHistory || [];
+        stored[u].coinHistory.unshift({ title: `${name} ne refer code use kiya!`, coins: 50, type: 'earn', date: new Date().toLocaleDateString('hi-IN') });
+        coins = 10;
+        break;
       }
     }
-    const newUser = { name, phone, password: pass, referralCode: refCode, coins, email: '', address: '', orders: [], wishlist: [], coinHistory: [], referrals: [] };
-    stored[phone] = newUser;
-    localStorage.setItem('cpUsers', JSON.stringify(stored));
-    loginSuccess(newUser);
-    showToast('🎉 Account ban gaya! Welcome ' + name + '!');
   }
+  const newUser = { name, phone, password: pass, referralCode: refCode, coins, email: '', address: '', orders: [], wishlist: [], coinHistory: [], referrals: [], paymentInfo: {} };
+  stored[phone] = newUser;
+  localStorage.setItem('cpUsers', JSON.stringify(stored));
+  loginSuccess(newUser);
+  showToast('🎉 Account ban gaya! Welcome ' + name + '!');
+}
 
-  function guestLogin() {
-    const guest = { name: 'Guest User', phone: '', email: '', address: '', coins: 0, referralCode: 'GUEST', orders: [], wishlist: [], coinHistory: [], referrals: [], isGuest: true };
-    loginSuccess(guest);
-  }
+function guestLogin() {
+  const guest = { name: 'Guest User', phone: '', email: '', address: '', coins: 0, referralCode: 'GUEST', orders: [], wishlist: [], coinHistory: [], referrals: [], isGuest: true, paymentInfo: {} };
+  loginSuccess(guest);
+}
 
-  function loginSuccess(user) {
-    currentUser = user;
-    localStorage.setItem('cpUser', JSON.stringify(user));
-    closeAuthModal();
-    updateAuthUI();
-    showToast('Welcome back, ' + user.name + '! 👋');
-  }
+function loginSuccess(user) {
+  currentUser = user;
+  localStorage.setItem('cpUser', JSON.stringify(user));
+  closeAuthModal();
+  updateAuthUI();
+  showToast('Welcome back, ' + user.name + '! 👋');
+}
 
-  function logoutUser() {
-    currentUser = null;
-    localStorage.removeItem('cpUser');
-    updateAuthUI();
-    showHomePage();
-    showToast('Logout ho gaye!');
-  }
+function logoutUser() {
+  currentUser = null;
+  localStorage.removeItem('cpUser');
+  updateAuthUI();
+  showHomePage();
+  showToast('Logout ho gaye!');
+}
 
-  function updateAuthUI() {
-    const area = document.getElementById('authBtnArea');
-    if (currentUser) {
-      const initials = currentUser.name ? currentUser.name.charAt(0).toUpperCase() : '?';
-      area.innerHTML = `<button class="user-avatar-btn" onclick="openUserPanel()" title="${currentUser.name}">${initials}</button>`;
-      // Update user panel header
-      document.getElementById('upName').textContent = currentUser.name || 'My Account';
-      document.getElementById('upEmail').textContent = currentUser.email || '';
-      document.getElementById('upPhone').textContent = currentUser.phone || '';
-      document.getElementById('upAvatar').textContent = initials;
-      document.getElementById('upCoins').textContent = (currentUser.coins || 0) + ' 🪙';
-      document.getElementById('upCoinsRs').textContent = '= ₹' + ((currentUser.coins || 0) * COIN_VALUE).toFixed(0);
-      document.getElementById('referCodeDisplay').textContent = currentUser.referralCode || 'CHAI000';
-      document.getElementById('pf-name').value = currentUser.name || '';
-      document.getElementById('pf-phone').value = currentUser.phone || '';
-      document.getElementById('pf-email').value = currentUser.email || '';
-      document.getElementById('pf-address').value = currentUser.address || '';
-      const navAddr = document.getElementById('navAddressLabel');
-      if (navAddr) navAddr.textContent = currentUser.address ? currentUser.address.split(',').slice(0,2).join(',') : 'Nagpur, MH';
-      updateWalletTab();
-      updateOrdersTab();
-      updateWishlistTab();
-      updateFreeItemTab();
-    } else {
-      area.innerHTML = `<button class="login-btn" onclick="openAuthModal()">Login / Sign Up</button>`;
-    }
-  }
-
-  function saveUser() {
-    if (!currentUser || currentUser.isGuest) return;
-    const stored = JSON.parse(localStorage.getItem('cpUsers') || '{}');
-    stored[currentUser.phone] = currentUser;
-    localStorage.setItem('cpUsers', JSON.stringify(stored));
-    localStorage.setItem('cpUser', JSON.stringify(currentUser));
-  }
-
-  function saveProfile() {
-    if (!currentUser) { openAuthModal(); return; }
-    currentUser.name = document.getElementById('pf-name').value.trim() || currentUser.name;
-    currentUser.phone = document.getElementById('pf-phone').value.trim() || currentUser.phone;
-    currentUser.email = document.getElementById('pf-email').value.trim();
-    currentUser.address = document.getElementById('pf-address').value.trim();
-    saveUser();
-    updateAuthUI();
-    showToast('Profile save ho gaya! ✅');
-  }
-
-  function detectAddress() {
-    if (!navigator.geolocation) { showToast('Location access nahi mila!', '#e74c3c'); return; }
-    navigator.geolocation.getCurrentPosition(pos => {
-      const { latitude, longitude } = pos.coords;
-      fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`)
-        .then(r => r.json())
-        .then(d => {
-          const addr = d.display_name || `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
-          document.getElementById('pf-address').value = addr;
-          showToast('📍 Location detect ho gaya!');
-        }).catch(() => {
-          document.getElementById('pf-address').value = `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
-        });
-    }, () => showToast('Location access deny kiya!', '#e74c3c'));
-  }
-
-  // ── USER PANEL ──
-  function openUserPanel() {
-    if (!currentUser) { openAuthModal(); return; }
-    document.getElementById('homePage').style.display = 'none';
-    document.getElementById('leaderboardPage').style.display = 'none';
-    document.getElementById('userPanelPage').classList.add('show');
-    updateAuthUI();
-  }
-
-  function switchUpTab(tab, btn) {
-    document.querySelectorAll('.up-section').forEach(s => s.classList.remove('active'));
-    document.querySelectorAll('.up-tab').forEach(t => t.classList.remove('active'));
-    document.getElementById('tab-' + tab).classList.add('active');
-    if (btn) btn.classList.add('active');
-  }
-
-  // ── WALLET ──
-  function updateWalletTab() {
-    if (!currentUser) return;
-    document.getElementById('walletCoins').textContent = (currentUser.coins || 0) + ' 🪙';
-    document.getElementById('walletRs').textContent = '= ₹' + ((currentUser.coins || 0) * COIN_VALUE).toFixed(0) + ' (1 coin = ₹' + COIN_VALUE + ')';
-    const hist = currentUser.coinHistory || [];
-    const cont = document.getElementById('walletHistContainer');
-    if (!hist.length) {
-      cont.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px">Koi transactions nahi hain abhi</div>';
-    } else {
-      cont.innerHTML = hist.map(h => `
-        <div class="wallet-hist-item">
-          <div class="whi-left">
-            <div class="whi-title">${h.title}</div>
-            <div class="whi-date">${h.date}</div>
-          </div>
-          <div class="whi-coins ${h.type}">${h.type === 'earn' ? '+' : '-'}${h.coins} 🪙</div>
-        </div>`).join('');
-    }
-  }
-
-  // ── ORDERS HISTORY ──
-  function updateOrdersTab() {
-    if (!currentUser) return;
-    const orders = currentUser.orders || [];
-    const cont = document.getElementById('orderHistContainer');
-    if (!orders.length) {
-      cont.innerHTML = '<div style="text-align:center;padding:30px;color:var(--text-muted)"><div style="font-size:40px;margin-bottom:8px">📦</div><div>Koi orders nahi hain abhi</div></div>';
-    } else {
-      cont.innerHTML = orders.map(o => `
-        <div class="order-hist-card">
-          <div class="ohc-header">
-            <span class="ohc-id">#${o.id}</span>
-            <span class="ohc-date">${o.date}</span>
-            <span class="ohc-status ${o.status}">${o.status === 'delivered' ? '✅ Delivered' : '⏳ Pending'}</span>
-          </div>
-          <div class="ohc-items">${o.items.map(i => i.name + ' ×' + i.qty).join(', ')}</div>
-          <div class="ohc-footer">
-            <span class="ohc-total">₹${o.total}</span>
-            <div style="display:flex;align-items:center;gap:10px">
-              <div class="stars" onclick="rateOrder(${o.id})">${'★'.repeat(o.rating || 0)}${'☆'.repeat(5 - (o.rating || 0))}</div>
-              <button class="reorder-btn" onclick="reorderItems(${JSON.stringify(o.items).replace(/"/g,'&quot;')})">Reorder 🔄</button>
-            </div>
-          </div>
-        </div>`).join('');
-    }
-  }
-
-  function reorderItems(items) {
-    items.forEach(i => addToCart(i.name, i.price));
-    showHomePage();
-    showToast('Items cart mein add ho gaye! 🛒');
-  }
-
-  function rateOrder(orderId) {
-    const stars = prompt('Order ko rate karo (1-5):');
-    const rating = parseInt(stars);
-    if (rating >= 1 && rating <= 5 && currentUser) {
-      const order = currentUser.orders.find(o => o.id === orderId);
-      if (order) { order.rating = rating; saveUser(); updateOrdersTab(); showToast('Rating save ho gaya! ⭐'); }
-    }
-  }
-
-  // ── WISHLIST ──
-  function addToWishlist(name, price) {
-    if (!currentUser) { openAuthModal(); return; }
-    currentUser.wishlist = currentUser.wishlist || [];
-    if (currentUser.wishlist.find(w => w.name === name)) { showToast('Already wishlist mein hai!', '#e74c3c'); return; }
-    currentUser.wishlist.push({ name, price, emoji: getEmoji(name) });
-    saveUser();
+function updateAuthUI() {
+  const area = document.getElementById('authBtnArea');
+  if (currentUser) {
+    const initials = currentUser.name ? currentUser.name.charAt(0).toUpperCase() : '?';
+    area.innerHTML = `<button class="user-avatar-btn" onclick="openUserPanel()" title="${currentUser.name}">${initials}</button>`;
+    document.getElementById('upName').textContent = currentUser.name || 'My Account';
+    document.getElementById('upEmail').textContent = currentUser.email || '';
+    document.getElementById('upPhone').textContent = currentUser.phone || '';
+    document.getElementById('upAvatar').textContent = initials;
+    document.getElementById('upCoins').textContent = (currentUser.coins || 0) + ' 🪙';
+    document.getElementById('upCoinsRs').textContent = '= ₹' + ((currentUser.coins || 0) * COIN_VALUE).toFixed(0);
+    document.getElementById('referCodeDisplay').textContent = currentUser.referralCode || 'CHAI000';
+    document.getElementById('pf-name').value = currentUser.name || '';
+    document.getElementById('pf-phone').value = currentUser.phone || '';
+    document.getElementById('pf-email').value = currentUser.email || '';
+    document.getElementById('pf-address').value = currentUser.address || '';
+    const navAddr = document.getElementById('navAddressLabel');
+    if (navAddr) navAddr.textContent = currentUser.address ? currentUser.address.split(',').slice(0,2).join(',') : 'Nagpur, MH';
+    updateWalletTab();
+    updateOrdersTab();
     updateWishlistTab();
-    showToast('❤️ Wishlist mein add ho gaya!');
+    updateFreeItemTab();
+    updateLevelUI();
+    loadPaymentInfo();
+  } else {
+    area.innerHTML = `<button class="login-btn" onclick="openAuthModal()">Login / Sign Up</button>`;
+    const badge = document.getElementById('upLevelBadge');
+    if(badge){ badge.className='up-level-badge level-bronze'; badge.textContent='🥉 Bronze Member'; }
   }
+}
 
-  function updateWishlistTab() {
-    if (!currentUser) return;
-    const wl = currentUser.wishlist || [];
-    const cont = document.getElementById('wishlistContainer');
-    if (!wl.length) {
-      cont.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--text-muted)"><div style="font-size:36px">❤️</div><div>Wishlist khali hai! Items add karo.</div></div>';
-    } else {
-      cont.innerHTML = wl.map((w, i) => `
-        <div class="wishlist-item">
-          <button class="wishlist-remove" onclick="removeWishlist(${i})">✕</button>
-          <div class="wi-emoji">${w.emoji}</div>
-          <div class="wi-name">${w.name}</div>
-          <div class="wi-price">₹${w.price}</div>
-          <button class="wi-add" onclick="addToCart('${w.name.replace(/'/g,"\\'")}',${w.price});showHomePage()">Add to Cart</button>
-        </div>`).join('');
-    }
+function saveUser() {
+  if (!currentUser || currentUser.isGuest) return;
+  const stored = JSON.parse(localStorage.getItem('cpUsers') || '{}');
+  stored[currentUser.phone] = currentUser;
+  localStorage.setItem('cpUsers', JSON.stringify(stored));
+  localStorage.setItem('cpUser', JSON.stringify(currentUser));
+}
+
+function saveProfile() {
+  if (!currentUser) { openAuthModal(); return; }
+  currentUser.name = document.getElementById('pf-name').value.trim() || currentUser.name;
+  currentUser.phone = document.getElementById('pf-phone').value.trim() || currentUser.phone;
+  currentUser.email = document.getElementById('pf-email').value.trim();
+  currentUser.address = document.getElementById('pf-address').value.trim();
+  saveUser();
+  updateAuthUI();
+  showToast('Profile save ho gaya! ✅');
+}
+
+function detectAddress() {
+  if (!navigator.geolocation) { showToast('Location access nahi mila!', '#e74c3c'); return; }
+  navigator.geolocation.getCurrentPosition(pos => {
+    const { latitude, longitude } = pos.coords;
+    fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`)
+      .then(r => r.json())
+      .then(d => {
+        const addr = d.display_name || `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
+        document.getElementById('pf-address').value = addr;
+        showToast('📍 Location detect ho gaya!');
+      }).catch(() => {
+        document.getElementById('pf-address').value = `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
+      });
+  }, () => showToast('Location access deny kiya!', '#e74c3c'));
+}
+
+// ── USER PANEL ──
+function openUserPanel() {
+  if (!currentUser) { openAuthModal(); return; }
+  document.getElementById('homePage').style.display = 'none';
+  document.getElementById('leaderboardPage').style.display = 'none';
+  document.getElementById('userPanelPage').classList.add('show');
+  updateAuthUI();
+}
+
+function switchUpTab(tab, btn) {
+  document.querySelectorAll('.up-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.up-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  if (btn) btn.classList.add('active');
+}
+
+// ── WALLET ──
+function updateWalletTab() {
+  if (!currentUser) return;
+  document.getElementById('walletCoins').textContent = (currentUser.coins || 0) + ' 🪙';
+  document.getElementById('walletRs').textContent = '= ₹' + ((currentUser.coins || 0) * COIN_VALUE).toFixed(0) + ' (1 coin = ₹' + COIN_VALUE + ')';
+  const hist = currentUser.coinHistory || [];
+  const cont = document.getElementById('walletHistContainer');
+  if (!hist.length) {
+    cont.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px">Koi transactions nahi hain abhi</div>';
+  } else {
+    cont.innerHTML = hist.map(h => `
+      <div class="wallet-hist-item">
+        <div class="whi-left"><div class="whi-title">${h.title}</div><div class="whi-date">${h.date}</div></div>
+        <div class="whi-coins ${h.type}">${h.type === 'earn' ? '+' : '-'}${h.coins} 🪙</div>
+      </div>`).join('');
   }
+}
 
-  function removeWishlist(idx) {
-    currentUser.wishlist.splice(idx, 1);
-    saveUser();
-    updateWishlistTab();
-  }
-
-  // ── COUPONS ──
-  let appliedCoupon = null;
-  function applyCoupon(code, val, type) {
-    appliedCoupon = { code, val, type };
-    showHomePage();
-    showToast('Coupon ' + code + ' apply ho gaya! 🎉');
-  }
-
-  // ── REFERRAL ──
-  function copyReferCode() {
-    const code = document.getElementById('referCodeDisplay').textContent;
-    navigator.clipboard.writeText(code).then(() => showToast('Code copy ho gaya! 📋'));
-  }
-
-  function shareReferral() {
-    const code = document.getElementById('referCodeDisplay').textContent;
-    const msg = encodeURIComponent(`Chai Pila pe order karo aur mere refer code ${code} se sign up karo! Dono ko coins milenge! 🎉 chaipila.co.in`);
-    window.open(`https://wa.me/?text=${msg}`, '_blank');
-  }
-
-  // ── FREE ITEM ──
-  function updateFreeItemTab() {
-    if (!currentUser) return;
-    const count = (currentUser.orders || []).length;
-    document.getElementById('freeItemOrderCount').textContent = count;
-    const unlocked = count >= 3;
-    const options = document.getElementById('freeItemOptions');
-    const claim = document.getElementById('freeItemClaim');
-    options.querySelectorAll('div').forEach(d => d.style.opacity = unlocked ? '1' : '0.5');
-    claim.style.display = unlocked ? 'block' : 'none';
-  }
-
-  function claimFreeItem(item) {
-    addToCart(item, 0);
-    showToast('🎁 ' + item + ' free cart mein add ho gaya!');
-    showHomePage();
-  }
-
-  // ── PAGES ──
-  function showHomePage() {
-    document.getElementById('homePage').style.display = 'block';
-    document.getElementById('leaderboardPage').style.display = 'none';
-    document.getElementById('userPanelPage').classList.remove('show');
-  }
-
-  function showLeaderboard() {
-    document.getElementById('homePage').style.display = 'none';
-    document.getElementById('leaderboardPage').style.display = 'block';
-    document.getElementById('userPanelPage').classList.remove('show');
-    loadLeaderboard();
-  }
-
-  async function loadLeaderboard() {
-    try {
-      const res = await fetch('/api/leaderboard');
-      const data = await res.json();
-      renderLeaderboard(data.data || []);
-    } catch(e) {
-      const fallback = [
-        { rank:1, display_name:'Rahul Sharma', tag:'Food King 👑', orders:48, total_spent:8640 },
-        { rank:2, display_name:'Priya Patel', tag:'Midnight Monster 🌙', orders:36, total_spent:6480 },
-        { rank:3, display_name:'Arjun Singh', tag:'Combo Queen 🍕', orders:32, total_spent:5760 },
-        { rank:4, display_name:'Sneha Joshi', tag:'Chai Champion ☕', orders:28, total_spent:5040 },
-        { rank:5, display_name:'Rohit Kumar', tag:'Spice Lord 🌶️', orders:24, total_spent:4320 },
-        { rank:6, display_name:'Anita Desai', tag:'Burger Boss 🍔', orders:20, total_spent:3600 },
-        { rank:7, display_name:'Vikram Nair', tag:'Noodle Ninja 🍜', orders:18, total_spent:3240 },
-        { rank:8, display_name:'Pooja Mehta', tag:'Sweet Tooth 🍫', orders:15, total_spent:2700 },
-        { rank:9, display_name:'Kartik Rao', tag:'Momos Master 🥟', orders:12, total_spent:2160 },
-        { rank:10, display_name:'Divya Shah', tag:'Fries Forever 🍟', orders:10, total_spent:1800 },
-      ];
-      renderLeaderboard(fallback);
-    }
-  }
-
-  function renderLeaderboard(entries) {
-    const podium = document.getElementById('lbPodium');
-    const list = document.getElementById('lbList');
-    const top3 = entries.slice(0,3);
-    const podiumOrder = [top3[1], top3[0], top3[2]].filter(Boolean);
-    const posClass = ['second','first','third'];
-    const crowns = ['🥈','👑','🥉'];
-    podium.innerHTML = podiumOrder.map((e, i) => {
-      const cls = posClass[i];
-      const sz = cls==='first'?80:cls==='second'?64:56;
-      const fs = cls==='first'?36:cls==='second'?28:24;
-      return `<div class="lb-podium-item ${cls}">
-        <div class="lb-avatar" style="width:${sz}px;height:${sz}px;font-size:${fs}px">${crowns[i]}</div>
-        <div class="lb-podium-name">${e.display_name}</div>
-        <div class="lb-podium-tag">${e.tag}</div>
-        <div class="lb-podium-orders">${e.orders} orders</div>
-      </div>`;
-    }).join('');
-    const rankClass = ['gold','silver','bronze'];
-    list.innerHTML = entries.map((e, i) => `
-      <div class="lb-row">
-        <div class="lb-rank ${rankClass[i]||''}">${e.rank}</div>
-        <div class="lb-info"><h4>${e.display_name}</h4><span>${e.tag}</span></div>
-        <div class="lb-stats">
-          <div class="orders">${e.orders} orders</div>
-          <div class="spent">₹${e.total_spent} spent</div>
+// ── ORDERS HISTORY ──
+function updateOrdersTab() {
+  if (!currentUser) return;
+  const orders = currentUser.orders || [];
+  const cont = document.getElementById('orderHistContainer');
+  if (!orders.length) {
+    cont.innerHTML = '<div style="text-align:center;padding:30px;color:var(--text-muted)"><div style="font-size:40px;margin-bottom:8px">📦</div><div>Koi orders nahi hain abhi</div></div>';
+  } else {
+    cont.innerHTML = orders.map(o => `
+      <div class="order-hist-card">
+        <div class="ohc-header">
+          <span class="ohc-id">#${o.id}</span>
+          <span class="ohc-date">${o.date}</span>
+          <span class="ohc-status ${o.status}">${o.status === 'delivered' ? '✅ Delivered' : '⏳ Pending'}</span>
+        </div>
+        <div class="ohc-items">${o.items.map(i => i.name + ' ×' + i.qty).join(', ')}</div>
+        <div class="ohc-footer">
+          <span class="ohc-total">₹${o.total}</span>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div class="stars" onclick="rateOrder(${o.id})">${'★'.repeat(o.rating || 0)}${'☆'.repeat(5-(o.rating||0))}</div>
+            <button class="reorder-btn" onclick="reorderItems(${JSON.stringify(o.items).replace(/"/g,'&quot;')})">Reorder 🔄</button>
+          </div>
         </div>
       </div>`).join('');
   }
+}
 
-  // ── MISC ──
-  let isDark = false;
-  function toggleDark() {
-    isDark = !isDark;
-    document.body.setAttribute('data-theme', isDark ? 'dark' : '');
-    document.querySelector('.dark-toggle').textContent = isDark ? '☀️ Light' : '🌙 Dark Mode';
+function reorderItems(items) {
+  items.forEach(i => addToCart(i.name, i.price));
+  showHomePage();
+  showToast('Items cart mein add ho gaye! 🛒');
+}
+
+function rateOrder(orderId) {
+  const stars = prompt('Order ko rate karo (1-5):');
+  const rating = parseInt(stars);
+  if (rating >= 1 && rating <= 5 && currentUser) {
+    const order = currentUser.orders.find(o => o.id === orderId);
+    if (order) { order.rating = rating; saveUser(); updateOrdersTab(); showToast('Rating save ho gaya! ⭐'); }
   }
+}
 
-  function openWhatsApp() {
-    const cartItems = document.querySelectorAll('#cartItems .order-item');
-    let msg = 'Namaste! Chai Pila se order karna chahta hoon. 😊';
-    if (cartItems.length > 0) {
-      let itemLines = '';
-      let total = 0;
-      cartItems.forEach(item => {
-        const qty = parseInt(item.querySelector('.qty-val').textContent);
-        const price = parseInt(item.dataset.price);
-        itemLines += '• ' + item.dataset.item + ' x' + qty + ' = ₹' + (price * qty) + '\n';
-        total += price * qty;
-      });
-      msg = 'Namaste! Chai Pila se order karna chahta hoon:\n\n' + itemLines + '\nTotal: ₹' + (total + 20) + ' (delivery included)\n\nPlease confirm! 🙏';
-    }
-    window.open('https://wa.me/' + WHATSAPP_NUMBER + '?text=' + encodeURIComponent(msg), '_blank');
+// ── WISHLIST ──
+function addToWishlist(name, price) {
+  if (!currentUser) { openAuthModal(); return; }
+  currentUser.wishlist = currentUser.wishlist || [];
+  if (currentUser.wishlist.find(w => w.name === name)) { showToast('Already wishlist mein hai!', '#e74c3c'); return; }
+  currentUser.wishlist.push({ name, price, emoji: getEmoji(name) });
+  saveUser();
+  updateWishlistTab();
+  showToast('❤️ Wishlist mein add ho gaya!');
+}
+
+function updateWishlistTab() {
+  if (!currentUser) return;
+  const wl = currentUser.wishlist || [];
+  const cont = document.getElementById('wishlistContainer');
+  if (!wl.length) {
+    cont.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--text-muted)"><div style="font-size:36px">❤️</div><div>Wishlist khali hai!</div></div>';
+  } else {
+    cont.innerHTML = wl.map((w,i) => `
+      <div class="wishlist-item">
+        <button class="wishlist-remove" onclick="removeWishlist(${i})">✕</button>
+        <div class="wi-emoji">${w.emoji}</div>
+        <div class="wi-name">${w.name}</div>
+        <div class="wi-price">₹${w.price}</div>
+        <button class="wi-add" onclick="addToCart('${w.name.replace(/'/g,"\\'")}',${w.price});showHomePage()">Add to Cart</button>
+      </div>`).join('');
   }
+}
 
-  function openDirections() {
-    window.open('https://www.google.com/maps/dir/?api=1&destination=' + CAFE_LAT + ',' + CAFE_LNG + '&travelmode=driving', '_blank');
+function removeWishlist(idx) {
+  currentUser.wishlist.splice(idx, 1);
+  saveUser();
+  updateWishlistTab();
+}
+
+// ── COUPONS ──
+let appliedCoupon = null;
+function applyCoupon(code, val, type) {
+  appliedCoupon = { code, val, type };
+  showHomePage();
+  showToast('Coupon ' + code + ' apply ho gaya! 🎉');
+}
+
+// ── REFERRAL ──
+function copyReferCode() {
+  const code = document.getElementById('referCodeDisplay').textContent;
+  navigator.clipboard.writeText(code).then(() => showToast('Code copy ho gaya! 📋'));
+}
+
+function shareReferral() {
+  const code = document.getElementById('referCodeDisplay').textContent;
+  const msg = encodeURIComponent(`Chai Pila pe order karo aur mere refer code ${code} se sign up karo! Dono ko coins milenge! 🎉 chaipila.co.in`);
+  window.open(`https://wa.me/?text=${msg}`, '_blank');
+}
+
+// ── FREE ITEM ──
+function updateFreeItemTab() {
+  if (!currentUser) return;
+  const count = (currentUser.orders || []).length;
+  document.getElementById('freeItemOrderCount').textContent = count;
+  const unlocked = count >= 3;
+  document.getElementById('freeItemOptions').querySelectorAll('div').forEach(d => d.style.opacity = unlocked ? '1' : '0.5');
+  document.getElementById('freeItemClaim').style.display = unlocked ? 'block' : 'none';
+}
+
+function claimFreeItem(item) {
+  addToCart(item, 0);
+  showToast('🎁 ' + item + ' free cart mein add ho gaya!');
+  showHomePage();
+}
+
+// ── UPSELL ──
+let upsellRules = [];
+let currentUpsellItem = null;
+let upsellTimer = null;
+
+async function loadUpsellRules() {
+  try {
+    const res = await fetch('/api/upsell');
+    const data = await res.json();
+    if (data.success) upsellRules = data.data.filter(u => u.is_active);
+  } catch(e) {}
+}
+
+function checkUpsell(itemName) {
+  const rule = upsellRules.find(r => itemName.toLowerCase().includes(r.trigger_item.toLowerCase()));
+  if (!rule) return;
+  currentUpsellItem = rule;
+  document.getElementById('upsellMsg').textContent = rule.message;
+  document.getElementById('upsellAddBtn').textContent = 'Add karo ₹' + (rule.suggest_price || 0);
+  document.getElementById('upsellPopup').classList.add('show');
+  clearTimeout(upsellTimer);
+  upsellTimer = setTimeout(closeUpsell, 8000);
+}
+
+function closeUpsell() {
+  document.getElementById('upsellPopup').classList.remove('show');
+  currentUpsellItem = null;
+}
+
+function addUpsellItem() {
+  if (currentUpsellItem) {
+    addToCart(currentUpsellItem.suggest_item, currentUpsellItem.suggest_price || 0);
+    closeUpsell();
   }
+}
 
-  function setOrderType(type, btn) {
-    currentOrderType = type;
-    document.querySelectorAll('.order-type-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    document.getElementById('deliveryRow').style.display = (type === 'dine_in' || type === 'takeaway') ? 'none' : 'flex';
-    calcTotal();
+// ── PAGES ──
+function showHomePage() {
+  document.getElementById('homePage').style.display = 'block';
+  document.getElementById('leaderboardPage').style.display = 'none';
+  document.getElementById('userPanelPage').classList.remove('show');
+}
+
+function showLeaderboard() {
+  document.getElementById('homePage').style.display = 'none';
+  document.getElementById('leaderboardPage').style.display = 'block';
+  document.getElementById('userPanelPage').classList.remove('show');
+  loadLeaderboard();
+}
+
+async function loadLeaderboard() {
+  try {
+    const res = await fetch('/api/leaderboard');
+    const data = await res.json();
+    renderLeaderboard(data.data || []);
+  } catch(e) {
+    const fallback = [
+      {rank:1,display_name:'Rahul Sharma',tag:'Food King 👑',orders:48,total_spent:8640},
+      {rank:2,display_name:'Priya Patel',tag:'Midnight Monster 🌙',orders:36,total_spent:6480},
+      {rank:3,display_name:'Arjun Singh',tag:'Combo Queen 🍕',orders:32,total_spent:5760},
+      {rank:4,display_name:'Sneha Joshi',tag:'Chai Champion ☕',orders:28,total_spent:5040},
+      {rank:5,display_name:'Rohit Kumar',tag:'Spice Lord 🌶️',orders:24,total_spent:4320},
+    ];
+    renderLeaderboard(fallback);
   }
+}
 
-  function setBottomNav(el) {
-    document.querySelectorAll('.bn-item').forEach(b => b.classList.remove('active'));
-    el.classList.add('active');
-  }
+function renderLeaderboard(entries) {
+  const podium = document.getElementById('lbPodium');
+  const list = document.getElementById('lbList');
+  const top3 = entries.slice(0,3);
+  const podiumOrder = [top3[1],top3[0],top3[2]].filter(Boolean);
+  const posClass = ['second','first','third'];
+  const crowns = ['🥈','👑','🥉'];
+  podium.innerHTML = podiumOrder.map((e,i) => {
+    const cls = posClass[i];
+    const sz = cls==='first'?80:cls==='second'?64:56;
+    const fs = cls==='first'?36:cls==='second'?28:24;
+    return `<div class="lb-podium-item ${cls}">
+      <div class="lb-avatar" style="width:${sz}px;height:${sz}px;font-size:${fs}px">${crowns[i]}</div>
+      <div class="lb-podium-name">${e.display_name}</div>
+      <div class="lb-podium-tag">${e.tag}</div>
+      <div class="lb-podium-orders">${e.orders} orders</div>
+    </div>`;
+  }).join('');
+  const rankClass = ['gold','silver','bronze'];
+  list.innerHTML = entries.map((e,i) => `
+    <div class="lb-row">
+      <div class="lb-rank ${rankClass[i]||''}">${e.rank}</div>
+      <div class="lb-info"><h4>${e.display_name}</h4><span>${e.tag}</span></div>
+      <div class="lb-stats"><div class="orders">${e.orders} orders</div><div class="spent">₹${e.total_spent} spent</div></div>
+    </div>`).join('');
+}
 
-  function focusSearch() {
-    document.getElementById('searchInput').focus();
-    window.scrollTo({ top:0, behavior:'smooth' });
-  }
+// ── DARK MODE ──
+let isDark = false;
+function toggleDark() {
+  isDark = !isDark;
+  document.body.setAttribute('data-theme', isDark ? 'dark' : '');
+  document.querySelector('.dark-toggle').textContent = isDark ? '☀️ Light' : '🌙 Dark Mode';
+}
 
-  function scrollToSection(id, el) {
-    showHomePage();
-    setTimeout(() => {
-      const s = document.getElementById(id);
-      if (s) s.scrollIntoView({ behavior:'smooth', block:'start' });
-    }, 50);
-    document.querySelectorAll('.cat-link').forEach(l => l.classList.remove('active'));
-    if (el) el.classList.add('active');
-  }
-
-  const EMOJIS = {
-    'Pizza':'🍕','Burger':'🍔','Sandwich':'🥪','Thali':'🍛','Noodles':'🍝',
-    'Rice':'🍚','Chilly':'🌶️','Momos':'🥟','Wrap':'🌯','Fries':'🍟',
-    'Coffee':'☕','Mojito':'🍋','Falooda':'🍨','Shake':'🥤','Ice':'🍦',
-    'Lagoon':'🧊','Punch':'🥭','Chicken':'🍗','Mutton':'🍖','Paneer':'🧀',
-    'Brownie':'🍫','Softy':'🍦','Combo':'🎁'
-  };
-  function getEmoji(name) {
-    for (const [k,v] of Object.entries(EMOJIS)) { if (name.includes(k)) return v; } return '🍽️';
-  }
-
-  function calcTotal() {
-    let sub = 0, count = 0, savedAmt = 0;
-    document.querySelectorAll('#cartItems .order-item').forEach(item => {
-      const qty = parseInt(item.querySelector('.qty-val').textContent);
-      sub += parseInt(item.dataset.price) * qty;
-      if (item.dataset.oldPrice) savedAmt += (parseInt(item.dataset.oldPrice) - parseInt(item.dataset.price)) * qty;
-      count++;
-    });
-    const isDelivery = currentOrderType === 'delivery';
-    const deliveryFee = isDelivery ? 20 : 0;
-    document.getElementById('subtotal').textContent = '₹' + sub;
-    document.getElementById('totalPrice').textContent = '₹' + (sub + deliveryFee);
-    document.getElementById('cartBadge').textContent = count;
-    const savingsRow = document.getElementById('savingsRow');
-    if (savedAmt > 0) { savingsRow.style.display = 'flex'; document.getElementById('savingsAmt').textContent = '₹' + savedAmt; }
-    else { savingsRow.style.display = 'none'; }
-    if (count === 0 && !document.querySelector('#cartItems .empty-cart')) {
-      document.getElementById('cartItems').innerHTML = '<div class="empty-cart"><div>🍽️</div>Cart khali hai<br>Kuch add karo!</div>';
-    }
-  }
-
-  function changeQty(btn, delta) {
-    const qtyEl = btn.parentElement.querySelector('.qty-val');
-    let q = parseInt(qtyEl.textContent) + delta;
-    if (q < 1) q = 1;
-    qtyEl.textContent = q; calcTotal();
-  }
-
-  function removeItem(btn) { btn.closest('.order-item').remove(); calcTotal(); }
-
-  function addToCart(name, price, oldPrice) {
-    const emptyEl = document.querySelector('#cartItems .empty-cart');
-    if (emptyEl) emptyEl.remove();
-    const container = document.getElementById('cartItems');
-    for (const item of container.querySelectorAll('.order-item')) {
-      if (item.dataset.item === name) {
-        item.querySelector('.qty-val').textContent = parseInt(item.querySelector('.qty-val').textContent) + 1;
-        calcTotal(); flashItem(item); return;
-      }
-    }
-    const div = document.createElement('div');
-    div.className = 'order-item';
-    div.dataset.item = name;
-    div.dataset.price = price;
-    if (oldPrice) div.dataset.oldPrice = oldPrice;
-    div.innerHTML = `
-      <div class="order-item-img">${getEmoji(name)}</div>
-      <div class="order-item-info"><h5>${name}</h5></div>
-      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
-        <span class="order-item-price">₹${price}</span>
-        <div class="qty-control">
-          <button class="qty-btn" onclick="changeQty(this,-1)">−</button>
-          <span class="qty-val">1</span>
-          <button class="qty-btn" onclick="changeQty(this,1)">+</button>
-          <button class="remove-btn" onclick="removeItem(this)">✕</button>
-        </div>
-      </div>`;
-    container.appendChild(div);
-    calcTotal(); div.scrollIntoView({ behavior:'smooth', block:'nearest' }); flashItem(div);
-  }
-
-  function flashItem(el) {
-    el.style.background = 'rgba(200,75,17,0.08)';
-    setTimeout(() => el.style.background = '', 500);
-  }
-
-  function openCheckout() {
-    const items = document.querySelectorAll('#cartItems .order-item');
-    if (!items.length) { showToast('Cart khali hai! Pehle kuch add karo 🍽️', '#e74c3c'); return; }
-    const addrInput = document.getElementById('co-address');
-    addrInput.style.display = currentOrderType === 'delivery' ? 'block' : 'none';
-    // Pre-fill from logged in user
-    if (currentUser) {
-      document.getElementById('co-name').value = currentUser.name || '';
-      document.getElementById('co-phone').value = currentUser.phone || '';
-      document.getElementById('co-address').value = currentUser.address || '';
-    }
-    let html = `<strong>Order Type:</strong> ${currentOrderType === 'delivery' ? '🛵 Delivery' : currentOrderType === 'dine_in' ? '🍽️ Dine In' : '🥡 Takeaway'}<br><br><strong>Order Summary:</strong><br>`;
-    let sub = 0;
-    items.forEach(item => {
+// ── WHATSAPP / DIRECTIONS ──
+function openWhatsApp() {
+  const cartItems = document.querySelectorAll('#cartItems .order-item');
+  let msg = 'Namaste! Chai Pila se order karna chahta hoon. 😊';
+  if (cartItems.length > 0) {
+    let itemLines = '';
+    let total = 0;
+    cartItems.forEach(item => {
       const qty = parseInt(item.querySelector('.qty-val').textContent);
       const price = parseInt(item.dataset.price);
-      html += `• ${item.dataset.item} ×${qty} — ₹${price * qty}<br>`;
-      sub += price * qty;
+      itemLines += '• ' + item.dataset.item + ' x' + qty + ' = ₹' + (price * qty) + '\n';
+      total += price * qty;
     });
-    const deliveryFee = currentOrderType === 'delivery' ? 20 : 0;
-    html += `<br><strong>Subtotal:</strong> ₹${sub}${deliveryFee ? ' + ₹20 delivery' : ''} = <strong style="color:var(--primary);font-size:15px">₹${sub + deliveryFee}</strong>`;
-    document.getElementById('co-summary').innerHTML = html;
-    document.getElementById('checkoutModal').classList.add('open');
+    msg = 'Namaste! Chai Pila se order karna chahta hoon:\n\n' + itemLines + '\nTotal: ₹' + (total + 20) + '\n\nPlease confirm! 🙏';
   }
+  window.open('https://wa.me/' + WHATSAPP_NUMBER + '?text=' + encodeURIComponent(msg), '_blank');
+}
 
-  function closeCheckout() { document.getElementById('checkoutModal').classList.remove('open'); }
+function openDirections() {
+  window.open('https://www.google.com/maps/dir/?api=1&destination=' + CAFE_LAT + ',' + CAFE_LNG + '&travelmode=driving', '_blank');
+}
 
-  async function confirmOrder() {
-    const btn = document.getElementById('confirmBtn');
-    btn.textContent = 'Bhej raha hoon...';
-    btn.disabled = true;
-    const items = [];
-    document.querySelectorAll('#cartItems .order-item').forEach(item => {
-      items.push({ name:item.dataset.item, price:parseInt(item.dataset.price), qty:parseInt(item.querySelector('.qty-val').textContent) });
-    });
-    const subtotal = parseInt(document.getElementById('subtotal').textContent.replace('₹',''));
-    const deliveryFee = currentOrderType === 'delivery' ? 20 : 0;
-    const total = subtotal + deliveryFee;
-    const orderId = 'CP' + Date.now().toString().slice(-6);
-    // Save to user history
-    if (currentUser) {
-      currentUser.orders = currentUser.orders || [];
-      currentUser.orders.unshift({ id: orderId, date: new Date().toLocaleDateString('hi-IN'), items, total, status: 'pending', rating: 0 });
-      // Add coins: 1 coin per ₹10 spent
-      const coinsEarned = Math.floor(total / 10);
-      currentUser.coins = (currentUser.coins || 0) + coinsEarned;
-      currentUser.coinHistory = currentUser.coinHistory || [];
-      currentUser.coinHistory.unshift({ title: `Order #${orderId} ka reward`, coins: coinsEarned, type: 'earn', date: new Date().toLocaleDateString('hi-IN') });
-      saveUser();
-      updateFreeItemTab();
+// ── FEATURE 2: ORDER TYPE ──
+function setOrderType(type, btn) {
+  currentOrderType = type;
+  document.querySelectorAll('.order-type-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  // Delivery fee sirf delivery pe
+  document.getElementById('deliveryRow').style.display = type === 'delivery' ? 'flex' : 'none';
+  // Table number sirf dine_in pe
+  document.getElementById('tableNumberBox').style.display = type === 'dine_in' ? 'block' : 'none';
+  // Address sirf delivery pe
+  document.getElementById('deliveryAddressBox').style.display = type === 'delivery' ? 'block' : 'none';
+  calcTotal();
+}
+
+function setBottomNav(el) {
+  document.querySelectorAll('.bn-item').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function focusSearch() {
+  document.getElementById('searchInput').focus();
+  window.scrollTo({ top:0, behavior:'smooth' });
+}
+
+function scrollToSection(id, el) {
+  showHomePage();
+  setTimeout(() => {
+    const s = document.getElementById(id);
+    if (s) s.scrollIntoView({ behavior:'smooth', block:'start' });
+  }, 50);
+  document.querySelectorAll('.cat-link').forEach(l => l.classList.remove('active'));
+  if (el) el.classList.add('active');
+}
+
+const EMOJIS = {
+  'Pizza':'🍕','Burger':'🍔','Sandwich':'🥪','Thali':'🍛','Noodles':'🍝',
+  'Rice':'🍚','Chilly':'🌶️','Momos':'🥟','Wrap':'🌯','Fries':'🍟',
+  'Coffee':'☕','Mojito':'🍋','Falooda':'🍨','Shake':'🥤','Ice':'🍦',
+  'Lagoon':'🧊','Punch':'🥭','Chicken':'🍗','Mutton':'🍖','Paneer':'🧀',
+  'Brownie':'🍫','Softy':'🍦','Combo':'🎁'
+};
+function getEmoji(name) {
+  for (const [k,v] of Object.entries(EMOJIS)) { if (name.includes(k)) return v; } return '🍽️';
+}
+
+function calcTotal() {
+  let sub = 0, count = 0, savedAmt = 0;
+  document.querySelectorAll('#cartItems .order-item').forEach(item => {
+    const qty = parseInt(item.querySelector('.qty-val').textContent);
+    sub += parseInt(item.dataset.price) * qty;
+    if (item.dataset.oldPrice) savedAmt += (parseInt(item.dataset.oldPrice) - parseInt(item.dataset.price)) * qty;
+    count++;
+  });
+  const deliveryFee = currentOrderType === 'delivery' ? 20 : 0;
+  document.getElementById('subtotal').textContent = '₹' + sub;
+  document.getElementById('totalPrice').textContent = '₹' + (sub + deliveryFee);
+  document.getElementById('cartBadge').textContent = count;
+  const savingsRow = document.getElementById('savingsRow');
+  if (savedAmt > 0) { savingsRow.style.display = 'flex'; document.getElementById('savingsAmt').textContent = '₹' + savedAmt; }
+  else { savingsRow.style.display = 'none'; }
+  if (count === 0 && !document.querySelector('#cartItems .empty-cart')) {
+    document.getElementById('cartItems').innerHTML = '<div class="empty-cart"><div>🍽️</div>Cart khali hai<br>Kuch add karo!</div>';
+  }
+}
+
+function changeQty(btn, delta) {
+  const qtyEl = btn.parentElement.querySelector('.qty-val');
+  let q = parseInt(qtyEl.textContent) + delta;
+  if (q < 1) q = 1;
+  qtyEl.textContent = q; calcTotal();
+}
+
+function removeItem(btn) { btn.closest('.order-item').remove(); calcTotal(); }
+
+function addToCart(name, price, oldPrice) {
+  const emptyEl = document.querySelector('#cartItems .empty-cart');
+  if (emptyEl) emptyEl.remove();
+  const container = document.getElementById('cartItems');
+  for (const item of container.querySelectorAll('.order-item')) {
+    if (item.dataset.item === name) {
+      item.querySelector('.qty-val').textContent = parseInt(item.querySelector('.qty-val').textContent) + 1;
+      calcTotal(); flashItem(item); return;
     }
-    try {
-      const res = await fetch(`${API}/api/orders`, {
-        method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ items, subtotal, deliveryFee, total, customer_name: document.getElementById('co-name').value||'Guest', customer_phone: document.getElementById('co-phone').value||'', customer_address: document.getElementById('co-address').value||'', payment_method:'COD', order_type:currentOrderType })
-      });
-      const result = await res.json();
-      if (result.success) {
-        closeCheckout();
-        document.getElementById('cartItems').innerHTML = '<div class="empty-cart"><div>🍽️</div>Cart khali hai<br>Kuch add karo!</div>';
-        calcTotal();
-        showToast('🎉 Order #' + (result.order_id || orderId) + ' place ho gaya! 25-35 min mein aayega 🛵');
-        if (currentUser) showToast('🪙 +' + Math.floor(total/10) + ' Reward Coins mile!');
-      } else { alert('Order fail: ' + result.message); }
-    } catch(e) {
-      // Offline fallback
+  }
+  const div = document.createElement('div');
+  div.className = 'order-item';
+  div.dataset.item = name;
+  div.dataset.price = price;
+  if (oldPrice) div.dataset.oldPrice = oldPrice;
+  div.innerHTML = `
+    <div class="order-item-img">${getEmoji(name)}</div>
+    <div class="order-item-info"><h5>${name}</h5></div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+      <span class="order-item-price">₹${price}</span>
+      <div class="qty-control">
+        <button class="qty-btn" onclick="changeQty(this,-1)">−</button>
+        <span class="qty-val">1</span>
+        <button class="qty-btn" onclick="changeQty(this,1)">+</button>
+        <button class="remove-btn" onclick="removeItem(this)">✕</button>
+      </div>
+    </div>`;
+  container.appendChild(div);
+  calcTotal();
+  div.scrollIntoView({ behavior:'smooth', block:'nearest' });
+  flashItem(div);
+  // Upsell check
+  checkUpsell(name);
+}
+
+function flashItem(el) {
+  el.style.background = 'rgba(200,75,17,0.08)';
+  setTimeout(() => el.style.background = '', 500);
+}
+
+function openCheckout() {
+  const items = document.querySelectorAll('#cartItems .order-item');
+  if (!items.length) { showToast('Cart khali hai! Pehle kuch add karo 🍽️', '#e74c3c'); return; }
+  const addrInput = document.getElementById('co-address');
+  const tableInput = document.getElementById('co-table');
+  addrInput.style.display = currentOrderType === 'delivery' ? 'block' : 'none';
+  tableInput.style.display = currentOrderType === 'dine_in' ? 'block' : 'none';
+  if (currentUser) {
+    document.getElementById('co-name').value = currentUser.name || '';
+    document.getElementById('co-phone').value = currentUser.phone || '';
+    if (currentOrderType === 'delivery') document.getElementById('co-address').value = currentUser.address || document.getElementById('quickAddress').value || '';
+    if (currentOrderType === 'dine_in') document.getElementById('co-table').value = document.getElementById('tableNumber').value || '';
+  }
+  const tableNo = currentOrderType === 'dine_in' ? document.getElementById('tableNumber').value : '';
+  let html = `<strong>Order Type:</strong> ${currentOrderType === 'delivery' ? '🛵 Delivery' : currentOrderType === 'dine_in' ? '🍽️ Dine In' : '🥡 Takeaway'}${tableNo ? ' — Table #'+tableNo : ''}<br><br><strong>Order Summary:</strong><br>`;
+  let sub = 0;
+  items.forEach(item => {
+    const qty = parseInt(item.querySelector('.qty-val').textContent);
+    const price = parseInt(item.dataset.price);
+    html += `• ${item.dataset.item} ×${qty} — ₹${price * qty}<br>`;
+    sub += price * qty;
+  });
+  const deliveryFee = currentOrderType === 'delivery' ? 20 : 0;
+  html += `<br><strong>Subtotal:</strong> ₹${sub}${deliveryFee ? ' + ₹20 delivery' : ''} = <strong style="color:var(--primary);font-size:15px">₹${sub + deliveryFee}</strong>`;
+  document.getElementById('co-summary').innerHTML = html;
+  document.getElementById('checkoutModal').classList.add('open');
+}
+
+function closeCheckout() { document.getElementById('checkoutModal').classList.remove('open'); }
+
+async function confirmOrder() {
+  const btn = document.getElementById('confirmBtn');
+  btn.textContent = 'Bhej raha hoon...';
+  btn.disabled = true;
+  const items = [];
+  document.querySelectorAll('#cartItems .order-item').forEach(item => {
+    items.push({ name:item.dataset.item, price:parseInt(item.dataset.price), qty:parseInt(item.querySelector('.qty-val').textContent) });
+  });
+  const subtotal = parseInt(document.getElementById('subtotal').textContent.replace('₹',''));
+  const deliveryFee = currentOrderType === 'delivery' ? 20 : 0;
+  const total = subtotal + deliveryFee;
+  const orderId = 'CP' + Date.now().toString().slice(-6);
+  if (currentUser) {
+    currentUser.orders = currentUser.orders || [];
+    currentUser.orders.unshift({ id: orderId, date: new Date().toLocaleDateString('hi-IN'), items, total, status: 'pending', rating: 0 });
+    const coinsEarned = Math.floor(total / 10);
+    currentUser.coins = (currentUser.coins || 0) + coinsEarned;
+    currentUser.coinHistory = currentUser.coinHistory || [];
+    currentUser.coinHistory.unshift({ title: `Order #${orderId} ka reward`, coins: coinsEarned, type: 'earn', date: new Date().toLocaleDateString('hi-IN') });
+    saveUser();
+    updateFreeItemTab();
+    updateLevelUI();
+  }
+  try {
+    const res = await fetch(`${API}/api/orders`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        items, subtotal, deliveryFee, total,
+        customer_name: document.getElementById('co-name').value||'Guest',
+        customer_phone: document.getElementById('co-phone').value||'',
+        customer_address: document.getElementById('co-address').value || document.getElementById('quickAddress').value || '',
+        table_number: currentOrderType === 'dine_in' ? (document.getElementById('tableNumber').value || '') : '',
+        payment_method:'COD',
+        order_type: currentOrderType
+      })
+    });
+    const result = await res.json();
+    if (result.success) {
       closeCheckout();
       document.getElementById('cartItems').innerHTML = '<div class="empty-cart"><div>🍽️</div>Cart khali hai<br>Kuch add karo!</div>';
       calcTotal();
-      showToast('🎉 Order #' + orderId + ' place ho gaya! 25-35 min mein aayega 🛵');
-    }
-    finally { btn.textContent = 'Place Order ✓'; btn.disabled = false; }
-  }
-
-  function showToast(msg, color) {
-    const t = document.getElementById('successToast');
-    if (msg) t.textContent = msg;
-    if (color) t.style.background = color;
-    else t.style.background = '';
-    t.classList.add('show');
-    setTimeout(() => { t.classList.remove('show'); t.style.background = ''; }, 4500);
-  }
-
-  // ── SEARCH ──
-  const searchInput = document.getElementById('searchInput');
-  const searchDropdown = document.getElementById('searchDropdown');
-  let searchTimer;
-  searchInput.addEventListener('input', () => {
-    clearTimeout(searchTimer);
-    const q = searchInput.value.trim();
-    if (!q) { searchDropdown.classList.remove('show'); return; }
-    searchTimer = setTimeout(() => doSearch(q), 300);
-  });
-  searchInput.addEventListener('blur', () => { setTimeout(() => searchDropdown.classList.remove('show'), 200); });
-
-  async function doSearch(q) {
-    try {
-      const res = await fetch(`${API}/api/search?q=${encodeURIComponent(q)}`);
-      const data = await res.json();
-      if (!data.success) return;
-      const items = data.data;
-      if (!items.length) searchDropdown.innerHTML = '<div class="search-empty">🔍 Koi item nahi mila</div>';
-      else searchDropdown.innerHTML = items.slice(0,6).map(item => `
-        <div class="search-result-item" onclick="addToCart('${item.name.replace(/'/g,"\\'")}',${item.price});searchDropdown.classList.remove('show');searchInput.value=''">
-          <span class="sr-emoji">${item.emoji||getEmoji(item.name)}</span>
-          <div class="sr-info"><h5>${item.name}</h5><span>${item.category}</span></div>
-          <span class="sr-price">₹${item.price}</span>
-        </div>`).join('');
-      searchDropdown.classList.add('show');
-    } catch(e) {}
-  }
-
-  document.getElementById('checkoutModal').addEventListener('click', e => { if (e.target === document.getElementById('checkoutModal')) closeCheckout(); });
-  document.getElementById('authModal').addEventListener('click', e => { if (e.target === document.getElementById('authModal')) closeAuthModal(); });
-
-  async function loadTodaySpecial() {
-    try {
-      const res = await fetch('/api/today-special');
-      const data = await res.json();
-      const banner = document.getElementById('todaySpecialBanner');
-      if (data.data) {
-        banner.style.display = 'block';
-        banner.innerHTML = `<div class="today-special-banner" onclick="addToCart('${data.data.item_name}',${data.data.price})">
-          <div class="ts-left"><div class="ts-emoji">${data.data.emoji||'🍽️'}</div>
-          <div class="ts-info"><h3>⚡ Today's Special</h3><p>${data.data.item_name} — ${data.data.description||''}</p></div></div>
-          <div class="ts-price"><div class="new">₹${data.data.price}</div>
-          ${data.data.old_price?`<div class="old">₹${data.data.old_price}</div>`:''}
-          <div class="ts-badge">LIMITED TIME</div></div></div>`;
-      }
-    } catch(e) {}
-  }
-
-  const CATEGORY_LABELS = {
-    combos:{label:'🎁 Combo Offers',layout:'combo'},
-    thali:{label:'🍛 Sasuryadi Thali',layout:'grid'},
-    chinese:{label:'🍜 Chinese Menu',layout:'grid'},
-    pizza:{label:'🍕 Burgers, Pizzas & Snacks',layout:'grid'},
-    burger:{label:'🍔 Burger & Fries',layout:'grid'},
-    momos:{label:'🥟 Momos & Wraps',layout:'grid'},
-    beverages:{label:'🍹 Beverages & Mocktails',layout:'grid'},
-    desserts:{label:'🍨 Desserts & Ice Creams',layout:'grid'},
-  };
-
-  async function loadMenu() {
-    try {
-      const res = await fetch(`${API}/api/menu`);
-      const data = await res.json();
-      if (!data.success) return;
-      const grouped = {};
-      data.data.forEach(item => { if (!grouped[item.category]) grouped[item.category]=[]; grouped[item.category].push(item); });
-      const container = document.getElementById('menuContainer');
-      container.innerHTML = '';
-      const order = ['combos','thali','chinese','pizza','burger','momos','beverages','desserts'];
-      order.forEach(cat => {
-        if (!grouped[cat]||!grouped[cat].length) return;
-        const meta = CATEGORY_LABELS[cat]||{label:cat,layout:'grid'};
-        const section = document.createElement('div');
-        section.id = cat; section.style.marginBottom = '28px';
-        if (meta.layout === 'combo') {
-          section.innerHTML = `<div class="section-title">${meta.label}</div><div class="combo-grid">
-            ${grouped[cat].map(item => `
-              <div class="combo-card" onclick="addToCart('${item.name.replace(/'/g,"\\'")}',${item.price},${item.old_price||0})">
-                <div class="combo-info"><h3>${item.name}</h3><p>${item.description||''}</p>
-                <div class="combo-price"><span class="price-new">₹${item.price}</span>${item.old_price?`<span class="price-old">₹${item.old_price}</span>`:''}</div></div>
-                <div class="combo-emoji">${item.emoji||getEmoji(item.name)}</div>
-              </div>`).join('')}</div>`;
-        } else {
-          section.innerHTML = `<div class="section-header"><div class="section-title">${meta.label}</div><span class="view-all">View All →</span></div>
-            <div class="items-grid">${grouped[cat].map(item => `
-              <div class="food-card" onclick="addToCart('${item.name.replace(/'/g,"\\'")}',${item.price},${item.old_price||0})">
-                <div class="food-img">${item.is_bestseller?'<span class="bestseller-badge">Bestseller</span>':''}${item.emoji||getEmoji(item.name)}</div>
-                <div class="food-info"><h4>${item.name}</h4>
-                <div class="food-footer"><span class="food-price">₹${item.price}</span>
-                <button class="add-btn" onclick="event.stopPropagation();addToCart('${item.name.replace(/'/g,"\\'")}',${item.price},${item.old_price||0})">Add +</button>
-                </div></div></div>`).join('')}</div>`;
-        }
-        container.appendChild(section);
-      });
-    } catch(e) {
-      document.getElementById('menuContainer').innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-muted)">Menu load nahi ho paya. Page refresh karo.</div>';
-    }
-  }
-
-  window.addEventListener('DOMContentLoaded', () => {
-    loadMenu();
-    loadTodaySpecial();
+      showToast('🎉 Order #' + (result.order_id || orderId) + ' place ho gaya! 25-35 min mein aayega 🛵');
+      if (currentUser) setTimeout(() => showToast('🪙 +' + Math.floor(total/10) + ' Reward Coins mile!'), 2000);
+    } else { alert('Order fail: ' + result.message); }
+  } catch(e) {
+    closeCheckout();
+    document.getElementById('cartItems').innerHTML = '<div class="empty-cart"><div>🍽️</div>Cart khali hai<br>Kuch add karo!</div>';
     calcTotal();
-    updateAuthUI();
-  });
+    showToast('🎉 Order #' + orderId + ' place ho gaya! 25-35 min mein aayega 🛵');
+  } finally {
+    btn.textContent = 'Place Order ✓'; btn.disabled = false;
+  }
+}
+
+function showToast(msg, color) {
+  const t = document.getElementById('successToast');
+  if (msg) t.textContent = msg;
+  t.style.background = color || '#1a7a4a';
+  t.classList.add('show');
+  setTimeout(() => { t.classList.remove('show'); t.style.background = ''; }, 4500);
+}
+
+// ── SEARCH ──
+const searchInput = document.getElementById('searchInput');
+const searchDropdown = document.getElementById('searchDropdown');
+let searchTimer;
+searchInput.addEventListener('input', () => {
+  clearTimeout(searchTimer);
+  const q = searchInput.value.trim();
+  if (!q) { searchDropdown.classList.remove('show'); return; }
+  searchTimer = setTimeout(() => doSearch(q), 300);
+});
+searchInput.addEventListener('blur', () => { setTimeout(() => searchDropdown.classList.remove('show'), 200); });
+
+async function doSearch(q) {
+  try {
+    const res = await fetch(`${API}/api/search?q=${encodeURIComponent(q)}`);
+    const data = await res.json();
+    if (!data.success) return;
+    const items = data.data;
+    if (!items.length) searchDropdown.innerHTML = '<div class="search-empty">🔍 Koi item nahi mila</div>';
+    else searchDropdown.innerHTML = items.slice(0,6).map(item => `
+      <div class="search-result-item" onclick="addToCart('${item.name.replace(/'/g,"\\'")}',${item.price});searchDropdown.classList.remove('show');searchInput.value=''">
+        <span class="sr-emoji">${item.emoji||getEmoji(item.name)}</span>
+        <div class="sr-info"><h5>${item.name}</h5><span>${item.category}</span></div>
+        <span class="sr-price">₹${item.price}</span>
+      </div>`).join('');
+    searchDropdown.classList.add('show');
+  } catch(e) {}
+}
+
+document.getElementById('checkoutModal').addEventListener('click', e => { if (e.target === document.getElementById('checkoutModal')) closeCheckout(); });
+document.getElementById('authModal').addEventListener('click', e => { if (e.target === document.getElementById('authModal')) closeAuthModal(); });
+
+async function loadTodaySpecial() {
+  try {
+    const res = await fetch('/api/today-special');
+    const data = await res.json();
+    const banner = document.getElementById('todaySpecialBanner');
+    if (data.data) {
+      banner.style.display = 'block';
+      banner.innerHTML = `<div class="today-special-banner" onclick="addToCart('${data.data.item_name}',${data.data.price})">
+        <div class="ts-left"><div class="ts-emoji">${data.data.emoji||'🍽️'}</div>
+        <div class="ts-info"><h3>⚡ Today's Special</h3><p>${data.data.item_name} — ${data.data.description||''}</p></div></div>
+        <div class="ts-price"><div class="new">₹${data.data.price}</div>
+        ${data.data.old_price?`<div class="old">₹${data.data.old_price}</div>`:''}
+        <div class="ts-badge">LIMITED TIME</div></div></div>`;
+    }
+  } catch(e) {}
+}
+
+const CATEGORY_LABELS = {
+  combos:{label:'🎁 Combo Offers',layout:'combo'},
+  thali:{label:'🍛 Sasuryadi Thali',layout:'grid'},
+  chinese:{label:'🍜 Chinese Menu',layout:'grid'},
+  pizza:{label:'🍕 Burgers, Pizzas & Snacks',layout:'grid'},
+  burger:{label:'🍔 Burger & Fries',layout:'grid'},
+  momos:{label:'🥟 Momos & Wraps',layout:'grid'},
+  beverages:{label:'🍹 Beverages & Mocktails',layout:'grid'},
+  desserts:{label:'🍨 Desserts & Ice Creams',layout:'grid'},
+};
+
+async function loadMenu() {
+  try {
+    const res = await fetch(`${API}/api/menu`);
+    const data = await res.json();
+    if (!data.success) return;
+    const grouped = {};
+    data.data.forEach(item => { if (!grouped[item.category]) grouped[item.category]=[]; grouped[item.category].push(item); });
+    const container = document.getElementById('menuContainer');
+    container.innerHTML = '';
+    const order = ['combos','thali','chinese','pizza','burger','momos','beverages','desserts'];
+    order.forEach(cat => {
+      if (!grouped[cat]||!grouped[cat].length) return;
+      const meta = CATEGORY_LABELS[cat]||{label:cat,layout:'grid'};
+      const section = document.createElement('div');
+      section.id = cat; section.style.marginBottom = '28px';
+      if (meta.layout === 'combo') {
+        section.innerHTML = `<div class="section-title">${meta.label}</div><div class="combo-grid">
+          ${grouped[cat].map(item => `
+            <div class="combo-card" onclick="addToCart('${item.name.replace(/'/g,"\\'")}',${item.price},${item.old_price||0})">
+              <div class="combo-info"><h3>${item.name}</h3><p>${item.description||''}</p>
+              <div class="combo-price"><span class="price-new">₹${item.price}</span>${item.old_price?`<span class="price-old">₹${item.old_price}</span>`:''}</div></div>
+              <div class="combo-emoji">${item.emoji||getEmoji(item.name)}</div>
+            </div>`).join('')}</div>`;
+      } else {
+        section.innerHTML = `<div class="section-header"><div class="section-title">${meta.label}</div><span class="view-all">View All →</span></div>
+          <div class="items-grid">${grouped[cat].map(item => `
+            <div class="food-card" onclick="addToCart('${item.name.replace(/'/g,"\\'")}',${item.price},${item.old_price||0})">
+              <div class="food-img">${item.is_bestseller?'<span class="bestseller-badge">Bestseller</span>':''}${item.emoji||getEmoji(item.name)}</div>
+              <div class="food-info"><h4>${item.name}</h4>
+              <div class="food-footer"><span class="food-price">₹${item.price}</span>
+              <button class="add-btn" onclick="event.stopPropagation();addToCart('${item.name.replace(/'/g,"\\'")}',${item.price},${item.old_price||0})">Add +</button>
+              </div></div></div>`).join('')}</div>`;
+      }
+      container.appendChild(section);
+    });
+  } catch(e) {
+    document.getElementById('menuContainer').innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-muted)">Menu load nahi ho paya. Page refresh karo.</div>';
+  }
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  loadMenu();
+  loadTodaySpecial();
+  loadUpsellRules();
+  calcTotal();
+  updateAuthUI();
+  // Default dine_in active set karo
+  setOrderType('dine_in', document.querySelector('.order-type-btn.active'));
+});
 </script>
 </body>
 </html>
+HTMLEOF
+echo "Done!"
