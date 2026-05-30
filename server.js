@@ -2,31 +2,38 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const db = require('./database');
- 
+
 const app = express();
 const PORT = process.env.PORT || 5000;
- 
-// ── MIGRATIONS - Purane database ke liye ──
+
+// ── MIGRATIONS ──
 const migrations = [
   `ALTER TABLE referrals ADD COLUMN reward_type TEXT DEFAULT 'fixed'`,
   `ALTER TABLE referrals ADD COLUMN reward_amount INTEGER DEFAULT 0`,
   `ALTER TABLE referrals ADD COLUMN is_lifetime INTEGER DEFAULT 0`,
-  `ALTER TABLE orders ADD COLUMN order_type TEXT DEFAULT 'delivery'`,
+  `ALTER TABLE orders ADD COLUMN order_type TEXT DEFAULT 'dine_in'`,
+  `ALTER TABLE orders ADD COLUMN table_number INTEGER DEFAULT 0`,
   `ALTER TABLE customers ADD COLUMN coins INTEGER DEFAULT 0`,
   `ALTER TABLE customers ADD COLUMN referral_code TEXT DEFAULT ''`,
+  `ALTER TABLE customers ADD COLUMN level TEXT DEFAULT ''`,
+  `ALTER TABLE customers ADD COLUMN tags TEXT DEFAULT ''`,
+  `ALTER TABLE customers ADD COLUMN upi_id TEXT DEFAULT ''`,
+  `ALTER TABLE customers ADD COLUMN bank_account TEXT DEFAULT ''`,
+  `ALTER TABLE customers ADD COLUMN bank_ifsc TEXT DEFAULT ''`,
+  `ALTER TABLE customers ADD COLUMN bank_holder TEXT DEFAULT ''`,
 ];
 for (const sql of migrations) {
   try { db.exec(sql); } catch(e) { /* already exists */ }
 }
 console.log('✅ Migrations done!');
- 
+
 // ============================
 //  MIDDLEWARE
 // ============================
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
- 
+
 // ============================
 //  ADMIN AUTH
 // ============================
@@ -40,7 +47,30 @@ app.post('/api/admin/login', (req, res) => {
     res.status(500).json({ success: false, message: 'Login error' });
   }
 });
- 
+
+// ============================
+//  CAFE SETTINGS
+// ============================
+app.get('/api/cafe/settings', (req, res) => {
+  try {
+    const settings = db.prepare('SELECT * FROM cafe_settings WHERE id = 1').get();
+    res.json({ success: true, data: settings });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Error aaya' });
+  }
+});
+
+app.put('/api/cafe/settings', (req, res) => {
+  try {
+    const { is_open, opens_at, closes_at, closed_message } = req.body;
+    db.prepare('UPDATE cafe_settings SET is_open=?, opens_at=?, closes_at=?, closed_message=? WHERE id=1')
+      .run(is_open, opens_at || '09:00', closes_at || '23:00', closed_message || 'Cafe abhi band hai!');
+    res.json({ success: true, message: is_open ? '✅ Cafe OPEN ho gaya!' : '🔴 Cafe BAND ho gaya!' });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Error aaya' });
+  }
+});
+
 // ============================
 //  MENU ROUTES
 // ============================
@@ -58,7 +88,7 @@ app.get('/api/menu', (req, res) => {
     res.status(500).json({ success: false, message: 'Menu load karne mein error' });
   }
 });
- 
+
 app.get('/api/menu/categories', (req, res) => {
   try {
     const categories = db.prepare('SELECT DISTINCT category FROM menu_items WHERE is_available = 1').all();
@@ -67,7 +97,7 @@ app.get('/api/menu/categories', (req, res) => {
     res.status(500).json({ success: false, message: 'Categories load karne mein error' });
   }
 });
- 
+
 app.get('/api/menu/:id', (req, res) => {
   try {
     const item = db.prepare('SELECT * FROM menu_items WHERE id = ?').get(req.params.id);
@@ -77,7 +107,7 @@ app.get('/api/menu/:id', (req, res) => {
     res.status(500).json({ success: false, message: 'Error aaya' });
   }
 });
- 
+
 app.post('/api/menu', (req, res) => {
   try {
     const { name, category, price, old_price, emoji, description, is_bestseller } = req.body;
@@ -90,7 +120,7 @@ app.post('/api/menu', (req, res) => {
     res.status(500).json({ success: false, message: 'Item add karne mein error' });
   }
 });
- 
+
 app.put('/api/menu/:id', (req, res) => {
   try {
     const { name, category, price, old_price, emoji, description, is_bestseller, is_available } = req.body;
@@ -103,7 +133,7 @@ app.put('/api/menu/:id', (req, res) => {
     res.status(500).json({ success: false, message: 'Update mein error' });
   }
 });
- 
+
 app.delete('/api/menu/:id', (req, res) => {
   try {
     db.prepare('DELETE FROM menu_items WHERE id = ?').run(req.params.id);
@@ -112,7 +142,7 @@ app.delete('/api/menu/:id', (req, res) => {
     res.status(500).json({ success: false, message: 'Delete mein error' });
   }
 });
- 
+
 app.get('/api/search', (req, res) => {
   try {
     const { q } = req.query;
@@ -125,49 +155,72 @@ app.get('/api/search', (req, res) => {
     res.status(500).json({ success: false, message: 'Search mein error' });
   }
 });
- 
+
 // ============================
 //  ORDER ROUTES
 // ============================
 app.post('/api/orders', (req, res) => {
   try {
-    const { items, subtotal, deliveryFee, total, customer_name, customer_phone, customer_address, instructions, coupon_code, discount, payment_method, order_type } = req.body;
- 
+    const {
+      items, subtotal, deliveryFee, total,
+      customer_name, customer_phone, customer_address,
+      instructions, coupon_code, discount,
+      payment_method, order_type, table_number
+    } = req.body;
+
     if (!items || items.length === 0) {
       return res.status(400).json({ success: false, message: 'Cart khali hai bhai!' });
     }
- 
+
     const orderResult = db.prepare(`
-      INSERT INTO orders (customer_name, customer_phone, customer_address, items_json, subtotal, delivery_fee, discount, total, status, payment_method, instructions, coupon_code, order_type)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'confirmed', ?, ?, ?, ?)
+      INSERT INTO orders (customer_name, customer_phone, customer_address, items_json, subtotal, delivery_fee, discount, total, status, payment_method, instructions, coupon_code, order_type, table_number)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'confirmed', ?, ?, ?, ?, ?)
     `).run(
       customer_name || 'Guest',
       customer_phone || '',
       customer_address || '',
       JSON.stringify(items),
       subtotal,
-      deliveryFee || 20,
+      deliveryFee || 0,
       discount || 0,
       total,
-      payment_method || 'COD',
+      payment_method || 'Cash',
       instructions || '',
       coupon_code || '',
-      order_type || 'delivery'
+      order_type || 'dine_in',
+      table_number || 0
     );
- 
+
     const orderId = orderResult.lastInsertRowid;
- 
+
     const insertOrderItem = db.prepare(`
       INSERT INTO order_items (order_id, item_name, price, quantity)
       VALUES (?, ?, ?, ?)
     `);
- 
+
     db.transaction((orderItems) => {
       for (const item of orderItems) {
-        insertOrderItem.run(orderId, item.name, item.price, item.quantity);
+        insertOrderItem.run(orderId, item.name, item.price, item.quantity || item.qty || 1);
       }
     })(items);
- 
+
+    // Auto-create bill
+    db.prepare(`
+      INSERT INTO bills (order_id, customer_name, customer_phone, items_json, subtotal, discount, total, payment_method, order_type, table_number, is_manual, status)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, 'paid')
+    `).run(
+      orderId,
+      customer_name || 'Guest',
+      customer_phone || '',
+      JSON.stringify(items),
+      subtotal,
+      discount || 0,
+      total,
+      payment_method || 'Cash',
+      order_type || 'dine_in',
+      table_number || 0
+    );
+
     if (customer_phone) {
       const existing = db.prepare('SELECT * FROM customers WHERE phone = ?').get(customer_phone);
       if (existing) {
@@ -182,20 +235,24 @@ app.post('/api/orders', (req, res) => {
       }
       updateCustomerCategory(customer_phone);
     }
- 
+
     res.status(201).json({
       success: true,
-      message: '🎉 Order place ho gaya! Thoda wait karo, jaldi aayega.',
+      message: order_type === 'takeaway'
+        ? '🎉 Order place ho gaya! 15 minutes mein ready hoga. Aake le jaana!'
+        : order_type === 'dine_in'
+        ? `🎉 Order place ho gaya! Table #${table_number} pe serve kiya jaayega!`
+        : '🎉 Order place ho gaya! 25-35 min mein aayega.',
       order_id: orderId,
-      estimated_time: '25-35 minutes'
+      estimated_time: order_type === 'takeaway' ? '15 minutes' : '25-35 minutes'
     });
- 
+
   } catch (err) {
     console.error('Order error:', err);
     res.status(500).json({ success: false, message: 'Order place karne mein error aaya' });
   }
 });
- 
+
 function updateCustomerCategory(phone) {
   try {
     const customer = db.prepare('SELECT * FROM customers WHERE phone = ?').get(phone);
@@ -215,7 +272,7 @@ function updateCustomerCategory(phone) {
     console.error('Category update error:', err);
   }
 }
- 
+
 app.get('/api/orders', (req, res) => {
   try {
     const orders = db.prepare('SELECT * FROM orders ORDER BY created_at DESC').all();
@@ -228,7 +285,7 @@ app.get('/api/orders', (req, res) => {
     res.status(500).json({ success: false, message: 'Orders fetch karne mein error' });
   }
 });
- 
+
 app.get('/api/orders/:id', (req, res) => {
   try {
     const order = db.prepare('SELECT * FROM orders WHERE id = ?').get(req.params.id);
@@ -239,7 +296,7 @@ app.get('/api/orders/:id', (req, res) => {
     res.status(500).json({ success: false, message: 'Error aaya' });
   }
 });
- 
+
 app.put('/api/orders/:id/status', (req, res) => {
   try {
     const { status } = req.body;
@@ -253,7 +310,112 @@ app.put('/api/orders/:id/status', (req, res) => {
     res.status(500).json({ success: false, message: 'Status update mein error' });
   }
 });
- 
+
+// ============================
+//  UPSELL ROUTES
+// ============================
+app.get('/api/upsell', (req, res) => {
+  try {
+    const items = db.prepare('SELECT * FROM upsell_items WHERE is_active = 1 ORDER BY sort_order ASC').all();
+    res.json({ success: true, data: items });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Error aaya' });
+  }
+});
+
+app.get('/api/admin/upsell', (req, res) => {
+  try {
+    const items = db.prepare('SELECT * FROM upsell_items ORDER BY sort_order ASC').all();
+    res.json({ success: true, data: items });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Error aaya' });
+  }
+});
+
+app.post('/api/admin/upsell', (req, res) => {
+  try {
+    const { name, emoji, original_price, offer_price, offer_text, sort_order } = req.body;
+    db.prepare('INSERT INTO upsell_items (name, emoji, original_price, offer_price, offer_text, sort_order) VALUES (?, ?, ?, ?, ?, ?)')
+      .run(name, emoji || '🍽️', original_price, offer_price, offer_text || '', sort_order || 0);
+    res.json({ success: true, message: 'Upsell item add ho gaya!' });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Error aaya' });
+  }
+});
+
+app.put('/api/admin/upsell/:id', (req, res) => {
+  try {
+    const { name, emoji, original_price, offer_price, offer_text, is_active, sort_order } = req.body;
+    db.prepare('UPDATE upsell_items SET name=?, emoji=?, original_price=?, offer_price=?, offer_text=?, is_active=?, sort_order=? WHERE id=?')
+      .run(name, emoji, original_price, offer_price, offer_text, is_active, sort_order, req.params.id);
+    res.json({ success: true, message: 'Updated!' });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Error aaya' });
+  }
+});
+
+app.delete('/api/admin/upsell/:id', (req, res) => {
+  try {
+    db.prepare('DELETE FROM upsell_items WHERE id = ?').run(req.params.id);
+    res.json({ success: true, message: 'Delete ho gaya!' });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Error aaya' });
+  }
+});
+
+// ============================
+//  BILLING ROUTES
+// ============================
+app.get('/api/bills', (req, res) => {
+  try {
+    const { date, from, to } = req.query;
+    let bills;
+    if (date) {
+      bills = db.prepare("SELECT * FROM bills WHERE DATE(created_at) = ? ORDER BY created_at DESC").all(date);
+    } else if (from && to) {
+      bills = db.prepare("SELECT * FROM bills WHERE DATE(created_at) BETWEEN ? AND ? ORDER BY created_at DESC").all(from, to);
+    } else {
+      bills = db.prepare("SELECT * FROM bills ORDER BY created_at DESC LIMIT 100").all();
+    }
+    res.json({ success: true, data: bills });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Error aaya' });
+  }
+});
+
+app.post('/api/bills/manual', (req, res) => {
+  try {
+    const { customer_name, customer_phone, items, subtotal, discount, total, payment_method, order_type, table_number } = req.body;
+    const result = db.prepare(`
+      INSERT INTO bills (customer_name, customer_phone, items_json, subtotal, discount, total, payment_method, order_type, table_number, is_manual, status)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1, 'paid')
+    `).run(
+      customer_name || 'Walk-in Customer',
+      customer_phone || '',
+      JSON.stringify(items || []),
+      subtotal || 0,
+      discount || 0,
+      total || 0,
+      payment_method || 'Cash',
+      order_type || 'dine_in',
+      table_number || 0
+    );
+    res.json({ success: true, message: 'Bill create ho gaya!', id: result.lastInsertRowid });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Error aaya' });
+  }
+});
+
+app.get('/api/bills/:id', (req, res) => {
+  try {
+    const bill = db.prepare('SELECT * FROM bills WHERE id = ?').get(req.params.id);
+    if (!bill) return res.status(404).json({ success: false, message: 'Bill nahi mila' });
+    res.json({ success: true, data: bill });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Error aaya' });
+  }
+});
+
 // ============================
 //  COUPON ROUTES
 // ============================
@@ -265,7 +427,7 @@ app.get('/api/coupons', (req, res) => {
     res.status(500).json({ success: false, message: 'Coupons fetch error' });
   }
 });
- 
+
 app.post('/api/coupons', (req, res) => {
   try {
     const { code, type, amount, min_order, max_uses, valid_till } = req.body;
@@ -276,7 +438,7 @@ app.post('/api/coupons', (req, res) => {
     res.status(500).json({ success: false, message: 'Coupon create error' });
   }
 });
- 
+
 app.post('/api/coupons/validate', (req, res) => {
   try {
     const { code, order_total } = req.body;
@@ -292,7 +454,7 @@ app.post('/api/coupons/validate', (req, res) => {
     res.status(500).json({ success: false, message: 'Coupon validate error' });
   }
 });
- 
+
 app.delete('/api/coupons/:id', (req, res) => {
   try {
     db.prepare('DELETE FROM coupons WHERE id = ?').run(req.params.id);
@@ -301,7 +463,7 @@ app.delete('/api/coupons/:id', (req, res) => {
     res.status(500).json({ success: false, message: 'Delete error' });
   }
 });
- 
+
 // ============================
 //  CUSTOMER ROUTES
 // ============================
@@ -313,17 +475,40 @@ app.get('/api/customers', (req, res) => {
     res.status(500).json({ success: false, message: 'Customers fetch error' });
   }
 });
- 
+
+app.get('/api/customers/phone/:phone', (req, res) => {
+  try {
+    const customer = db.prepare('SELECT * FROM customers WHERE phone = ?').get(req.params.phone);
+    if (!customer) return res.status(404).json({ success: false, message: 'Customer nahi mila' });
+    res.json({ success: true, data: customer });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Error aaya' });
+  }
+});
+
 app.put('/api/customers/:id', (req, res) => {
   try {
-    const { name, address, dob, gender } = req.body;
-    db.prepare('UPDATE customers SET name=?, address=?, dob=?, gender=? WHERE id=?').run(name, address, dob, gender, req.params.id);
+    const { name, address, dob, gender, level, tags } = req.body;
+    db.prepare('UPDATE customers SET name=?, address=?, dob=?, gender=?, level=?, tags=? WHERE id=?')
+      .run(name, address, dob, gender, level || '', tags || '', req.params.id);
     res.json({ success: true, message: 'Customer update ho gaya!' });
   } catch (err) {
     res.status(500).json({ success: false, message: 'Update error' });
   }
 });
- 
+
+// Update payment info from user side
+app.put('/api/customers/payment/:phone', (req, res) => {
+  try {
+    const { upi_id, bank_account, bank_ifsc, bank_holder } = req.body;
+    db.prepare('UPDATE customers SET upi_id=?, bank_account=?, bank_ifsc=?, bank_holder=? WHERE phone=?')
+      .run(upi_id || '', bank_account || '', bank_ifsc || '', bank_holder || '', req.params.phone);
+    res.json({ success: true, message: 'Payment info save ho gaya!' });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Error aaya' });
+  }
+});
+
 // ============================
 //  REWARD ROUTES
 // ============================
@@ -335,7 +520,7 @@ app.get('/api/rewards/settings', (req, res) => {
     res.status(500).json({ success: false, message: 'Settings fetch error' });
   }
 });
- 
+
 app.put('/api/rewards/settings', (req, res) => {
   try {
     const { is_active, points_per_order, point_value, validity_days } = req.body;
@@ -346,7 +531,7 @@ app.put('/api/rewards/settings', (req, res) => {
     res.status(500).json({ success: false, message: 'Settings update error' });
   }
 });
- 
+
 app.post('/api/rewards/add', (req, res) => {
   try {
     const { customer_phone, points, reason } = req.body;
@@ -357,7 +542,7 @@ app.post('/api/rewards/add', (req, res) => {
     res.status(500).json({ success: false, message: 'Reward add error' });
   }
 });
- 
+
 // ============================
 //  SALES ROUTES
 // ============================
@@ -371,7 +556,7 @@ app.get('/api/sales/today', (req, res) => {
     res.status(500).json({ success: false, message: 'Sales fetch error' });
   }
 });
- 
+
 app.get('/api/sales/history', (req, res) => {
   try {
     const sales = db.prepare(`
@@ -384,7 +569,7 @@ app.get('/api/sales/history', (req, res) => {
     res.status(500).json({ success: false, message: 'History fetch error' });
   }
 });
- 
+
 // ============================
 //  DELIVERY SETTINGS
 // ============================
@@ -396,7 +581,7 @@ app.get('/api/delivery/settings', (req, res) => {
     res.status(500).json({ success: false, message: 'Delivery settings fetch error' });
   }
 });
- 
+
 app.put('/api/delivery/settings', (req, res) => {
   try {
     const { base_charge, per_km_charge, free_delivery_above } = req.body;
@@ -407,14 +592,7 @@ app.put('/api/delivery/settings', (req, res) => {
     res.status(500).json({ success: false, message: 'Settings update error' });
   }
 });
- 
-// ============================
-//  HEALTH CHECK
-// ============================
-app.get('/api/health', (req, res) => {
-  res.json({ success: true, message: 'Chai Pila Backend chal raha hai! ☕', timestamp: new Date().toISOString() });
-});
- 
+
 // ============================
 //  WISHLIST ROUTES
 // ============================
@@ -427,28 +605,28 @@ app.post('/api/wishlist/add', (req, res) => {
     res.json({ success: true, message: 'Wishlist mein add ho gaya! ❤️' });
   } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
 });
- 
+
 app.get('/api/wishlist/:phone', (req, res) => {
   try {
     const items = db.prepare('SELECT * FROM wishlists WHERE customer_phone = ? ORDER BY added_at DESC').all(req.params.phone);
     res.json({ success: true, data: items });
   } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
 });
- 
+
 app.delete('/api/wishlist/:phone/:item_id', (req, res) => {
   try {
     db.prepare('DELETE FROM wishlists WHERE customer_phone = ? AND item_id = ?').run(req.params.phone, req.params.item_id);
     res.json({ success: true, message: 'Wishlist se remove ho gaya!' });
   } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
 });
- 
+
 app.get('/api/admin/wishlists', (req, res) => {
   try {
     const items = db.prepare('SELECT w.*, c.name as customer_name FROM wishlists w LEFT JOIN customers c ON w.customer_phone = c.phone ORDER BY w.added_at DESC').all();
     res.json({ success: true, data: items });
   } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
 });
- 
+
 // ============================
 //  REFERRAL ROUTES
 // ============================
@@ -458,7 +636,7 @@ app.get('/api/referral/settings', (req, res) => {
     res.json({ success: true, data: settings });
   } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
 });
- 
+
 app.put('/api/referral/settings', (req, res) => {
   try {
     const { is_active, reward_type, reward_amount, is_lifetime, lifetime_percent, max_limit } = req.body;
@@ -467,7 +645,7 @@ app.put('/api/referral/settings', (req, res) => {
     res.json({ success: true, message: 'Referral settings save ho gayi!' });
   } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
 });
- 
+
 app.post('/api/referral/apply', (req, res) => {
   try {
     const { referrer_phone, referred_phone, referred_name } = req.body;
@@ -482,21 +660,21 @@ app.post('/api/referral/apply', (req, res) => {
     res.json({ success: true, message: `Referral applied! ${settings.reward_amount} coins mile! 🎉` });
   } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
 });
- 
+
 app.get('/api/referral/history', (req, res) => {
   try {
     const referrals = db.prepare('SELECT * FROM referrals ORDER BY created_at DESC').all();
     res.json({ success: true, data: referrals });
   } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
 });
- 
+
 app.get('/api/referral/history/:phone', (req, res) => {
   try {
     const referrals = db.prepare('SELECT * FROM referrals WHERE referrer_phone = ? ORDER BY created_at DESC').all(req.params.phone);
     res.json({ success: true, data: referrals });
   } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
 });
- 
+
 // ============================
 //  LEADERBOARD ROUTES
 // ============================
@@ -506,14 +684,14 @@ app.get('/api/leaderboard', (req, res) => {
     res.json({ success: true, data: entries });
   } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
 });
- 
+
 app.get('/api/admin/leaderboard', (req, res) => {
   try {
     const entries = db.prepare('SELECT * FROM leaderboard ORDER BY rank ASC').all();
     res.json({ success: true, data: entries });
   } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
 });
- 
+
 app.post('/api/admin/leaderboard', (req, res) => {
   try {
     const { rank, display_name, tag, orders, total_spent, is_manual, is_visible } = req.body;
@@ -522,7 +700,7 @@ app.post('/api/admin/leaderboard', (req, res) => {
     res.json({ success: true, message: 'Entry add ho gayi!' });
   } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
 });
- 
+
 app.put('/api/admin/leaderboard/:id', (req, res) => {
   try {
     const { rank, display_name, tag, orders, total_spent, is_visible } = req.body;
@@ -531,14 +709,14 @@ app.put('/api/admin/leaderboard/:id', (req, res) => {
     res.json({ success: true, message: 'Updated!' });
   } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
 });
- 
+
 app.delete('/api/admin/leaderboard/:id', (req, res) => {
   try {
     db.prepare('DELETE FROM leaderboard WHERE id = ?').run(req.params.id);
     res.json({ success: true, message: 'Delete ho gaya!' });
   } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
 });
- 
+
 // ============================
 //  FREE ITEM ROUTES
 // ============================
@@ -548,7 +726,7 @@ app.get('/api/free-item/settings', (req, res) => {
     res.json({ success: true, data: settings });
   } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
 });
- 
+
 app.put('/api/free-item/settings', (req, res) => {
   try {
     const { is_active, task_type, target_count, reward_item } = req.body;
@@ -557,14 +735,14 @@ app.put('/api/free-item/settings', (req, res) => {
     res.json({ success: true, message: 'Free item settings save ho gayi!' });
   } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
 });
- 
+
 app.get('/api/free-item/tasks', (req, res) => {
   try {
     const tasks = db.prepare('SELECT * FROM free_item_tasks ORDER BY created_at DESC').all();
     res.json({ success: true, data: tasks });
   } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
 });
- 
+
 app.get('/api/free-item/progress/:phone', (req, res) => {
   try {
     const settings = db.prepare('SELECT * FROM free_item_settings WHERE id = 1').get();
@@ -577,7 +755,7 @@ app.get('/api/free-item/progress/:phone', (req, res) => {
     res.json({ success: true, data: task });
   } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
 });
- 
+
 // ============================
 //  WALLET ROUTES
 // ============================
@@ -588,22 +766,78 @@ app.get('/api/wallet/:phone', (req, res) => {
     res.json({ success: true, data: { balance: customer ? customer.reward_points : 0, history } });
   } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
 });
- 
+
 // ============================
 //  ANALYTICS ROUTES
 // ============================
 app.get('/api/analytics', (req, res) => {
   try {
+    const { range, from, to } = req.query;
+    const today = new Date().toISOString().split('T')[0];
+
+    let dateFilter = '';
+    if (range === 'today') {
+      dateFilter = `AND DATE(created_at) = '${today}'`;
+    } else if (range === 'yesterday') {
+      const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+      dateFilter = `AND DATE(created_at) = '${yesterday}'`;
+    } else if (range === '7days') {
+      dateFilter = `AND DATE(created_at) >= DATE('now', '-7 days')`;
+    } else if (range === '15days') {
+      dateFilter = `AND DATE(created_at) >= DATE('now', '-15 days')`;
+    } else if (range === '30days') {
+      dateFilter = `AND DATE(created_at) >= DATE('now', '-30 days')`;
+    } else if (range === 'custom' && from && to) {
+      dateFilter = `AND DATE(created_at) BETWEEN '${from}' AND '${to}'`;
+    } else {
+      dateFilter = `AND DATE(created_at) >= DATE('now', '-7 days')`;
+    }
+
     const bestSelling = db.prepare(`SELECT item_name, SUM(quantity) as total_qty FROM order_items GROUP BY item_name ORDER BY total_qty DESC LIMIT 10`).all();
     const peakHours = db.prepare(`SELECT strftime('%H', created_at) as hour, COUNT(*) as count FROM orders GROUP BY hour ORDER BY count DESC LIMIT 5`).all();
     const repeatCustomers = db.prepare('SELECT COUNT(*) as count FROM customers WHERE total_orders > 1').get();
     const totalCustomers = db.prepare('SELECT COUNT(*) as count FROM customers').get();
     const couponPerf = db.prepare(`SELECT coupon_code, COUNT(*) as used_times, SUM(discount) as total_discount FROM orders WHERE coupon_code != '' GROUP BY coupon_code`).all();
-    const dailyRevenue = db.prepare(`SELECT DATE(created_at) as date, SUM(total) as revenue, COUNT(*) as orders FROM orders WHERE status != 'cancelled' GROUP BY DATE(created_at) ORDER BY date DESC LIMIT 7`).all();
-    res.json({ success: true, data: { bestSelling, peakHours, repeatCustomers: repeatCustomers.count, totalCustomers: totalCustomers.count, couponPerf, dailyRevenue } });
-  } catch (err) { res.status(500).json({ success: false, message: 'Analytics error' }); }
+
+    const dailyRevenue = db.prepare(`
+      SELECT DATE(created_at) as date, SUM(total) as revenue, COUNT(*) as orders
+      FROM orders WHERE status != 'cancelled' ${dateFilter}
+      GROUP BY DATE(created_at) ORDER BY date ASC
+    `).all();
+
+    // AI Tomorrow Prediction — moving average of last 7 days
+    const last7 = db.prepare(`
+      SELECT SUM(total) as revenue FROM orders
+      WHERE status != 'cancelled' AND DATE(created_at) >= DATE('now', '-7 days')
+      GROUP BY DATE(created_at) ORDER BY DATE(created_at) ASC
+    `).all();
+    let predictedTomorrow = 0;
+    if (last7.length > 0) {
+      const avg = last7.reduce((s, d) => s + (d.revenue || 0), 0) / last7.length;
+      // Simple linear trend
+      if (last7.length >= 3) {
+        const recent = last7.slice(-3).reduce((s, d) => s + (d.revenue || 0), 0) / 3;
+        predictedTomorrow = Math.round((avg * 0.4) + (recent * 0.6));
+      } else {
+        predictedTomorrow = Math.round(avg);
+      }
+    }
+
+    res.json({
+      success: true,
+      data: {
+        bestSelling, peakHours,
+        repeatCustomers: repeatCustomers.count,
+        totalCustomers: totalCustomers.count,
+        couponPerf, dailyRevenue,
+        predictedTomorrow
+      }
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Analytics error' });
+  }
 });
- 
+
 // ============================
 //  TODAY SPECIAL ROUTES
 // ============================
@@ -613,7 +847,7 @@ app.get('/api/today-special', (req, res) => {
     res.json({ success: true, data: special || null });
   } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
 });
- 
+
 app.post('/api/today-special', (req, res) => {
   try {
     const { item_name, description, price, old_price, emoji } = req.body;
@@ -623,18 +857,25 @@ app.post('/api/today-special', (req, res) => {
     res.json({ success: true, message: "Today's special set ho gaya!" });
   } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
 });
- 
+
+// ============================
+//  HEALTH CHECK
+// ============================
+app.get('/api/health', (req, res) => {
+  res.json({ success: true, message: 'Chai Pila Backend chal raha hai! ☕', timestamp: new Date().toISOString() });
+});
+
 // ============================
 //  FRONTEND SERVE
 // ============================
 app.get('/admin', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin.html'));
 });
- 
+
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
- 
+
 // ============================
 //  SERVER START
 // ============================
