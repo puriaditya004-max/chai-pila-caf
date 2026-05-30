@@ -113,7 +113,38 @@ tr:hover td { background: #fafafa; }
   </div>
 
   <div class="main-content">
+<!-- CAFE STATUS BAR -->
+<div id="cafe-status-bar" style="margin-bottom:20px;padding:18px 24px;border-radius:12px;display:flex;align-items:center;justify-content:space-between;background:white;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
+  <div style="display:flex;align-items:center;gap:14px;">
+    <div id="cafe-status-dot" style="width:16px;height:16px;border-radius:50%;background:#00b894;box-shadow:0 0 0 4px rgba(0,184,148,0.2);flex-shrink:0;"></div>
+    <div>
+      <div style="font-size:16px;font-weight:700;" id="cafe-status-text">☕ Cafe OPEN hai</div>
+      <div style="font-size:13px;color:#888;" id="cafe-timing-text">Opens: 09:00 — Closes: 23:00</div>
+    </div>
+  </div>
+  <div style="display:flex;align-items:center;gap:12px;">
+    <button onclick="toggleCafe()" id="cafe-toggle-btn" style="padding:10px 24px;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;background:#ff4444;color:white;font-family:'Segoe UI',sans-serif;">🔴 Cafe Band Karo</button>
+    <button onclick="openCafeSettings()" style="padding:10px 16px;border:2px solid #eee;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;background:white;color:#555;font-family:'Segoe UI',sans-serif;">⚙️ Timing</button>
+  </div>
+</div>
 
+<!-- CAFE SETTINGS MODAL -->
+<div class="modal" id="cafeSettingsModal">
+  <div class="modal-box">
+    <h3>⚙️ Cafe Timing Settings</h3>
+    <div class="form-row">
+      <div class="form-group"><label>Opens At</label><input type="time" id="cafe-opens" value="09:00"></div>
+      <div class="form-group"><label>Closes At</label><input type="time" id="cafe-closes" value="23:00"></div>
+    </div>
+    <div class="form-group"><label>Closed Message (customers ko dikhega)</label>
+      <input type="text" id="cafe-closed-msg" placeholder="Cafe abhi band hai. Kal 9 baje aana!"></div>
+    <div style="display:flex;gap:10px;margin-top:8px;">
+      <button class="btn btn-primary" onclick="saveCafeSettings()">Save Karo</button>
+      <button class="btn" style="background:#eee;" onclick="closeModal('cafeSettingsModal')">Cancel</button>
+    </div>
+  </div>
+</div>
+    
     <!-- DASHBOARD -->
     <div class="page active" id="page-dashboard">
       <div class="page-header"><h1>📊 Dashboard</h1><p>Aaj ka overview</p></div>
@@ -501,6 +532,7 @@ function showPage(page) {
 
 async function loadDashboard() {
   try {
+    loadCafeStatus();
     const [todayRes, custRes, menuRes] = await Promise.all([fetch('/api/sales/today'), fetch('/api/customers'), fetch('/api/menu')]);
     const today = await todayRes.json();
     const custs = await custRes.json();
@@ -927,6 +959,82 @@ async function saveTodaySpecial() {
 }
 
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+  // ── CAFE OPEN/CLOSED ──
+let cafeIsOpen = true;
+
+async function loadCafeStatus() {
+  try {
+    const res = await fetch('/api/cafe/settings');
+    const data = await res.json();
+    if (data.data) {
+      cafeIsOpen = data.data.is_open === 1;
+      updateCafeUI(cafeIsOpen, data.data.opens_at, data.data.closes_at);
+      document.getElementById('cafe-opens').value = data.data.opens_at || '09:00';
+      document.getElementById('cafe-closes').value = data.data.closes_at || '23:00';
+      document.getElementById('cafe-closed-msg').value = data.data.closed_message || '';
+    }
+  } catch(e) {}
+}
+
+function updateCafeUI(isOpen, opensAt, closesAt) {
+  const dot = document.getElementById('cafe-status-dot');
+  const text = document.getElementById('cafe-status-text');
+  const timing = document.getElementById('cafe-timing-text');
+  const btn = document.getElementById('cafe-toggle-btn');
+  if (isOpen) {
+    dot.style.background = '#00b894';
+    dot.style.boxShadow = '0 0 0 4px rgba(0,184,148,0.2)';
+    text.textContent = '☕ Cafe OPEN hai';
+    text.style.color = '#00b894';
+    btn.textContent = '🔴 Cafe Band Karo';
+    btn.style.background = '#ff4444';
+  } else {
+    dot.style.background = '#ff4444';
+    dot.style.boxShadow = '0 0 0 4px rgba(255,68,68,0.2)';
+    text.textContent = '🔴 Cafe BAND hai';
+    text.style.color = '#ff4444';
+    btn.textContent = '🟢 Cafe Kholo';
+    btn.style.background = '#00b894';
+  }
+  if (opensAt && closesAt) timing.textContent = `Opens: ${opensAt} — Closes: ${closesAt}`;
+}
+
+async function toggleCafe() {
+  cafeIsOpen = !cafeIsOpen;
+  const res = await fetch('/api/cafe/settings');
+  const cur = await res.json();
+  await fetch('/api/cafe/settings', {
+    method: 'PUT', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({
+      is_open: cafeIsOpen ? 1 : 0,
+      opens_at: cur.data?.opens_at || '09:00',
+      closes_at: cur.data?.closes_at || '23:00',
+      closed_message: cur.data?.closed_message || 'Cafe abhi band hai!'
+    })
+  });
+  updateCafeUI(cafeIsOpen, cur.data?.opens_at, cur.data?.closes_at);
+  alert(cafeIsOpen ? '✅ Cafe OPEN ho gaya!' : '🔴 Cafe BAND ho gaya!');
+}
+
+function openCafeSettings() {
+  document.getElementById('cafeSettingsModal').classList.add('open');
+}
+
+async function saveCafeSettings() {
+  const body = {
+    is_open: cafeIsOpen ? 1 : 0,
+    opens_at: document.getElementById('cafe-opens').value,
+    closes_at: document.getElementById('cafe-closes').value,
+    closed_message: document.getElementById('cafe-closed-msg').value
+  };
+  await fetch('/api/cafe/settings', {
+    method: 'PUT', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify(body)
+  });
+  closeModal('cafeSettingsModal');
+  updateCafeUI(cafeIsOpen, body.opens_at, body.closes_at);
+  alert('✅ Timing save ho gayi!');
+}
 </script>
 </body>
 </html>
