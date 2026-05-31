@@ -1,31 +1,10 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-const db = require('./database');
+const { pool } = require('./database');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-
-// ── MIGRATIONS ──
-const migrations = [
-  `ALTER TABLE referrals ADD COLUMN reward_type TEXT DEFAULT 'fixed'`,
-  `ALTER TABLE referrals ADD COLUMN reward_amount INTEGER DEFAULT 0`,
-  `ALTER TABLE referrals ADD COLUMN is_lifetime INTEGER DEFAULT 0`,
-  `ALTER TABLE orders ADD COLUMN order_type TEXT DEFAULT 'dine_in'`,
-  `ALTER TABLE orders ADD COLUMN table_number INTEGER DEFAULT 0`,
-  `ALTER TABLE customers ADD COLUMN coins INTEGER DEFAULT 0`,
-  `ALTER TABLE customers ADD COLUMN referral_code TEXT DEFAULT ''`,
-  `ALTER TABLE customers ADD COLUMN level TEXT DEFAULT ''`,
-  `ALTER TABLE customers ADD COLUMN tags TEXT DEFAULT ''`,
-  `ALTER TABLE customers ADD COLUMN upi_id TEXT DEFAULT ''`,
-  `ALTER TABLE customers ADD COLUMN bank_account TEXT DEFAULT ''`,
-  `ALTER TABLE customers ADD COLUMN bank_ifsc TEXT DEFAULT ''`,
-  `ALTER TABLE customers ADD COLUMN bank_holder TEXT DEFAULT ''`,
-];
-for (const sql of migrations) {
-  try { db.exec(sql); } catch(e) { /* already exists */ }
-}
-console.log('✅ Migrations done!');
 
 // ============================
 //  MIDDLEWARE
@@ -37,11 +16,11 @@ app.use(express.static(path.join(__dirname, 'public')));
 // ============================
 //  ADMIN AUTH
 // ============================
-app.post('/api/admin/login', (req, res) => {
+app.post('/api/admin/login', async (req, res) => {
   try {
     const { username, password } = req.body;
-    const admin = db.prepare('SELECT * FROM admin WHERE username = ? AND password = ?').get(username, password);
-    if (!admin) return res.status(401).json({ success: false, message: 'Galat username ya password!' });
+    const result = await pool.query('SELECT * FROM admin WHERE username = $1 AND password = $2', [username, password]);
+    if (result.rows.length === 0) return res.status(401).json({ success: false, message: 'Galat username ya password!' });
     res.json({ success: true, message: 'Login ho gaya!', token: 'chaipila-admin-token' });
   } catch (err) {
     res.status(500).json({ success: false, message: 'Login error' });
@@ -51,20 +30,20 @@ app.post('/api/admin/login', (req, res) => {
 // ============================
 //  CAFE SETTINGS
 // ============================
-app.get('/api/cafe/settings', (req, res) => {
+app.get('/api/cafe/settings', async (req, res) => {
   try {
-    const settings = db.prepare('SELECT * FROM cafe_settings WHERE id = 1').get();
-    res.json({ success: true, data: settings });
+    const result = await pool.query('SELECT * FROM cafe_settings WHERE id = 1');
+    res.json({ success: true, data: result.rows[0] });
   } catch (err) {
     res.status(500).json({ success: false, message: 'Error aaya' });
   }
 });
 
-app.put('/api/cafe/settings', (req, res) => {
+app.put('/api/cafe/settings', async (req, res) => {
   try {
     const { is_open, opens_at, closes_at, closed_message } = req.body;
-    db.prepare('UPDATE cafe_settings SET is_open=?, opens_at=?, closes_at=?, closed_message=? WHERE id=1')
-      .run(is_open, opens_at || '09:00', closes_at || '23:00', closed_message || 'Cafe abhi band hai!');
+    await pool.query('UPDATE cafe_settings SET is_open=$1, opens_at=$2, closes_at=$3, closed_message=$4 WHERE id=1',
+      [is_open, opens_at || '09:00', closes_at || '23:00', closed_message || 'Cafe abhi band hai!']);
     res.json({ success: true, message: is_open ? '✅ Cafe OPEN ho gaya!' : '🔴 Cafe BAND ho gaya!' });
   } catch (err) {
     res.status(500).json({ success: false, message: 'Error aaya' });
@@ -74,83 +53,84 @@ app.put('/api/cafe/settings', (req, res) => {
 // ============================
 //  MENU ROUTES
 // ============================
-app.get('/api/menu', (req, res) => {
+app.get('/api/menu', async (req, res) => {
   try {
     const { category } = req.query;
-    let items;
+    let result;
     if (category) {
-      items = db.prepare('SELECT * FROM menu_items WHERE category = ? AND is_available = 1').all(category);
+      result = await pool.query('SELECT * FROM menu_items WHERE category = $1 AND is_available = 1', [category]);
     } else {
-      items = db.prepare('SELECT * FROM menu_items ORDER BY category, id').all();
+      result = await pool.query('SELECT * FROM menu_items ORDER BY category, id');
     }
-    res.json({ success: true, data: items });
+    res.json({ success: true, data: result.rows });
   } catch (err) {
     res.status(500).json({ success: false, message: 'Menu load karne mein error' });
   }
 });
 
-app.get('/api/menu/categories', (req, res) => {
+app.get('/api/menu/categories', async (req, res) => {
   try {
-    const categories = db.prepare('SELECT DISTINCT category FROM menu_items WHERE is_available = 1').all();
-    res.json({ success: true, data: categories.map(c => c.category) });
+    const result = await pool.query('SELECT DISTINCT category FROM menu_items WHERE is_available = 1');
+    res.json({ success: true, data: result.rows.map(c => c.category) });
   } catch (err) {
     res.status(500).json({ success: false, message: 'Categories load karne mein error' });
   }
 });
 
-app.get('/api/menu/:id', (req, res) => {
+app.get('/api/menu/:id', async (req, res) => {
   try {
-    const item = db.prepare('SELECT * FROM menu_items WHERE id = ?').get(req.params.id);
-    if (!item) return res.status(404).json({ success: false, message: 'Item nahi mila' });
-    res.json({ success: true, data: item });
+    const result = await pool.query('SELECT * FROM menu_items WHERE id = $1', [req.params.id]);
+    if (result.rows.length === 0) return res.status(404).json({ success: false, message: 'Item nahi mila' });
+    res.json({ success: true, data: result.rows[0] });
   } catch (err) {
     res.status(500).json({ success: false, message: 'Error aaya' });
   }
 });
 
-app.post('/api/menu', (req, res) => {
+app.post('/api/menu', async (req, res) => {
   try {
     const { name, category, price, old_price, emoji, description, is_bestseller } = req.body;
-    const result = db.prepare(`
-      INSERT INTO menu_items (name, category, price, old_price, emoji, description, is_bestseller)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
-    `).run(name, category, price || 0, old_price || null, emoji || '🍽️', description || '', is_bestseller || 0);
-    res.json({ success: true, message: 'Item add ho gaya!', id: result.lastInsertRowid });
+    const result = await pool.query(
+      'INSERT INTO menu_items (name, category, price, old_price, emoji, description, is_bestseller) VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING id',
+      [name, category, price || 0, old_price || null, emoji || '🍽️', description || '', is_bestseller || 0]
+    );
+    res.json({ success: true, message: 'Item add ho gaya!', id: result.rows[0].id });
   } catch (err) {
     res.status(500).json({ success: false, message: 'Item add karne mein error' });
   }
 });
 
-app.put('/api/menu/:id', (req, res) => {
+app.put('/api/menu/:id', async (req, res) => {
   try {
     const { name, category, price, old_price, emoji, description, is_bestseller, is_available } = req.body;
-    db.prepare(`
-      UPDATE menu_items SET name=?, category=?, price=?, old_price=?, emoji=?, description=?, is_bestseller=?, is_available=?
-      WHERE id=?
-    `).run(name, category, price, old_price || null, emoji, description, is_bestseller, is_available, req.params.id);
+    await pool.query(
+      'UPDATE menu_items SET name=$1, category=$2, price=$3, old_price=$4, emoji=$5, description=$6, is_bestseller=$7, is_available=$8 WHERE id=$9',
+      [name, category, price, old_price || null, emoji, description, is_bestseller, is_available, req.params.id]
+    );
     res.json({ success: true, message: 'Item update ho gaya!' });
   } catch (err) {
     res.status(500).json({ success: false, message: 'Update mein error' });
   }
 });
 
-app.delete('/api/menu/:id', (req, res) => {
+app.delete('/api/menu/:id', async (req, res) => {
   try {
-    db.prepare('DELETE FROM menu_items WHERE id = ?').run(req.params.id);
+    await pool.query('DELETE FROM menu_items WHERE id = $1', [req.params.id]);
     res.json({ success: true, message: 'Item delete ho gaya!' });
   } catch (err) {
     res.status(500).json({ success: false, message: 'Delete mein error' });
   }
 });
 
-app.get('/api/search', (req, res) => {
+app.get('/api/search', async (req, res) => {
   try {
     const { q } = req.query;
     if (!q) return res.json({ success: true, data: [] });
-    const items = db.prepare(
-      "SELECT * FROM menu_items WHERE (name LIKE ? OR description LIKE ?) AND is_available = 1"
-    ).all(`%${q}%`, `%${q}%`);
-    res.json({ success: true, data: items });
+    const result = await pool.query(
+      "SELECT * FROM menu_items WHERE (name ILIKE $1 OR description ILIKE $1) AND is_available = 1",
+      [`%${q}%`]
+    );
+    res.json({ success: true, data: result.rows });
   } catch (err) {
     res.status(500).json({ success: false, message: 'Search mein error' });
   }
@@ -159,7 +139,8 @@ app.get('/api/search', (req, res) => {
 // ============================
 //  ORDER ROUTES
 // ============================
-app.post('/api/orders', (req, res) => {
+app.post('/api/orders', async (req, res) => {
+  const client = await pool.connect();
   try {
     const {
       items, subtotal, deliveryFee, total,
@@ -172,69 +153,51 @@ app.post('/api/orders', (req, res) => {
       return res.status(400).json({ success: false, message: 'Cart khali hai bhai!' });
     }
 
-    const orderResult = db.prepare(`
+    await client.query('BEGIN');
+
+    const orderResult = await client.query(`
       INSERT INTO orders (customer_name, customer_phone, customer_address, items_json, subtotal, delivery_fee, discount, total, status, payment_method, instructions, coupon_code, order_type, table_number)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'confirmed', ?, ?, ?, ?, ?)
-    `).run(
-      customer_name || 'Guest',
-      customer_phone || '',
-      customer_address || '',
-      JSON.stringify(items),
-      subtotal,
-      deliveryFee || 0,
-      discount || 0,
-      total,
-      payment_method || 'Cash',
-      instructions || '',
-      coupon_code || '',
-      order_type || 'dine_in',
-      table_number || 0
+      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,'confirmed',$9,$10,$11,$12,$13) RETURNING id`,
+      [customer_name || 'Guest', customer_phone || '', customer_address || '',
+       JSON.stringify(items), subtotal, deliveryFee || 0, discount || 0, total,
+       payment_method || 'Cash', instructions || '', coupon_code || '',
+       order_type || 'dine_in', table_number || 0]
     );
+    const orderId = orderResult.rows[0].id;
 
-    const orderId = orderResult.lastInsertRowid;
-
-    const insertOrderItem = db.prepare(`
-      INSERT INTO order_items (order_id, item_name, price, quantity)
-      VALUES (?, ?, ?, ?)
-    `);
-
-    db.transaction((orderItems) => {
-      for (const item of orderItems) {
-        insertOrderItem.run(orderId, item.name, item.price, item.quantity || item.qty || 1);
-      }
-    })(items);
+    for (const item of items) {
+      await client.query(
+        'INSERT INTO order_items (order_id, item_name, price, quantity) VALUES ($1,$2,$3,$4)',
+        [orderId, item.name, item.price, item.quantity || item.qty || 1]
+      );
+    }
 
     // Auto-create bill
-    db.prepare(`
+    await client.query(`
       INSERT INTO bills (order_id, customer_name, customer_phone, items_json, subtotal, discount, total, payment_method, order_type, table_number, is_manual, status)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, 'paid')
-    `).run(
-      orderId,
-      customer_name || 'Guest',
-      customer_phone || '',
-      JSON.stringify(items),
-      subtotal,
-      discount || 0,
-      total,
-      payment_method || 'Cash',
-      order_type || 'dine_in',
-      table_number || 0
+      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,0,'paid')`,
+      [orderId, customer_name || 'Guest', customer_phone || '', JSON.stringify(items),
+       subtotal, discount || 0, total, payment_method || 'Cash', order_type || 'dine_in', table_number || 0]
     );
 
+    // Customer update
     if (customer_phone) {
-      const existing = db.prepare('SELECT * FROM customers WHERE phone = ?').get(customer_phone);
-      if (existing) {
-        db.prepare(`
-          UPDATE customers SET total_orders = total_orders + 1, total_spent = total_spent + ?, last_order_at = CURRENT_TIMESTAMP WHERE phone = ?
-        `).run(total, customer_phone);
+      const existing = await client.query('SELECT * FROM customers WHERE phone = $1', [customer_phone]);
+      if (existing.rows.length > 0) {
+        await client.query(
+          'UPDATE customers SET total_orders = total_orders + 1, total_spent = total_spent + $1, last_order_at = NOW() WHERE phone = $2',
+          [total, customer_phone]
+        );
       } else {
-        db.prepare(`
-          INSERT INTO customers (name, phone, address, total_orders, total_spent, last_order_at)
-          VALUES (?, ?, ?, 1, ?, CURRENT_TIMESTAMP)
-        `).run(customer_name || 'Guest', customer_phone, customer_address || '', total);
+        await client.query(
+          'INSERT INTO customers (name, phone, address, total_orders, total_spent, last_order_at) VALUES ($1,$2,$3,1,$4,NOW())',
+          [customer_name || 'Guest', customer_phone, customer_address || '', total]
+        );
       }
-      updateCustomerCategory(customer_phone);
+      await updateCustomerCategory(client, customer_phone);
     }
+
+    await client.query('COMMIT');
 
     res.status(201).json({
       success: true,
@@ -246,16 +209,19 @@ app.post('/api/orders', (req, res) => {
       order_id: orderId,
       estimated_time: order_type === 'takeaway' ? '15 minutes' : '25-35 minutes'
     });
-
   } catch (err) {
+    await client.query('ROLLBACK');
     console.error('Order error:', err);
     res.status(500).json({ success: false, message: 'Order place karne mein error aaya' });
+  } finally {
+    client.release();
   }
 });
 
-function updateCustomerCategory(phone) {
+async function updateCustomerCategory(client, phone) {
   try {
-    const customer = db.prepare('SELECT * FROM customers WHERE phone = ?').get(phone);
+    const result = await client.query('SELECT * FROM customers WHERE phone = $1', [phone]);
+    const customer = result.rows[0];
     if (!customer) return;
     const lastOrder = customer.last_order_at ? new Date(customer.last_order_at) : null;
     const now = new Date();
@@ -266,17 +232,16 @@ function updateCustomerCategory(phone) {
     else if (daysDiff <= 2) category = 'diamond';
     else if (daysDiff <= 6) category = 'gold';
     else if (daysDiff <= 15) category = 'silver';
-    else category = 'bronze';
-    db.prepare('UPDATE customers SET category = ? WHERE phone = ?').run(category, phone);
+    await client.query('UPDATE customers SET category = $1 WHERE phone = $2', [category, phone]);
   } catch (err) {
     console.error('Category update error:', err);
   }
 }
 
-app.get('/api/orders', (req, res) => {
+app.get('/api/orders', async (req, res) => {
   try {
-    const orders = db.prepare('SELECT * FROM orders ORDER BY created_at DESC').all();
-    const ordersWithItems = orders.map(order => ({
+    const result = await pool.query('SELECT * FROM orders ORDER BY created_at DESC');
+    const ordersWithItems = result.rows.map(order => ({
       ...order,
       items: JSON.parse(order.items_json || '[]')
     }));
@@ -286,25 +251,23 @@ app.get('/api/orders', (req, res) => {
   }
 });
 
-app.get('/api/orders/:id', (req, res) => {
+app.get('/api/orders/:id', async (req, res) => {
   try {
-    const order = db.prepare('SELECT * FROM orders WHERE id = ?').get(req.params.id);
-    if (!order) return res.status(404).json({ success: false, message: 'Order nahi mila' });
-    const orderItems = db.prepare('SELECT * FROM order_items WHERE order_id = ?').all(order.id);
-    res.json({ success: true, data: { ...order, items: orderItems } });
+    const order = await pool.query('SELECT * FROM orders WHERE id = $1', [req.params.id]);
+    if (order.rows.length === 0) return res.status(404).json({ success: false, message: 'Order nahi mila' });
+    const items = await pool.query('SELECT * FROM order_items WHERE order_id = $1', [req.params.id]);
+    res.json({ success: true, data: { ...order.rows[0], items: items.rows } });
   } catch (err) {
     res.status(500).json({ success: false, message: 'Error aaya' });
   }
 });
 
-app.put('/api/orders/:id/status', (req, res) => {
+app.put('/api/orders/:id/status', async (req, res) => {
   try {
     const { status } = req.body;
     const validStatuses = ['pending', 'confirmed', 'preparing', 'out_for_delivery', 'delivered', 'cancelled'];
-    if (!validStatuses.includes(status)) {
-      return res.status(400).json({ success: false, message: 'Invalid status' });
-    }
-    db.prepare('UPDATE orders SET status = ? WHERE id = ?').run(status, req.params.id);
+    if (!validStatuses.includes(status)) return res.status(400).json({ success: false, message: 'Invalid status' });
+    await pool.query('UPDATE orders SET status = $1 WHERE id = $2', [status, req.params.id]);
     res.json({ success: true, message: `Order status updated: ${status}` });
   } catch (err) {
     res.status(500).json({ success: false, message: 'Status update mein error' });
@@ -314,136 +277,108 @@ app.put('/api/orders/:id/status', (req, res) => {
 // ============================
 //  UPSELL ROUTES
 // ============================
-app.get('/api/upsell', (req, res) => {
+app.get('/api/upsell', async (req, res) => {
   try {
-    const items = db.prepare('SELECT * FROM upsell_items WHERE is_active = 1 ORDER BY sort_order ASC').all();
-    res.json({ success: true, data: items });
-  } catch (err) {
-    res.status(500).json({ success: false, message: 'Error aaya' });
-  }
+    const result = await pool.query('SELECT * FROM upsell_items WHERE is_active = 1 ORDER BY sort_order ASC');
+    res.json({ success: true, data: result.rows });
+  } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
 });
 
-app.get('/api/admin/upsell', (req, res) => {
+app.get('/api/admin/upsell', async (req, res) => {
   try {
-    const items = db.prepare('SELECT * FROM upsell_items ORDER BY sort_order ASC').all();
-    res.json({ success: true, data: items });
-  } catch (err) {
-    res.status(500).json({ success: false, message: 'Error aaya' });
-  }
+    const result = await pool.query('SELECT * FROM upsell_items ORDER BY sort_order ASC');
+    res.json({ success: true, data: result.rows });
+  } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
 });
 
-app.post('/api/admin/upsell', (req, res) => {
+app.post('/api/admin/upsell', async (req, res) => {
   try {
     const { name, emoji, original_price, offer_price, offer_text, sort_order } = req.body;
     if (!name || !offer_price) return res.status(400).json({ success: false, message: 'Naam aur price zaroori hai!' });
-    db.prepare('INSERT INTO upsell_items (name, emoji, original_price, offer_price, offer_text, sort_order) VALUES (?, ?, ?, ?, ?, ?)')
-      .run(name, emoji || '🍽️', original_price || 0, offer_price, offer_text || '', sort_order || 0);
+    await pool.query('INSERT INTO upsell_items (name, emoji, original_price, offer_price, offer_text, sort_order) VALUES ($1,$2,$3,$4,$5,$6)',
+      [name, emoji || '🍽️', original_price || 0, offer_price, offer_text || '', sort_order || 0]);
     res.json({ success: true, message: 'Upsell item add ho gaya!' });
-  } catch (err) {
-    res.status(500).json({ success: false, message: 'Error aaya' });
-  }
+  } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
 });
 
-app.put('/api/admin/upsell/:id', (req, res) => {
+app.put('/api/admin/upsell/:id', async (req, res) => {
   try {
     const { name, emoji, original_price, offer_price, offer_text, is_active, sort_order } = req.body;
-    db.prepare('UPDATE upsell_items SET name=?, emoji=?, original_price=?, offer_price=?, offer_text=?, is_active=?, sort_order=? WHERE id=?')
-      .run(name, emoji, original_price, offer_price, offer_text, is_active, sort_order, req.params.id);
+    await pool.query('UPDATE upsell_items SET name=$1, emoji=$2, original_price=$3, offer_price=$4, offer_text=$5, is_active=$6, sort_order=$7 WHERE id=$8',
+      [name, emoji, original_price, offer_price, offer_text, is_active, sort_order, req.params.id]);
     res.json({ success: true, message: 'Updated!' });
-  } catch (err) {
-    res.status(500).json({ success: false, message: 'Error aaya' });
-  }
+  } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
 });
 
-app.delete('/api/admin/upsell/:id', (req, res) => {
+app.delete('/api/admin/upsell/:id', async (req, res) => {
   try {
-    db.prepare('DELETE FROM upsell_items WHERE id = ?').run(req.params.id);
+    await pool.query('DELETE FROM upsell_items WHERE id = $1', [req.params.id]);
     res.json({ success: true, message: 'Delete ho gaya!' });
-  } catch (err) {
-    res.status(500).json({ success: false, message: 'Error aaya' });
-  }
+  } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
 });
 
 // ============================
 //  BILLING ROUTES
 // ============================
-app.get('/api/bills', (req, res) => {
+app.get('/api/bills', async (req, res) => {
   try {
     const { date, from, to } = req.query;
-    let bills;
+    let result;
     if (date) {
-      bills = db.prepare("SELECT * FROM bills WHERE DATE(created_at) = ? ORDER BY created_at DESC").all(date);
+      result = await pool.query("SELECT * FROM bills WHERE DATE(created_at) = $1 ORDER BY created_at DESC", [date]);
     } else if (from && to) {
-      bills = db.prepare("SELECT * FROM bills WHERE DATE(created_at) BETWEEN ? AND ? ORDER BY created_at DESC").all(from, to);
+      result = await pool.query("SELECT * FROM bills WHERE DATE(created_at) BETWEEN $1 AND $2 ORDER BY created_at DESC", [from, to]);
     } else {
-      bills = db.prepare("SELECT * FROM bills ORDER BY created_at DESC LIMIT 100").all();
+      result = await pool.query("SELECT * FROM bills ORDER BY created_at DESC LIMIT 100");
     }
-    res.json({ success: true, data: bills });
-  } catch (err) {
-    res.status(500).json({ success: false, message: 'Error aaya' });
-  }
+    res.json({ success: true, data: result.rows });
+  } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
 });
 
-app.post('/api/bills/manual', (req, res) => {
+app.post('/api/bills/manual', async (req, res) => {
   try {
     const { customer_name, customer_phone, items, subtotal, discount, total, payment_method, order_type, table_number } = req.body;
-    const result = db.prepare(`
-      INSERT INTO bills (customer_name, customer_phone, items_json, subtotal, discount, total, payment_method, order_type, table_number, is_manual, status)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1, 'paid')
-    `).run(
-      customer_name || 'Walk-in Customer',
-      customer_phone || '',
-      JSON.stringify(items || []),
-      subtotal || 0,
-      discount || 0,
-      total || 0,
-      payment_method || 'Cash',
-      order_type || 'dine_in',
-      table_number || 0
+    const result = await pool.query(
+      "INSERT INTO bills (customer_name, customer_phone, items_json, subtotal, discount, total, payment_method, order_type, table_number, is_manual, status) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,1,'paid') RETURNING id",
+      [customer_name || 'Walk-in Customer', customer_phone || '', JSON.stringify(items || []),
+       subtotal || 0, discount || 0, total || 0, payment_method || 'Cash', order_type || 'dine_in', table_number || 0]
     );
-    res.json({ success: true, message: 'Bill create ho gaya!', id: result.lastInsertRowid });
-  } catch (err) {
-    res.status(500).json({ success: false, message: 'Error aaya' });
-  }
+    res.json({ success: true, message: 'Bill create ho gaya!', id: result.rows[0].id });
+  } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
 });
 
-app.get('/api/bills/:id', (req, res) => {
+app.get('/api/bills/:id', async (req, res) => {
   try {
-    const bill = db.prepare('SELECT * FROM bills WHERE id = ?').get(req.params.id);
-    if (!bill) return res.status(404).json({ success: false, message: 'Bill nahi mila' });
-    res.json({ success: true, data: bill });
-  } catch (err) {
-    res.status(500).json({ success: false, message: 'Error aaya' });
-  }
+    const result = await pool.query('SELECT * FROM bills WHERE id = $1', [req.params.id]);
+    if (result.rows.length === 0) return res.status(404).json({ success: false, message: 'Bill nahi mila' });
+    res.json({ success: true, data: result.rows[0] });
+  } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
 });
 
 // ============================
 //  COUPON ROUTES
 // ============================
-app.get('/api/coupons', (req, res) => {
+app.get('/api/coupons', async (req, res) => {
   try {
-    const coupons = db.prepare('SELECT * FROM coupons ORDER BY created_at DESC').all();
-    res.json({ success: true, data: coupons });
-  } catch (err) {
-    res.status(500).json({ success: false, message: 'Coupons fetch error' });
-  }
+    const result = await pool.query('SELECT * FROM coupons ORDER BY created_at DESC');
+    res.json({ success: true, data: result.rows });
+  } catch (err) { res.status(500).json({ success: false, message: 'Coupons fetch error' }); }
 });
 
-app.post('/api/coupons', (req, res) => {
+app.post('/api/coupons', async (req, res) => {
   try {
     const { code, type, amount, min_order, max_uses, valid_till } = req.body;
-    db.prepare(`INSERT INTO coupons (code, type, amount, min_order, max_uses, valid_till) VALUES (?, ?, ?, ?, ?, ?)`)
-      .run(code.toUpperCase(), type || 'flat', amount, min_order || 0, max_uses || 1, valid_till || '');
+    await pool.query('INSERT INTO coupons (code, type, amount, min_order, max_uses, valid_till) VALUES ($1,$2,$3,$4,$5,$6)',
+      [code.toUpperCase(), type || 'flat', amount, min_order || 0, max_uses || 1, valid_till || '']);
     res.json({ success: true, message: 'Coupon ban gaya!' });
-  } catch (err) {
-    res.status(500).json({ success: false, message: 'Coupon create error' });
-  }
+  } catch (err) { res.status(500).json({ success: false, message: 'Coupon create error' }); }
 });
 
-app.post('/api/coupons/validate', (req, res) => {
+app.post('/api/coupons/validate', async (req, res) => {
   try {
     const { code, order_total } = req.body;
-    const coupon = db.prepare('SELECT * FROM coupons WHERE code = ? AND is_active = 1').get(code.toUpperCase());
+    const result = await pool.query('SELECT * FROM coupons WHERE code = $1 AND is_active = 1', [code.toUpperCase()]);
+    const coupon = result.rows[0];
     if (!coupon) return res.status(404).json({ success: false, message: 'Coupon nahi mila ya expired hai!' });
     if (coupon.used_count >= coupon.max_uses) return res.status(400).json({ success: false, message: 'Coupon limit khatam ho gayi!' });
     if (coupon.min_order > 0 && order_total < coupon.min_order) return res.status(400).json({ success: false, message: `Minimum order ₹${coupon.min_order} hona chahiye!` });
@@ -451,269 +386,243 @@ app.post('/api/coupons/validate', (req, res) => {
     let discount = coupon.amount;
     if (coupon.type === 'percent') discount = Math.floor((order_total * coupon.amount) / 100);
     res.json({ success: true, discount, message: `🎉 ₹${discount} discount mila!` });
-  } catch (err) {
-    res.status(500).json({ success: false, message: 'Coupon validate error' });
-  }
+  } catch (err) { res.status(500).json({ success: false, message: 'Coupon validate error' }); }
 });
 
-app.delete('/api/coupons/:id', (req, res) => {
+app.delete('/api/coupons/:id', async (req, res) => {
   try {
-    db.prepare('DELETE FROM coupons WHERE id = ?').run(req.params.id);
+    await pool.query('DELETE FROM coupons WHERE id = $1', [req.params.id]);
     res.json({ success: true, message: 'Coupon delete ho gaya!' });
-  } catch (err) {
-    res.status(500).json({ success: false, message: 'Delete error' });
-  }
+  } catch (err) { res.status(500).json({ success: false, message: 'Delete error' }); }
 });
 
 // ============================
 //  CUSTOMER ROUTES
 // ============================
-app.get('/api/customers', (req, res) => {
+app.get('/api/customers', async (req, res) => {
   try {
-    const customers = db.prepare('SELECT * FROM customers ORDER BY total_spent DESC').all();
-    res.json({ success: true, data: customers });
-  } catch (err) {
-    res.status(500).json({ success: false, message: 'Customers fetch error' });
-  }
+    const result = await pool.query('SELECT * FROM customers ORDER BY total_spent DESC');
+    res.json({ success: true, data: result.rows });
+  } catch (err) { res.status(500).json({ success: false, message: 'Customers fetch error' }); }
 });
 
-app.get('/api/customers/phone/:phone', (req, res) => {
+app.get('/api/customers/phone/:phone', async (req, res) => {
   try {
-    const customer = db.prepare('SELECT * FROM customers WHERE phone = ?').get(req.params.phone);
-    if (!customer) return res.status(404).json({ success: false, message: 'Customer nahi mila' });
-    res.json({ success: true, data: customer });
-  } catch (err) {
-    res.status(500).json({ success: false, message: 'Error aaya' });
-  }
+    const result = await pool.query('SELECT * FROM customers WHERE phone = $1', [req.params.phone]);
+    if (result.rows.length === 0) return res.status(404).json({ success: false, message: 'Customer nahi mila' });
+    res.json({ success: true, data: result.rows[0] });
+  } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
 });
 
-app.put('/api/customers/:id', (req, res) => {
+app.put('/api/customers/:id', async (req, res) => {
   try {
     const { name, address, dob, gender, level, tags } = req.body;
-    db.prepare('UPDATE customers SET name=?, address=?, dob=?, gender=?, level=?, tags=? WHERE id=?')
-      .run(name, address, dob, gender, level || '', tags || '', req.params.id);
+    await pool.query('UPDATE customers SET name=$1, address=$2, dob=$3, gender=$4, level=$5, tags=$6 WHERE id=$7',
+      [name, address, dob, gender, level || '', tags || '', req.params.id]);
     res.json({ success: true, message: 'Customer update ho gaya!' });
-  } catch (err) {
-    res.status(500).json({ success: false, message: 'Update error' });
-  }
+  } catch (err) { res.status(500).json({ success: false, message: 'Update error' }); }
 });
 
-// Update payment info from user side
-app.put('/api/customers/payment/:phone', (req, res) => {
+app.put('/api/customers/payment/:phone', async (req, res) => {
   try {
     const { upi_id, bank_account, bank_ifsc, bank_holder } = req.body;
-    db.prepare('UPDATE customers SET upi_id=?, bank_account=?, bank_ifsc=?, bank_holder=? WHERE phone=?')
-      .run(upi_id || '', bank_account || '', bank_ifsc || '', bank_holder || '', req.params.phone);
+    await pool.query('UPDATE customers SET upi_id=$1, bank_account=$2, bank_ifsc=$3, bank_holder=$4 WHERE phone=$5',
+      [upi_id || '', bank_account || '', bank_ifsc || '', bank_holder || '', req.params.phone]);
     res.json({ success: true, message: 'Payment info save ho gaya!' });
-  } catch (err) {
-    res.status(500).json({ success: false, message: 'Error aaya' });
-  }
+  } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
 });
 
 // ============================
 //  REWARD ROUTES
 // ============================
-app.get('/api/rewards/settings', (req, res) => {
+app.get('/api/rewards/settings', async (req, res) => {
   try {
-    const settings = db.prepare('SELECT * FROM reward_settings WHERE id = 1').get();
-    res.json({ success: true, data: settings });
-  } catch (err) {
-    res.status(500).json({ success: false, message: 'Settings fetch error' });
-  }
+    const result = await pool.query('SELECT * FROM reward_settings WHERE id = 1');
+    res.json({ success: true, data: result.rows[0] });
+  } catch (err) { res.status(500).json({ success: false, message: 'Settings fetch error' }); }
 });
 
-app.put('/api/rewards/settings', (req, res) => {
+app.put('/api/rewards/settings', async (req, res) => {
   try {
     const { is_active, points_per_order, point_value, validity_days } = req.body;
-    db.prepare('UPDATE reward_settings SET is_active=?, points_per_order=?, point_value=?, validity_days=? WHERE id=1')
-      .run(is_active, points_per_order, point_value, validity_days);
+    await pool.query('UPDATE reward_settings SET is_active=$1, points_per_order=$2, point_value=$3, validity_days=$4 WHERE id=1',
+      [is_active, points_per_order, point_value, validity_days]);
     res.json({ success: true, message: 'Reward settings save ho gayi!' });
-  } catch (err) {
-    res.status(500).json({ success: false, message: 'Settings update error' });
-  }
+  } catch (err) { res.status(500).json({ success: false, message: 'Settings update error' }); }
 });
 
-app.post('/api/rewards/add', (req, res) => {
+app.post('/api/rewards/add', async (req, res) => {
   try {
     const { customer_phone, points, reason } = req.body;
-    db.prepare('INSERT INTO rewards (customer_phone, points, reason) VALUES (?, ?, ?)').run(customer_phone, points, reason || 'Admin ne add kiya');
-    db.prepare('UPDATE customers SET reward_points = reward_points + ? WHERE phone = ?').run(points, customer_phone);
+    await pool.query('INSERT INTO rewards (customer_phone, points, reason) VALUES ($1,$2,$3)', [customer_phone, points, reason || 'Admin ne add kiya']);
+    await pool.query('UPDATE customers SET reward_points = reward_points + $1 WHERE phone = $2', [points, customer_phone]);
     res.json({ success: true, message: `${points} points add ho gaye!` });
-  } catch (err) {
-    res.status(500).json({ success: false, message: 'Reward add error' });
-  }
+  } catch (err) { res.status(500).json({ success: false, message: 'Reward add error' }); }
 });
 
 // ============================
 //  SALES ROUTES
 // ============================
-app.get('/api/sales/today', (req, res) => {
+app.get('/api/sales/today', async (req, res) => {
   try {
     const today = new Date().toISOString().split('T')[0];
-    const orders = db.prepare(`SELECT * FROM orders WHERE DATE(created_at) = ? AND status != 'cancelled'`).all(today);
-    const totalSale = orders.reduce((sum, o) => sum + o.total, 0);
-    res.json({ success: true, data: { totalSale, totalOrders: orders.length, orders } });
-  } catch (err) {
-    res.status(500).json({ success: false, message: 'Sales fetch error' });
-  }
+    const result = await pool.query("SELECT * FROM orders WHERE DATE(created_at) = $1 AND status != 'cancelled'", [today]);
+    const totalSale = result.rows.reduce((sum, o) => sum + o.total, 0);
+    res.json({ success: true, data: { totalSale, totalOrders: result.rows.length, orders: result.rows } });
+  } catch (err) { res.status(500).json({ success: false, message: 'Sales fetch error' }); }
 });
 
-app.get('/api/sales/history', (req, res) => {
+app.get('/api/sales/history', async (req, res) => {
   try {
-    const sales = db.prepare(`
+    const result = await pool.query(`
       SELECT DATE(created_at) as date, COUNT(*) as total_orders, SUM(total) as total_sale
       FROM orders WHERE status != 'cancelled'
-      GROUP BY DATE(created_at) ORDER BY date DESC LIMIT 30
-    `).all();
-    res.json({ success: true, data: sales });
-  } catch (err) {
-    res.status(500).json({ success: false, message: 'History fetch error' });
-  }
+      GROUP BY DATE(created_at) ORDER BY date DESC LIMIT 30`);
+    res.json({ success: true, data: result.rows });
+  } catch (err) { res.status(500).json({ success: false, message: 'History fetch error' }); }
 });
 
 // ============================
 //  DELIVERY SETTINGS
 // ============================
-app.get('/api/delivery/settings', (req, res) => {
+app.get('/api/delivery/settings', async (req, res) => {
   try {
-    const settings = db.prepare('SELECT * FROM delivery_settings WHERE id = 1').get();
-    res.json({ success: true, data: settings });
-  } catch (err) {
-    res.status(500).json({ success: false, message: 'Delivery settings fetch error' });
-  }
+    const result = await pool.query('SELECT * FROM delivery_settings WHERE id = 1');
+    res.json({ success: true, data: result.rows[0] });
+  } catch (err) { res.status(500).json({ success: false, message: 'Delivery settings fetch error' }); }
 });
 
-app.put('/api/delivery/settings', (req, res) => {
+app.put('/api/delivery/settings', async (req, res) => {
   try {
     const { base_charge, per_km_charge, free_delivery_above } = req.body;
-    db.prepare('UPDATE delivery_settings SET base_charge=?, per_km_charge=?, free_delivery_above=? WHERE id=1')
-      .run(base_charge, per_km_charge, free_delivery_above);
+    await pool.query('UPDATE delivery_settings SET base_charge=$1, per_km_charge=$2, free_delivery_above=$3 WHERE id=1',
+      [base_charge, per_km_charge, free_delivery_above]);
     res.json({ success: true, message: 'Delivery settings save ho gayi!' });
-  } catch (err) {
-    res.status(500).json({ success: false, message: 'Settings update error' });
-  }
+  } catch (err) { res.status(500).json({ success: false, message: 'Settings update error' }); }
 });
 
 // ============================
 //  WISHLIST ROUTES
 // ============================
-app.post('/api/wishlist/add', (req, res) => {
+app.post('/api/wishlist/add', async (req, res) => {
   try {
     const { customer_phone, item_id, item_name, item_price, item_emoji } = req.body;
-    const existing = db.prepare('SELECT * FROM wishlists WHERE customer_phone = ? AND item_id = ?').get(customer_phone, item_id);
-    if (existing) return res.json({ success: false, message: 'Already wishlist mein hai!' });
-    db.prepare('INSERT INTO wishlists (customer_phone, item_id, item_name, item_price, item_emoji) VALUES (?, ?, ?, ?, ?)').run(customer_phone, item_id, item_name, item_price, item_emoji || '🍽️');
+    const existing = await pool.query('SELECT * FROM wishlists WHERE customer_phone = $1 AND item_id = $2', [customer_phone, item_id]);
+    if (existing.rows.length > 0) return res.json({ success: false, message: 'Already wishlist mein hai!' });
+    await pool.query('INSERT INTO wishlists (customer_phone, item_id, item_name, item_price, item_emoji) VALUES ($1,$2,$3,$4,$5)',
+      [customer_phone, item_id, item_name, item_price, item_emoji || '🍽️']);
     res.json({ success: true, message: 'Wishlist mein add ho gaya! ❤️' });
   } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
 });
 
-app.get('/api/wishlist/:phone', (req, res) => {
+app.get('/api/wishlist/:phone', async (req, res) => {
   try {
-    const items = db.prepare('SELECT * FROM wishlists WHERE customer_phone = ? ORDER BY added_at DESC').all(req.params.phone);
-    res.json({ success: true, data: items });
+    const result = await pool.query('SELECT * FROM wishlists WHERE customer_phone = $1 ORDER BY added_at DESC', [req.params.phone]);
+    res.json({ success: true, data: result.rows });
   } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
 });
 
-app.delete('/api/wishlist/:phone/:item_id', (req, res) => {
+app.delete('/api/wishlist/:phone/:item_id', async (req, res) => {
   try {
-    db.prepare('DELETE FROM wishlists WHERE customer_phone = ? AND item_id = ?').run(req.params.phone, req.params.item_id);
+    await pool.query('DELETE FROM wishlists WHERE customer_phone = $1 AND item_id = $2', [req.params.phone, req.params.item_id]);
     res.json({ success: true, message: 'Wishlist se remove ho gaya!' });
   } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
 });
 
-app.get('/api/admin/wishlists', (req, res) => {
+app.get('/api/admin/wishlists', async (req, res) => {
   try {
-    const items = db.prepare('SELECT w.*, c.name as customer_name FROM wishlists w LEFT JOIN customers c ON w.customer_phone = c.phone ORDER BY w.added_at DESC').all();
-    res.json({ success: true, data: items });
+    const result = await pool.query('SELECT w.*, c.name as customer_name FROM wishlists w LEFT JOIN customers c ON w.customer_phone = c.phone ORDER BY w.added_at DESC');
+    res.json({ success: true, data: result.rows });
   } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
 });
 
 // ============================
 //  REFERRAL ROUTES
 // ============================
-app.get('/api/referral/settings', (req, res) => {
+app.get('/api/referral/settings', async (req, res) => {
   try {
-    const settings = db.prepare('SELECT * FROM referral_settings WHERE id = 1').get();
-    res.json({ success: true, data: settings });
+    const result = await pool.query('SELECT * FROM referral_settings WHERE id = 1');
+    res.json({ success: true, data: result.rows[0] });
   } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
 });
 
-app.put('/api/referral/settings', (req, res) => {
+app.put('/api/referral/settings', async (req, res) => {
   try {
     const { is_active, reward_type, reward_amount, is_lifetime, lifetime_percent, max_limit } = req.body;
-    db.prepare('UPDATE referral_settings SET is_active=?, reward_type=?, reward_amount=?, is_lifetime=?, lifetime_percent=?, max_limit=? WHERE id=1')
-      .run(is_active, reward_type, reward_amount, is_lifetime, lifetime_percent, max_limit);
+    await pool.query('UPDATE referral_settings SET is_active=$1, reward_type=$2, reward_amount=$3, is_lifetime=$4, lifetime_percent=$5, max_limit=$6 WHERE id=1',
+      [is_active, reward_type, reward_amount, is_lifetime, lifetime_percent, max_limit]);
     res.json({ success: true, message: 'Referral settings save ho gayi!' });
   } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
 });
 
-app.post('/api/referral/apply', (req, res) => {
+app.post('/api/referral/apply', async (req, res) => {
   try {
     const { referrer_phone, referred_phone, referred_name } = req.body;
     if (referrer_phone === referred_phone) return res.status(400).json({ success: false, message: 'Apne aap ko refer nahi kar sakte!' });
-    const existing = db.prepare('SELECT * FROM referrals WHERE referred_phone = ?').get(referred_phone);
-    if (existing) return res.status(400).json({ success: false, message: 'Yeh number pehle se refer ho chuka hai!' });
-    const settings = db.prepare('SELECT * FROM referral_settings WHERE id = 1').get();
-    db.prepare('INSERT INTO referrals (referrer_phone, referred_phone, referred_name, reward_type, reward_amount, is_lifetime, status) VALUES (?, ?, ?, ?, ?, ?, "active")')
-      .run(referrer_phone, referred_phone, referred_name || '', settings.reward_type, settings.reward_amount, settings.is_lifetime);
-    db.prepare('INSERT INTO wallet_transactions (customer_phone, coins, type, reason) VALUES (?, ?, "credit", "Referral Bonus")').run(referrer_phone, settings.reward_amount);
-    db.prepare('UPDATE customers SET reward_points = reward_points + ? WHERE phone = ?').run(settings.reward_amount, referrer_phone);
-    res.json({ success: true, message: `Referral applied! ${settings.reward_amount} coins mile! 🎉` });
+    const existing = await pool.query('SELECT * FROM referrals WHERE referred_phone = $1', [referred_phone]);
+    if (existing.rows.length > 0) return res.status(400).json({ success: false, message: 'Yeh number pehle se refer ho chuka hai!' });
+    const settings = await pool.query('SELECT * FROM referral_settings WHERE id = 1');
+    const s = settings.rows[0];
+    await pool.query("INSERT INTO referrals (referrer_phone, referred_phone, referred_name, reward_type, reward_amount, is_lifetime, status) VALUES ($1,$2,$3,$4,$5,$6,'active')",
+      [referrer_phone, referred_phone, referred_name || '', s.reward_type, s.reward_amount, s.is_lifetime]);
+    await pool.query("INSERT INTO wallet_transactions (customer_phone, coins, type, reason) VALUES ($1,$2,'credit','Referral Bonus')", [referrer_phone, s.reward_amount]);
+    await pool.query('UPDATE customers SET reward_points = reward_points + $1 WHERE phone = $2', [s.reward_amount, referrer_phone]);
+    res.json({ success: true, message: `Referral applied! ${s.reward_amount} coins mile! 🎉` });
   } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
 });
 
-app.get('/api/referral/history', (req, res) => {
+app.get('/api/referral/history', async (req, res) => {
   try {
-    const referrals = db.prepare('SELECT * FROM referrals ORDER BY created_at DESC').all();
-    res.json({ success: true, data: referrals });
+    const result = await pool.query('SELECT * FROM referrals ORDER BY created_at DESC');
+    res.json({ success: true, data: result.rows });
   } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
 });
 
-app.get('/api/referral/history/:phone', (req, res) => {
+app.get('/api/referral/history/:phone', async (req, res) => {
   try {
-    const referrals = db.prepare('SELECT * FROM referrals WHERE referrer_phone = ? ORDER BY created_at DESC').all(req.params.phone);
-    res.json({ success: true, data: referrals });
+    const result = await pool.query('SELECT * FROM referrals WHERE referrer_phone = $1 ORDER BY created_at DESC', [req.params.phone]);
+    res.json({ success: true, data: result.rows });
   } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
 });
 
 // ============================
 //  LEADERBOARD ROUTES
 // ============================
-app.get('/api/leaderboard', (req, res) => {
+app.get('/api/leaderboard', async (req, res) => {
   try {
-    const entries = db.prepare('SELECT * FROM leaderboard WHERE is_visible = 1 ORDER BY rank ASC').all();
-    res.json({ success: true, data: entries });
+    const result = await pool.query('SELECT * FROM leaderboard WHERE is_visible = 1 ORDER BY rank ASC');
+    res.json({ success: true, data: result.rows });
   } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
 });
 
-app.get('/api/admin/leaderboard', (req, res) => {
+app.get('/api/admin/leaderboard', async (req, res) => {
   try {
-    const entries = db.prepare('SELECT * FROM leaderboard ORDER BY rank ASC').all();
-    res.json({ success: true, data: entries });
+    const result = await pool.query('SELECT * FROM leaderboard ORDER BY rank ASC');
+    res.json({ success: true, data: result.rows });
   } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
 });
 
-app.post('/api/admin/leaderboard', (req, res) => {
+app.post('/api/admin/leaderboard', async (req, res) => {
   try {
     const { rank, display_name, tag, orders, total_spent, is_manual, is_visible } = req.body;
-    db.prepare('INSERT INTO leaderboard (rank, display_name, tag, orders, total_spent, is_manual, is_visible) VALUES (?, ?, ?, ?, ?, ?, ?)')
-      .run(rank, display_name, tag, orders || 0, total_spent || 0, is_manual || 1, is_visible ?? 1);
+    await pool.query('INSERT INTO leaderboard (rank, display_name, tag, orders, total_spent, is_manual, is_visible) VALUES ($1,$2,$3,$4,$5,$6,$7)',
+      [rank, display_name, tag, orders || 0, total_spent || 0, is_manual || 1, is_visible ?? 1]);
     res.json({ success: true, message: 'Entry add ho gayi!' });
   } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
 });
 
-app.put('/api/admin/leaderboard/:id', (req, res) => {
+app.put('/api/admin/leaderboard/:id', async (req, res) => {
   try {
     const { rank, display_name, tag, orders, total_spent, is_visible } = req.body;
-    db.prepare('UPDATE leaderboard SET rank=?, display_name=?, tag=?, orders=?, total_spent=?, is_visible=? WHERE id=?')
-      .run(rank, display_name, tag, orders, total_spent, is_visible, req.params.id);
+    await pool.query('UPDATE leaderboard SET rank=$1, display_name=$2, tag=$3, orders=$4, total_spent=$5, is_visible=$6 WHERE id=$7',
+      [rank, display_name, tag, orders, total_spent, is_visible, req.params.id]);
     res.json({ success: true, message: 'Updated!' });
   } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
 });
 
-app.delete('/api/admin/leaderboard/:id', (req, res) => {
+app.delete('/api/admin/leaderboard/:id', async (req, res) => {
   try {
-    db.prepare('DELETE FROM leaderboard WHERE id = ?').run(req.params.id);
+    await pool.query('DELETE FROM leaderboard WHERE id = $1', [req.params.id]);
     res.json({ success: true, message: 'Delete ho gaya!' });
   } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
 });
@@ -721,132 +630,111 @@ app.delete('/api/admin/leaderboard/:id', (req, res) => {
 // ============================
 //  FREE ITEM ROUTES
 // ============================
-app.get('/api/free-item/settings', (req, res) => {
+app.get('/api/free-item/settings', async (req, res) => {
   try {
-    const settings = db.prepare('SELECT * FROM free_item_settings WHERE id = 1').get();
-    res.json({ success: true, data: settings });
+    const result = await pool.query('SELECT * FROM free_item_settings WHERE id = 1');
+    res.json({ success: true, data: result.rows[0] });
   } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
 });
 
-app.put('/api/free-item/settings', (req, res) => {
+app.put('/api/free-item/settings', async (req, res) => {
   try {
     const { is_active, task_type, target_count, reward_item } = req.body;
-    db.prepare('UPDATE free_item_settings SET is_active=?, task_type=?, target_count=?, reward_item=? WHERE id=1')
-      .run(is_active, task_type, target_count, reward_item);
+    await pool.query('UPDATE free_item_settings SET is_active=$1, task_type=$2, target_count=$3, reward_item=$4 WHERE id=1',
+      [is_active, task_type, target_count, reward_item]);
     res.json({ success: true, message: 'Free item settings save ho gayi!' });
   } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
 });
 
-app.get('/api/free-item/tasks', (req, res) => {
+app.get('/api/free-item/tasks', async (req, res) => {
   try {
-    const tasks = db.prepare('SELECT * FROM free_item_tasks ORDER BY created_at DESC').all();
-    res.json({ success: true, data: tasks });
+    const result = await pool.query('SELECT * FROM free_item_tasks ORDER BY created_at DESC');
+    res.json({ success: true, data: result.rows });
   } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
 });
 
-app.get('/api/free-item/progress/:phone', (req, res) => {
+app.get('/api/free-item/progress/:phone', async (req, res) => {
   try {
-    const settings = db.prepare('SELECT * FROM free_item_settings WHERE id = 1').get();
-    let task = db.prepare('SELECT * FROM free_item_tasks WHERE customer_phone = ? AND status = "in_progress"').get(req.params.phone);
-    if (!task) {
-      db.prepare('INSERT INTO free_item_tasks (customer_phone, task_type, target_count, reward_item) VALUES (?, ?, ?, ?)')
-        .run(req.params.phone, settings.task_type, settings.target_count, settings.reward_item);
-      task = db.prepare('SELECT * FROM free_item_tasks WHERE customer_phone = ? AND status = "in_progress"').get(req.params.phone);
+    const settings = await pool.query('SELECT * FROM free_item_settings WHERE id = 1');
+    const s = settings.rows[0];
+    let task = await pool.query("SELECT * FROM free_item_tasks WHERE customer_phone = $1 AND status = 'in_progress'", [req.params.phone]);
+    if (task.rows.length === 0) {
+      await pool.query('INSERT INTO free_item_tasks (customer_phone, task_type, target_count, reward_item) VALUES ($1,$2,$3,$4)',
+        [req.params.phone, s.task_type, s.target_count, s.reward_item]);
+      task = await pool.query("SELECT * FROM free_item_tasks WHERE customer_phone = $1 AND status = 'in_progress'", [req.params.phone]);
     }
-    res.json({ success: true, data: task });
+    res.json({ success: true, data: task.rows[0] });
   } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
 });
 
 // ============================
 //  WALLET ROUTES
 // ============================
-app.get('/api/wallet/:phone', (req, res) => {
+app.get('/api/wallet/:phone', async (req, res) => {
   try {
-    const customer = db.prepare('SELECT reward_points FROM customers WHERE phone = ?').get(req.params.phone);
-    const history = db.prepare('SELECT * FROM wallet_transactions WHERE customer_phone = ? ORDER BY created_at DESC LIMIT 20').all(req.params.phone);
-    res.json({ success: true, data: { balance: customer ? customer.reward_points : 0, history } });
+    const customer = await pool.query('SELECT reward_points FROM customers WHERE phone = $1', [req.params.phone]);
+    const history = await pool.query('SELECT * FROM wallet_transactions WHERE customer_phone = $1 ORDER BY created_at DESC LIMIT 20', [req.params.phone]);
+    res.json({ success: true, data: { balance: customer.rows[0] ? customer.rows[0].reward_points : 0, history: history.rows } });
   } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
 });
 
 // ============================
 //  ANALYTICS ROUTES
 // ============================
-app.get('/api/analytics', (req, res) => {
+app.get('/api/analytics', async (req, res) => {
   try {
     const { range, from, to } = req.query;
 
     let dateFilter = '';
-    if (range === 'today') {
-      const today = new Date().toISOString().split('T')[0];
-      dateFilter = `AND DATE(created_at) = '${today}'`;
-    } else if (range === 'yesterday') {
-      const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
-      dateFilter = `AND DATE(created_at) = '${yesterday}'`;
-    } else if (range === '7days') {
-      dateFilter = `AND DATE(created_at) >= DATE('now', '-7 days')`;
-    } else if (range === '15days') {
-      dateFilter = `AND DATE(created_at) >= DATE('now', '-15 days')`;
-    } else if (range === '30days') {
-      dateFilter = `AND DATE(created_at) >= DATE('now', '-30 days')`;
-    } else if (range === 'custom' && from && to) {
-      dateFilter = `AND DATE(created_at) BETWEEN '${from}' AND '${to}'`;
-    } else {
-      dateFilter = `AND DATE(created_at) >= DATE('now', '-7 days')`;
-    }
+    const today = new Date().toISOString().split('T')[0];
+    const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
 
-    const bestSelling = db.prepare(`SELECT item_name, SUM(quantity) as total_qty FROM order_items GROUP BY item_name ORDER BY total_qty DESC LIMIT 10`).all();
-    const peakHours = db.prepare(`SELECT strftime('%H', created_at) as hour, COUNT(*) as count FROM orders GROUP BY hour ORDER BY count DESC LIMIT 5`).all();
-    const repeatCustomers = db.prepare('SELECT COUNT(*) as count FROM customers WHERE total_orders > 1').get();
-    const totalCustomers = db.prepare('SELECT COUNT(*) as count FROM customers').get();
-    const couponPerf = db.prepare(`SELECT coupon_code, COUNT(*) as used_times, SUM(discount) as total_discount FROM orders WHERE coupon_code != '' GROUP BY coupon_code`).all();
+    if (range === 'today') dateFilter = `AND DATE(created_at) = '${today}'`;
+    else if (range === 'yesterday') dateFilter = `AND DATE(created_at) = '${yesterday}'`;
+    else if (range === '7days') dateFilter = `AND created_at >= NOW() - INTERVAL '7 days'`;
+    else if (range === '15days') dateFilter = `AND created_at >= NOW() - INTERVAL '15 days'`;
+    else if (range === '30days') dateFilter = `AND created_at >= NOW() - INTERVAL '30 days'`;
+    else if (range === 'custom' && from && to) dateFilter = `AND DATE(created_at) BETWEEN '${from}' AND '${to}'`;
+    else dateFilter = `AND created_at >= NOW() - INTERVAL '7 days'`;
 
-    const dailyRevenue = db.prepare(`
-      SELECT DATE(created_at) as date, SUM(total) as revenue, COUNT(*) as orders
-      FROM orders WHERE status != 'cancelled' ${dateFilter}
-      GROUP BY DATE(created_at) ORDER BY date ASC
-    `).all();
+    const bestSelling = await pool.query('SELECT item_name, SUM(quantity) as total_qty FROM order_items GROUP BY item_name ORDER BY total_qty DESC LIMIT 10');
+    const peakHours = await pool.query("SELECT TO_CHAR(created_at, 'HH24') as hour, COUNT(*) as count FROM orders GROUP BY hour ORDER BY count DESC LIMIT 5");
+    const repeatCustomers = await pool.query('SELECT COUNT(*) as count FROM customers WHERE total_orders > 1');
+    const totalCustomers = await pool.query('SELECT COUNT(*) as count FROM customers');
+    const couponPerf = await pool.query("SELECT coupon_code, COUNT(*) as used_times, SUM(discount) as total_discount FROM orders WHERE coupon_code != '' GROUP BY coupon_code");
+    const dailyRevenue = await pool.query(`SELECT DATE(created_at) as date, SUM(total) as revenue, COUNT(*) as orders FROM orders WHERE status != 'cancelled' ${dateFilter} GROUP BY DATE(created_at) ORDER BY date ASC`);
+    const last7 = await pool.query(`SELECT SUM(total) as revenue FROM orders WHERE status != 'cancelled' AND created_at >= NOW() - INTERVAL '7 days' GROUP BY DATE(created_at) ORDER BY DATE(created_at) ASC`);
+    const orderTypeBreakdown = await pool.query("SELECT order_type, COUNT(*) as count, SUM(total) as revenue FROM orders WHERE status != 'cancelled' GROUP BY order_type");
 
-    // AI Tomorrow Prediction — weighted moving average of last 7 days
-    const last7 = db.prepare(`
-      SELECT SUM(total) as revenue FROM orders
-      WHERE status != 'cancelled' AND DATE(created_at) >= DATE('now', '-7 days')
-      GROUP BY DATE(created_at) ORDER BY DATE(created_at) ASC
-    `).all();
-
-    let predictedTomorrow = 0;
-    let predictionConfidence = 'Low';
-    if (last7.length > 0) {
-      const avg = last7.reduce((s, d) => s + (d.revenue || 0), 0) / last7.length;
-      if (last7.length >= 3) {
-        const recent = last7.slice(-3).reduce((s, d) => s + (d.revenue || 0), 0) / 3;
+    let predictedTomorrow = 0, predictionConfidence = 'Low';
+    const last7rows = last7.rows;
+    if (last7rows.length > 0) {
+      const avg = last7rows.reduce((s, d) => s + parseFloat(d.revenue || 0), 0) / last7rows.length;
+      if (last7rows.length >= 3) {
+        const recent = last7rows.slice(-3).reduce((s, d) => s + parseFloat(d.revenue || 0), 0) / 3;
         predictedTomorrow = Math.round((avg * 0.4) + (recent * 0.6));
-        predictionConfidence = last7.length >= 5 ? 'High' : 'Medium';
+        predictionConfidence = last7rows.length >= 5 ? 'High' : 'Medium';
       } else {
         predictedTomorrow = Math.round(avg);
-        predictionConfidence = 'Low';
       }
     }
-
-    // Order type breakdown
-    const orderTypeBreakdown = db.prepare(`
-      SELECT order_type, COUNT(*) as count, SUM(total) as revenue
-      FROM orders WHERE status != 'cancelled'
-      GROUP BY order_type
-    `).all();
 
     res.json({
       success: true,
       data: {
-        bestSelling, peakHours,
-        repeatCustomers: repeatCustomers.count,
-        totalCustomers: totalCustomers.count,
-        couponPerf, dailyRevenue,
+        bestSelling: bestSelling.rows,
+        peakHours: peakHours.rows,
+        repeatCustomers: parseInt(repeatCustomers.rows[0].count),
+        totalCustomers: parseInt(totalCustomers.rows[0].count),
+        couponPerf: couponPerf.rows,
+        dailyRevenue: dailyRevenue.rows,
         predictedTomorrow,
         predictionConfidence,
-        orderTypeBreakdown
+        orderTypeBreakdown: orderTypeBreakdown.rows
       }
     });
   } catch (err) {
+    console.error('Analytics error:', err);
     res.status(500).json({ success: false, message: 'Analytics error' });
   }
 });
@@ -854,19 +742,19 @@ app.get('/api/analytics', (req, res) => {
 // ============================
 //  TODAY SPECIAL ROUTES
 // ============================
-app.get('/api/today-special', (req, res) => {
+app.get('/api/today-special', async (req, res) => {
   try {
-    const special = db.prepare('SELECT * FROM today_special WHERE is_active = 1 ORDER BY created_at DESC LIMIT 1').get();
-    res.json({ success: true, data: special || null });
+    const result = await pool.query('SELECT * FROM today_special WHERE is_active = 1 ORDER BY created_at DESC LIMIT 1');
+    res.json({ success: true, data: result.rows[0] || null });
   } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
 });
 
-app.post('/api/today-special', (req, res) => {
+app.post('/api/today-special', async (req, res) => {
   try {
     const { item_name, description, price, old_price, emoji } = req.body;
-    db.prepare('UPDATE today_special SET is_active = 0').run();
-    db.prepare('INSERT INTO today_special (item_name, description, price, old_price, emoji, is_active) VALUES (?, ?, ?, ?, ?, 1)')
-      .run(item_name, description || '', price, old_price || 0, emoji || '🍽️');
+    await pool.query('UPDATE today_special SET is_active = 0');
+    await pool.query('INSERT INTO today_special (item_name, description, price, old_price, emoji, is_active) VALUES ($1,$2,$3,$4,$5,1)',
+      [item_name, description || '', price, old_price || 0, emoji || '🍽️']);
     res.json({ success: true, message: "Today's special set ho gaya!" });
   } catch (err) { res.status(500).json({ success: false, message: 'Error aaya' }); }
 });
