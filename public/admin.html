@@ -109,6 +109,7 @@ tr:hover td { background: #fafafa; }
     <div class="nav-item" onclick="showPage('leaderboard')"><span>🏆</span> Leaderboard</div>
     <div class="nav-item" onclick="showPage('freeitem')"><span>🎁</span> Free Item</div>
     <div class="nav-item" onclick="showPage('special')"><span>⚡</span> Today Special</div>
+    <div class="nav-item" onclick="showPage('billing')"><span>🧾</span> Billing</div>
     <div class="nav-item" onclick="showPage('upsell')"><span>🔼</span> Upsell Manager</div>
     <div class="nav-item" onclick="doLogout()" style="color:#ff4444;"><span>🚪</span> Logout</div>
   </div>
@@ -410,6 +411,44 @@ tr:hover td { background: #fafafa; }
     <tbody id="upsell-table"><tr><td colspan="5" style="text-align:center;color:#aaa;">Loading...</td></tr></tbody></table>
   </div>
 </div>
+<!-- BILLING -->
+<div class="page" id="page-billing">
+  <div class="page-header" style="display:flex;justify-content:space-between;align-items:center;">
+    <div><h1>🧾 Billing</h1><p>Bills dekho aur manual bill banao</p></div>
+    <button class="btn btn-primary" onclick="openManualBill()">+ Manual Bill Banao</button>
+  </div>
+  <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:20px;">
+    <div class="stat-card"><div class="icon">🧾</div><div class="value" id="bill-today-count">0</div><div class="label">Aaj ke Bills</div></div>
+    <div class="stat-card"><div class="icon">💰</div><div class="value" id="bill-today-total">₹0</div><div class="label">Aaj ki Billing</div></div>
+    <div class="stat-card"><div class="icon">💵</div><div class="value" id="bill-today-avg">₹0</div><div class="label">Avg Bill Value</div></div>
+  </div>
+  <div class="card">
+    <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center;">
+      <select id="bill-filter" onchange="loadBilling()" style="padding:8px 14px;border:2px solid #eee;border-radius:8px;font-size:14px;outline:none;font-family:'Segoe UI',sans-serif;">
+        <option value="today">Aaj</option>
+        <option value="yesterday">Kal</option>
+        <option value="week">Is Hafte</option>
+        <option value="month">Is Mahine</option>
+      </select>
+      <select id="bill-type-filter" onchange="loadBilling()" style="padding:8px 14px;border:2px solid #eee;border-radius:8px;font-size:14px;outline:none;font-family:'Segoe UI',sans-serif;">
+        <option value="all">Sabhi Types</option>
+        <option value="dine_in">Dine In</option>
+        <option value="delivery">Delivery</option>
+        <option value="takeaway">Takeaway</option>
+      </select>
+      <select id="bill-pay-filter" onchange="loadBilling()" style="padding:8px 14px;border:2px solid #eee;border-radius:8px;font-size:14px;outline:none;font-family:'Segoe UI',sans-serif;">
+        <option value="all">Sabhi Payments</option>
+        <option value="Cash">Cash</option>
+        <option value="UPI">UPI</option>
+        <option value="Card">Card</option>
+      </select>
+    </div>
+    <table>
+      <thead><tr><th>#ID</th><th>Customer</th><th>Phone</th><th>Items</th><th>Subtotal</th><th>Discount</th><th>Total</th><th>Payment</th><th>Type</th><th>Table</th><th>Time</th><th>Action</th></tr></thead>
+      <tbody id="billing-table"><tr><td colspan="12" style="text-align:center;color:#aaa;">Loading...</td></tr></tbody>
+    </table>
+  </div>
+</div>
     
     <!-- TODAY SPECIAL -->
     <div class="page" id="page-special">
@@ -530,6 +569,55 @@ tr:hover td { background: #fafafa; }
   </div>
 </div>
   
+<!-- MANUAL BILL MODAL -->
+<div class="modal" id="manualBillModal">
+  <div class="modal-box" style="width:540px;">
+    <h3>🧾 Manual Bill Banao</h3>
+    <div class="form-row">
+      <div class="form-group"><label>Customer Name</label><input type="text" id="mb-name" placeholder="Walk-in Customer"></div>
+      <div class="form-group"><label>Phone (optional)</label><input type="text" id="mb-phone" placeholder="9876543210"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Order Type</label>
+        <select id="mb-type">
+          <option value="dine_in">🍽️ Dine In</option>
+          <option value="delivery">🛵 Delivery</option>
+          <option value="takeaway">🥡 Takeaway</option>
+        </select></div>
+      <div class="form-group"><label>Table Number</label><input type="number" id="mb-table" placeholder="1"></div>
+    </div>
+    <div class="form-group"><label>Items (ek ek karke add karo)</label>
+      <div style="display:flex;gap:8px;margin-bottom:8px;">
+        <input type="text" id="mb-item-name" placeholder="Item naam" style="flex:2">
+        <input type="number" id="mb-item-price" placeholder="Price ₹" style="flex:1">
+        <input type="number" id="mb-item-qty" placeholder="Qty" style="flex:1" value="1">
+        <button class="btn btn-primary btn-sm" onclick="addBillItem()" style="flex-shrink:0;">Add</button>
+      </div>
+      <div id="mb-items-list" style="background:#f8f9fa;border-radius:8px;padding:10px;min-height:60px;font-size:13px;">
+        <div style="color:#aaa;text-align:center;">Koi item nahi add kiya</div>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Discount ₹</label><input type="number" id="mb-discount" placeholder="0" onchange="calcBillTotal()"></div>
+      <div class="form-group"><label>Payment Method</label>
+        <select id="mb-payment">
+          <option value="Cash">💵 Cash</option>
+          <option value="UPI">📱 UPI</option>
+          <option value="Card">💳 Card</option>
+        </select></div>
+    </div>
+    <div style="background:#fff3e0;border-radius:8px;padding:12px;margin-bottom:16px;">
+      <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px;"><span>Subtotal</span><span id="mb-subtotal">₹0</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px;color:#e55a25;"><span>Discount</span><span id="mb-discount-show">-₹0</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:16px;font-weight:700;border-top:1px solid #eee;padding-top:8px;"><span>Total</span><span id="mb-total" style="color:#ff6b35;">₹0</span></div>
+    </div>
+    <div style="display:flex;gap:10px;">
+      <button class="btn btn-primary" onclick="saveManualBill()">Bill Banao 🧾</button>
+      <button class="btn" style="background:#eee;" onclick="closeModal('manualBillModal')">Cancel</button>
+    </div>
+  </div>
+</div>
+  
 <!-- LEADERBOARD MODAL -->
 <div class="modal" id="lbModal">
   <div class="modal-box">
@@ -601,6 +689,7 @@ function showPage(page) {
   if (page === 'freeitem') loadFreeItem();
   if (page === 'special') loadTodaySpecial();
   if (page === 'upsell') loadUpsell();
+  if (page === 'billing') loadBilling();
 }
 
 async function loadDashboard() {
@@ -1188,6 +1277,153 @@ async function deleteUpsell(id) {
   if (!confirm('Delete karna hai?')) return;
   await fetch('/api/upsell/' + id, { method: 'DELETE' });
   loadUpsell();
+}
+  // ── BILLING ──
+let manualBillItems = [];
+
+async function loadBilling() {
+  try {
+    const filter = document.getElementById('bill-filter').value;
+    const typeFilter = document.getElementById('bill-type-filter').value;
+    const payFilter = document.getElementById('bill-pay-filter').value;
+    const res = await fetch(`/api/bills?range=${filter}`);
+    const data = await res.json();
+    let bills = data.data || [];
+    if (typeFilter !== 'all') bills = bills.filter(b => b.order_type === typeFilter);
+    if (payFilter !== 'all') bills = bills.filter(b => b.payment_method === payFilter);
+    const total = bills.reduce((s,b) => s + b.total, 0);
+    document.getElementById('bill-today-count').textContent = bills.length;
+    document.getElementById('bill-today-total').textContent = '₹' + total;
+    document.getElementById('bill-today-avg').textContent = bills.length ? '₹' + Math.floor(total / bills.length) : '₹0';
+    const typeLabels = { dine_in:'🍽️ Dine In', delivery:'🛵 Delivery', takeaway:'🥡 Takeaway' };
+    document.getElementById('billing-table').innerHTML = bills.length ? bills.map(b => {
+      const items = JSON.parse(b.items_json || '[]');
+      return `<tr>
+        <td><strong>#${b.id}</strong></td>
+        <td>${b.customer_name}</td>
+        <td>${b.customer_phone || '-'}</td>
+        <td style="font-size:12px;max-width:150px;">${items.map(i => (i.name||i.item_name) + ' x' + (i.qty||i.quantity||1)).join(', ')}</td>
+        <td>₹${b.subtotal}</td>
+        <td>${b.discount > 0 ? '-₹'+b.discount : '-'}</td>
+        <td><strong>₹${b.total}</strong></td>
+        <td>${b.payment_method}</td>
+        <td>${typeLabels[b.order_type] || b.order_type}</td>
+        <td>${b.table_number || '-'}</td>
+        <td style="font-size:12px;">${new Date(b.created_at).toLocaleTimeString('en-IN')}</td>
+        <td><button class="btn btn-sm btn-primary" onclick="printBill(${b.id})">🖨️</button></td>
+      </tr>`;
+    }).join('') : '<tr><td colspan="12" style="text-align:center;color:#aaa;">Koi bills nahi hain</td></tr>';
+  } catch(e) {
+    document.getElementById('billing-table').innerHTML = '<tr><td colspan="12" style="text-align:center;color:#aaa;">Load nahi ho paya</td></tr>';
+  }
+}
+
+function openManualBill() {
+  manualBillItems = [];
+  ['mb-name','mb-phone','mb-item-name','mb-item-price','mb-discount'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('mb-item-qty').value = '1';
+  document.getElementById('mb-items-list').innerHTML = '<div style="color:#aaa;text-align:center;">Koi item nahi add kiya</div>';
+  calcBillTotal();
+  document.getElementById('manualBillModal').classList.add('open');
+}
+
+function addBillItem() {
+  const name = document.getElementById('mb-item-name').value.trim();
+  const price = parseInt(document.getElementById('mb-item-price').value) || 0;
+  const qty = parseInt(document.getElementById('mb-item-qty').value) || 1;
+  if (!name || !price) { alert('Item naam aur price daalo!'); return; }
+  manualBillItems.push({ name, price, qty });
+  document.getElementById('mb-item-name').value = '';
+  document.getElementById('mb-item-price').value = '';
+  document.getElementById('mb-item-qty').value = '1';
+  renderBillItems();
+  calcBillTotal();
+}
+
+function removeBillItem(idx) {
+  manualBillItems.splice(idx, 1);
+  renderBillItems();
+  calcBillTotal();
+}
+
+function renderBillItems() {
+  const list = document.getElementById('mb-items-list');
+  if (!manualBillItems.length) {
+    list.innerHTML = '<div style="color:#aaa;text-align:center;">Koi item nahi add kiya</div>';
+    return;
+  }
+  list.innerHTML = manualBillItems.map((item, i) => `
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #eee;">
+      <span>${item.name} × ${item.qty}</span>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-weight:700;">₹${item.price * item.qty}</span>
+        <button onclick="removeBillItem(${i})" style="background:none;border:none;color:#ff4444;cursor:pointer;font-size:16px;">✕</button>
+      </div>
+    </div>`).join('');
+}
+
+function calcBillTotal() {
+  const subtotal = manualBillItems.reduce((s, i) => s + (i.price * i.qty), 0);
+  const discount = parseInt(document.getElementById('mb-discount')?.value) || 0;
+  const total = Math.max(0, subtotal - discount);
+  if (document.getElementById('mb-subtotal')) document.getElementById('mb-subtotal').textContent = '₹' + subtotal;
+  if (document.getElementById('mb-discount-show')) document.getElementById('mb-discount-show').textContent = '-₹' + discount;
+  if (document.getElementById('mb-total')) document.getElementById('mb-total').textContent = '₹' + total;
+}
+
+async function saveManualBill() {
+  if (!manualBillItems.length) { alert('Koi item add nahi kiya!'); return; }
+  const subtotal = manualBillItems.reduce((s, i) => s + (i.price * i.qty), 0);
+  const discount = parseInt(document.getElementById('mb-discount').value) || 0;
+  const body = {
+    customer_name: document.getElementById('mb-name').value || 'Walk-in Customer',
+    customer_phone: document.getElementById('mb-phone').value || '',
+    items: manualBillItems,
+    subtotal,
+    discount,
+    total: Math.max(0, subtotal - discount),
+    payment_method: document.getElementById('mb-payment').value,
+    order_type: document.getElementById('mb-type').value,
+    table_number: parseInt(document.getElementById('mb-table').value) || 0
+  };
+  const res = await fetch('/api/bills/manual', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
+  const data = await res.json();
+  if (data.success) { closeModal('manualBillModal'); loadBilling(); alert('✅ Bill ban gaya! #' + data.id); }
+  else alert('❌ ' + data.message);
+}
+
+async function printBill(id) {
+  try {
+    const res = await fetch('/api/bills/' + id);
+    const data = await res.json();
+    const b = data.data;
+    const items = JSON.parse(b.items_json || '[]');
+    const win = window.open('', '_blank', 'width=400,height=600');
+    win.document.write(`
+      <html><head><title>Bill #${b.id}</title>
+      <style>body{font-family:monospace;padding:20px;max-width:300px;margin:0 auto;}
+      h2{text-align:center;}hr{border:1px dashed #000;}
+      .row{display:flex;justify-content:space-between;}
+      .total{font-size:18px;font-weight:bold;}</style></head>
+      <body>
+        <h2>☕ Chai Pila</h2>
+        <p style="text-align:center;font-size:12px;">Cafe & Restaurant</p>
+        <hr>
+        <p>Bill #${b.id} | ${new Date(b.created_at).toLocaleString('en-IN')}</p>
+        <p>Customer: ${b.customer_name}</p>
+        ${b.table_number ? '<p>Table: #' + b.table_number + '</p>' : ''}
+        <hr>
+        ${items.map(i => `<div class="row"><span>${i.name||i.item_name} x${i.qty||i.quantity||1}</span><span>₹${(i.price)*(i.qty||i.quantity||1)}</span></div>`).join('')}
+        <hr>
+        <div class="row"><span>Subtotal</span><span>₹${b.subtotal}</span></div>
+        ${b.discount > 0 ? '<div class="row"><span>Discount</span><span>-₹'+b.discount+'</span></div>' : ''}
+        <div class="row total"><span>TOTAL</span><span>₹${b.total}</span></div>
+        <hr>
+        <p style="text-align:center;">Payment: ${b.payment_method}</p>
+        <p style="text-align:center;font-size:12px;">Thank you! Phir aana! ☕</p>
+        <script>window.print();setTimeout(()=>window.close(),1000);<\/script>
+      </body></html>`);
+  } catch(e) { alert('Bill load nahi ho paya!'); }
 }
 </script>
 </body>
