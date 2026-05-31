@@ -259,12 +259,53 @@ tr:hover td { background: #fafafa; }
 
     <!-- ANALYTICS -->
     <div class="page" id="page-analytics">
-      <div class="page-header"><h1>📈 Analytics Dashboard</h1><p>Business insights</p></div>
+      <div class="page-header" style="display:flex;justify-content:space-between;align-items:center;">
+        <div><h1>📈 Analytics Dashboard</h1><p>Business insights</p></div>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+          <select id="ana-range" onchange="onRangeChange()" style="padding:8px 14px;border:2px solid #eee;border-radius:8px;font-size:14px;outline:none;font-family:'Segoe UI',sans-serif;">
+            <option value="7days">Last 7 Days</option>
+            <option value="today">Aaj</option>
+            <option value="yesterday">Kal</option>
+            <option value="15days">Last 15 Days</option>
+            <option value="30days">Last 30 Days</option>
+            <option value="custom">Custom Range</option>
+          </select>
+          <div id="custom-range-box" style="display:none;gap:8px;align-items:center;">
+            <input type="date" id="ana-from" style="padding:8px;border:2px solid #eee;border-radius:8px;font-size:14px;outline:none;">
+            <span style="color:#888;">to</span>
+            <input type="date" id="ana-to" style="padding:8px;border:2px solid #eee;border-radius:8px;font-size:14px;outline:none;">
+            <button class="btn btn-primary btn-sm" onclick="loadAnalytics()">Go</button>
+          </div>
+        </div>
+      </div>
+
+      <div style="background:linear-gradient(135deg,#1a1a2e,#16213e);border-radius:12px;padding:20px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;">
+        <div style="display:flex;align-items:center;gap:16px;">
+          <div style="font-size:40px;">🤖</div>
+          <div>
+            <div style="color:rgba(255,255,255,0.6);font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:1px;">AI Prediction</div>
+            <div style="color:white;font-size:22px;font-weight:800;margin:2px 0;" id="ana-predict-val">Calculating...</div>
+            <div style="color:rgba(255,255,255,0.5);font-size:13px;">Kal ki expected revenue</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;">
+          <div style="background:rgba(255,255,255,0.08);border-radius:10px;padding:12px 18px;text-align:center;">
+            <div style="color:#f7c59f;font-size:18px;font-weight:800;" id="ana-predict-conf">-</div>
+            <div style="color:rgba(255,255,255,0.5);font-size:12px;">Confidence</div>
+          </div>
+          <div style="background:rgba(255,255,255,0.08);border-radius:10px;padding:12px 18px;text-align:center;">
+            <div style="color:#00b894;font-size:18px;font-weight:800;" id="ana-order-type-top">-</div>
+            <div style="color:rgba(255,255,255,0.5);font-size:12px;">Top Order Type</div>
+          </div>
+        </div>
+      </div>
+
       <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);">
         <div class="stat-card"><div class="icon">🔁</div><div class="value" id="ana-repeat">0</div><div class="label">Repeat Customers</div></div>
         <div class="stat-card"><div class="icon">👥</div><div class="value" id="ana-total-cust">0</div><div class="label">Total Customers</div></div>
         <div class="stat-card"><div class="icon">📊</div><div class="value" id="ana-retention">0%</div><div class="label">Retention Rate</div></div>
       </div>
+
       <div class="analytics-grid">
         <div class="card">
           <h3 style="margin-bottom:16px;">🏆 Best Selling Items</h3>
@@ -280,7 +321,7 @@ tr:hover td { background: #fafafa; }
           <tbody id="coupon-perf-table"></tbody></table>
         </div>
         <div class="card">
-          <h3 style="margin-bottom:16px;">📅 Last 7 Days Revenue</h3>
+          <h3 style="margin-bottom:16px;">📅 Revenue Chart</h3>
           <div id="revenue-chart"></div>
         </div>
       </div>
@@ -788,14 +829,36 @@ async function saveDelivery() {
   alert(data.success ? '✅ Delivery settings save ho gayi!' : '❌ Error!');
 }
 
+function onRangeChange() {
+  const range = document.getElementById('ana-range').value;
+  const box = document.getElementById('custom-range-box');
+  box.style.display = range === 'custom' ? 'flex' : 'none';
+  if (range !== 'custom') loadAnalytics();
+}
+
 async function loadAnalytics() {
   try {
-    const res = await fetch('/api/analytics');
+    const range = document.getElementById('ana-range')?.value || '7days';
+    let url = `/api/analytics?range=${range}`;
+    if (range === 'custom') {
+      const from = document.getElementById('ana-from').value;
+      const to = document.getElementById('ana-to').value;
+      if (!from || !to) { alert('Date range select karo!'); return; }
+      url += `&from=${from}&to=${to}`;
+    }
+    const res = await fetch(url);
     const data = await res.json();
     const d = data.data;
     document.getElementById('ana-repeat').textContent = d.repeatCustomers;
     document.getElementById('ana-total-cust').textContent = d.totalCustomers;
     document.getElementById('ana-retention').textContent = d.totalCustomers > 0 ? Math.round((d.repeatCustomers / d.totalCustomers) * 100) + '%' : '0%';
+    document.getElementById('ana-predict-val').textContent = d.predictedTomorrow ? '₹' + d.predictedTomorrow : 'Data kam hai';
+    document.getElementById('ana-predict-conf').textContent = d.predictionConfidence || '-';
+    if (d.orderTypeBreakdown && d.orderTypeBreakdown.length) {
+      const top = d.orderTypeBreakdown.sort((a,b) => b.count - a.count)[0];
+      const labels = { dine_in:'🍽️ Dine In', delivery:'🛵 Delivery', takeaway:'🥡 Takeaway' };
+      document.getElementById('ana-order-type-top').textContent = labels[top.order_type] || top.order_type;
+    }
     const maxQty = d.bestSelling[0]?.total_qty || 1;
     document.getElementById('best-selling-chart').innerHTML = d.bestSelling.map(i => `
       <div class="chart-bar">
